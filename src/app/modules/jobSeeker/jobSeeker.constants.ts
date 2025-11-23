@@ -1,1 +1,5 @@
-export const JOB_SEEKER_CONSTANT = 'someValue';
+export enum SalaryType {
+    DAY = 'Day',
+    MONTH = 'Month',
+    YEAR = 'Year'
+}

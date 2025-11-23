@@ -1,7 +1,25 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
+import { SalaryType } from './jobSeeker.constants';
 
-export type IJobSeeker = {
-  // Define the interface for JobSeeker here
-};
+// Work Experience sub-document
+export interface IExperience {
+  category: string;
+  subCategory: string;
+  experience: number; // years
+  salaryType: SalaryType;
+  salaryAmount: number;
+}
+
+// Job Seeker entity
+export interface IJobSeeker {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  overview: string;
+  about: string;
+  experiences: IExperience[];
+  resumeUrl?: string;
+  resume?: Types.ObjectId;
+  attachments: string[];
+}
 
 export type JobSeekerModel = Model<IJobSeeker>;
