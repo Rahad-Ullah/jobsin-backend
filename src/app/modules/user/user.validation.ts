@@ -25,11 +25,14 @@ const createAdminZodSchema = z.object({
 });
 
 const updateUserZodSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().optional(),
-  phone: z.string().optional(),
+  name: z.string().nonempty('Name cannot be empty').optional(),
+  phone: z.string().nonempty('Phone cannot be empty').optional(),
+  address: z.string().nonempty('Address cannot be empty').optional(),
+  location: z
+    .array(z.number())
+    .length(2, 'Location must be an array of 2 numbers [longitude, latitude]')
+    .optional(),
   image: z.string().optional(),
-  status: z.nativeEnum(USER_STATUS).optional(),
 });
 
 export const UserValidation = {

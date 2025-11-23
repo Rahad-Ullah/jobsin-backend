@@ -43,14 +43,23 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
 
 //update profile
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
   let image = getSingleFilePath(req.files, 'image');
 
-  const data = {
+  const payload = {
     image,
     ...req.body,
   };
-  const result = await UserService.updateProfileToDB(user, data);
+
+  // update location in the payload
+  if (req.body.location) {
+    const [longitude, latitude] = req.body.location;
+    payload.location = {
+      type: 'Point',
+      coordinates: [longitude, latitude],
+    };
+  }
+
+  const result = await UserService.updateProfileToDB(req.user.id, payload);
 
   sendResponse(res, {
     success: true,
