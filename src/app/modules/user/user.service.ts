@@ -10,6 +10,7 @@ import { User } from './user.model';
 import { USER_ROLES } from './user.constant';
 import mongoose from 'mongoose';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
+import { Employer } from '../employer/employer.model';
 
 export const createUserIntoDB = async (
   payload: Partial<IUser>
@@ -41,19 +42,22 @@ export const createUserIntoDB = async (
         { $set: { jobSeeker: jobSeeker[0]._id } },
         { session }
       );
+    } else if (payload.role === USER_ROLES.EMPLOYER) {
+      const employer = await Employer.create(
+        [
+          {
+            user: user._id,
+          },
+        ],
+        { session }
+      );
+      // update user with employer id
+      await User.findByIdAndUpdate(
+        user._id,
+        { $set: { employer: employer[0]._id } },
+        { session }
+      );
     }
-    // else if (payload.role === USER_ROLES.EMPLOYER) {
-    //   const employer = await Employer.create(
-    //     [
-    //       {
-    //         user: user._id,
-    //       },
-    //     ],
-    //     { session }
-    //   );
-    //   roleEntityId = employer[0]._id;
-    //   user.employer = roleEntityId;
-    // }
 
     // 4. Send email with OTP
     const otp = generateOTP(6);
