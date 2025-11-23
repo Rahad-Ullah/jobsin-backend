@@ -1,0 +1,1 @@
+export const JOB_SEEKER_CONSTANT = 'someValue';
