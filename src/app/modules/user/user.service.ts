@@ -7,6 +7,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import { USER_ROLES } from './user.constant';
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   const createUser = await User.create(payload);
@@ -35,6 +36,19 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   );
 
   return 'Please verify your email address to complete the registration process.' as any;
+};
+
+const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
+  // set role as admin and verified true
+  payload.role = USER_ROLES.ADMIN;
+  payload.isVerified = true;
+
+  const createUser = await User.create(payload);
+  if (!createUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create admin');
+  }
+
+  return null as any;
 };
 
 const getSingleUserFromDB = async (id: string): Promise<Partial<IUser>> => {
@@ -70,6 +84,7 @@ const updateProfileToDB = async (
 
 export const UserService = {
   createUserToDB,
+  createAdminToDB,
   getSingleUserFromDB,
   updateProfileToDB,
 };

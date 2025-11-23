@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import { getSingleFilePath } from '../../../shared/getFilePath';
@@ -13,6 +13,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'User created successfully',
+    data: result,
+  });
+});
+
+// create admin
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+  const payload = { ...req.body };
+  const result = await UserService.createAdminToDB(payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Admin created successfully',
     data: result,
   });
 });
@@ -47,4 +60,9 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const UserController = { createUser, getUserProfile, updateProfile };
+export const UserController = {
+  createUser,
+  createAdmin,
+  getUserProfile,
+  updateProfile,
+};
