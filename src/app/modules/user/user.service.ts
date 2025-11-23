@@ -8,34 +8,85 @@ import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import { USER_ROLES } from './user.constant';
+import mongoose from 'mongoose';
+import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 
-const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-  const createUser = await User.create(payload);
-  if (!createUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+export const createUserIntoDB = async (
+  payload: Partial<IUser>
+): Promise<string> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 1. Create User
+    const createUser = await User.create([payload], { session });
+    if (!createUser || !createUser[0]) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+    }
+    const user = createUser[0];
+
+    // 2. Create role-specific entity
+    if (payload.role === USER_ROLES.JOB_SEEKER) {
+      const jobSeeker = await JobSeeker.create(
+        [
+          {
+            user: user._id,
+          },
+        ],
+        { session }
+      );
+      // update user with jobSeeker id
+      await User.findByIdAndUpdate(
+        user._id,
+        { $set: { jobSeeker: jobSeeker[0]._id } },
+        { session }
+      );
+    }
+    // else if (payload.role === USER_ROLES.EMPLOYER) {
+    //   const employer = await Employer.create(
+    //     [
+    //       {
+    //         user: user._id,
+    //       },
+    //     ],
+    //     { session }
+    //   );
+    //   roleEntityId = employer[0]._id;
+    //   user.employer = roleEntityId;
+    // }
+
+    // 4. Send email with OTP
+    const otp = generateOTP(6);
+    const values = {
+      name: user.name,
+      otp,
+      email: user.email!,
+    };
+    const createAccountTemplate = emailTemplate.createAccount(values);
+    emailHelper.sendEmail(createAccountTemplate);
+
+    // 5. Save authentication info
+    const authentication = {
+      oneTimeCode: otp,
+      expireAt: new Date(Date.now() + 3 * 60000),
+    };
+    await User.findOneAndUpdate(
+      { _id: user._id },
+      { $set: { authentication } },
+      { session }
+    );
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return 'Please verify your email address to complete the registration process.';
+  } catch (error) {
+    // Rollback transaction
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  //send email
-  const otp = generateOTP(6);
-  const values = {
-    name: createUser.name,
-    otp: otp,
-    email: createUser.email!,
-  };
-  const createAccountTemplate = emailTemplate.createAccount(values);
-  emailHelper.sendEmail(createAccountTemplate);
-
-  //save to DB
-  const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
-  };
-  await User.findOneAndUpdate(
-    { _id: createUser._id },
-    { $set: { authentication } }
-  );
-
-  return 'Please verify your email address to complete the registration process.' as any;
 };
 
 const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
@@ -82,7 +133,7 @@ const updateUserByIdIntoDB = async (
 };
 
 export const UserService = {
-  createUserToDB,
+  createUserIntoDB,
   createAdminToDB,
   getSingleUserFromDB,
   updateProfileToDB: updateUserByIdIntoDB,

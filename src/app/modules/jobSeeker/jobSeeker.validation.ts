@@ -11,7 +11,7 @@ export const experienceSchema = z.object({
 });
 
 // Job Seeker schema
-export const createJobSeekerSchema = z.object({
+export const jobSeekerSchema = z.object({
   overview: z.string().nonempty('Overview cannot be empty').max(500).optional(),
   about: z.string().nonempty('About cannot be empty').max(2000).optional(),
   experiences: z.array(experienceSchema).optional(),
@@ -20,5 +20,5 @@ export const createJobSeekerSchema = z.object({
 });
 
 export const JobSeekerValidations = {
-  createJobSeekerSchema,
+  jobSeekerSchema,
 };
