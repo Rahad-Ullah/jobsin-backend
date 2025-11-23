@@ -33,9 +33,39 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       default: '',
     },
+    address: {
+      type: String,
+      default: '',
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
     image: {
       type: String,
       default: '',
+    },
+    jobSeeker: {
+      type: Schema.Types.ObjectId,
+      ref: 'JobSeeker',
+      default: null,
+    },
+    employer: {
+      type: Schema.Types.ObjectId,
+      ref: 'Employer',
+      default: null,
+    },
+    subscription: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subscription',
+      default: null,
     },
     status: {
       type: String,
@@ -46,9 +76,21 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
+    isAccountVerified: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    googleUserId: {
+      type: String,
+      default: null,
+    },
+    appleUserId: {
+      type: String,
+      default: null,
     },
     authentication: {
       type: {

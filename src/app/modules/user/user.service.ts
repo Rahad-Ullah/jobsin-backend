@@ -7,11 +7,8 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
-import { USER_ROLES } from './user.constant';
 
 const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
-  //set role
-  payload.role = USER_ROLES.USER;
   const createUser = await User.create(payload);
   if (!createUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to create user');
@@ -37,7 +34,7 @@ const createUserToDB = async (payload: Partial<IUser>): Promise<IUser> => {
     { $set: { authentication } }
   );
 
-  return createUser;
+  return 'Please verify your email address to complete the registration process.' as any;
 };
 
 const getSingleUserFromDB = async (id: string): Promise<Partial<IUser>> => {

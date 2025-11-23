@@ -1,14 +1,17 @@
 import { z } from 'zod';
-import { USER_STATUS } from './user.constant';
+import { USER_ROLES, USER_STATUS } from './user.constant';
 
 const createUserZodSchema = z.object({
-  body: z.object({
-    name: z.string({ required_error: 'Name is required' }),
-    email: z.string({ required_error: 'Email is required' }),
-    password: z.string({ required_error: 'Password is required' }),
-    phone: z.string({ required_error: 'Phone is required' }).optional(),
-    image: z.string().optional(),
-  }),
+  body: z
+    .object({
+      name: z.string({ required_error: 'Name is required' }),
+      email: z.string({ required_error: 'Email is required' }),
+      password: z.string({ required_error: 'Password is required' }),
+      role: z.enum([USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER], {
+        required_error: 'Invalid role',
+      }),
+    })
+    .strict(),
 });
 
 const updateUserZodSchema = z.object({
