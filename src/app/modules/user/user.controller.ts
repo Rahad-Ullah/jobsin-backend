@@ -5,6 +5,7 @@ import { getSingleFilePath } from '../../../shared/getFilePath';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 
+// create user
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
   const result = await UserService.createUserIntoDB(userData);
@@ -30,8 +31,9 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//get profile
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getSingleUserFromDB(req.user.id);
+  const result = await UserService.getUserProfileFromDB(req.user.id);
 
   sendResponse(res, {
     success: true,

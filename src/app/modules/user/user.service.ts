@@ -1,5 +1,4 @@
 import { StatusCodes } from 'http-status-codes';
-import { JwtPayload } from 'jsonwebtoken';
 import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
@@ -12,6 +11,7 @@ import mongoose from 'mongoose';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { Employer } from '../employer/employer.model';
 
+// ------------- create user -------------
 export const createUserIntoDB = async (
   payload: Partial<IUser>
 ): Promise<string> => {
@@ -93,6 +93,7 @@ export const createUserIntoDB = async (
   }
 };
 
+// ------------- create admin -------------
 const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   // set role as admin and verified true
   payload.role = USER_ROLES.ADMIN;
@@ -106,8 +107,9 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   return null as any;
 };
 
-const getSingleUserFromDB = async (id: string): Promise<Partial<IUser>> => {
-  const isExistUser = await User.isExistUserById(id);
+// ------------- get user profile -------------
+const getUserProfileFromDB = async (id: string): Promise<Partial<IUser>> => {
+  const isExistUser = await User.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -139,6 +141,6 @@ const updateUserByIdIntoDB = async (
 export const UserService = {
   createUserIntoDB,
   createAdminToDB,
-  getSingleUserFromDB,
+  getUserProfileFromDB,
   updateProfileToDB: updateUserByIdIntoDB,
 };
