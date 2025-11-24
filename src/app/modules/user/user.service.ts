@@ -6,7 +6,7 @@ import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
 import { User } from './user.model';
-import { USER_ROLES } from './user.constant';
+import { USER_ROLES, USER_STATUS } from './user.constant';
 import mongoose from 'mongoose';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { Employer } from '../employer/employer.model';
@@ -130,6 +130,31 @@ const updateUserByIdIntoDB = async (
   return updateDoc;
 };
 
+// ------------- update user status by id -------------
+const toggleUserStatusById = async (
+  id: string
+): Promise<Partial<IUser | null>> => {
+  const isExistUser = await User.findById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const updateDoc = await User.findByIdAndUpdate(
+    id,
+    {
+      status:
+        isExistUser.status === USER_STATUS.ACTIVE
+          ? USER_STATUS.INACTIVE
+          : USER_STATUS.ACTIVE,
+    },
+    {
+      new: true,
+    }
+  );
+
+  return updateDoc;
+};
+
 // ------------- get user by id -------------
 const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
   const isExistUser = await User.findById(id)
@@ -173,6 +198,7 @@ export const UserService = {
   createUserIntoDB,
   createAdminToDB,
   updateUserByIdIntoDB,
+  toggleUserStatusById,
   getUserByIdFromDB,
   getUserProfileFromDB,
   getAllUsersFromDB,

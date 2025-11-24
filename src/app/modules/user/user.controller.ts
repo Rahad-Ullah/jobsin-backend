@@ -59,6 +59,18 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// toggle user status by id
+const toggleUserStatusById = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.toggleUserStatusById(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User status updated successfully',
+    data: result,
+  });
+});
+
 //get profile
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getUserProfileFromDB(req.user.id);
@@ -100,6 +112,7 @@ export const UserController = {
   createUser,
   createAdmin,
   updateProfile,
+  toggleUserStatusById,
   getUserProfile,
   getSingleUserById,
   getAllUsers,
