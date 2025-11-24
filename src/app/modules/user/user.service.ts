@@ -10,6 +10,7 @@ import { USER_ROLES } from './user.constant';
 import mongoose from 'mongoose';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { Employer } from '../employer/employer.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // ------------- create user -------------
 export const createUserIntoDB = async (
@@ -131,7 +132,9 @@ const updateUserByIdIntoDB = async (
 
 // ------------- get user by id -------------
 const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
-  const isExistUser = await User.findById(id).populate('jobSeeker').populate('employer');
+  const isExistUser = await User.findById(id)
+    .populate('jobSeeker')
+    .populate('employer');
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -149,10 +152,28 @@ const getUserProfileFromDB = async (id: string): Promise<Partial<IUser>> => {
   return isExistUser;
 };
 
+// ------------- get all users -------------
+const getAllUsersFromDB = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(User.find({ isDeleted: false }), query)
+    .search(['name', 'email', 'phone'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  // .populate(['jobSeeker', 'employer'], {});
+
+  const [data, pagination] = await Promise.all([
+    userQuery.modelQuery.lean(),
+    userQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
+
 export const UserService = {
   createUserIntoDB,
   createAdminToDB,
   updateUserByIdIntoDB,
   getUserByIdFromDB,
   getUserProfileFromDB,
+  getAllUsersFromDB,
 };

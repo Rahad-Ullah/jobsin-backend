@@ -37,4 +37,7 @@ router.get('/profile', auth(), UserController.getUserProfile);
 // get single user by id
 router.get('/single/:id', auth(), UserController.getSingleUserById);
 
+// get all users
+router.get('/', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), UserController.getAllUsers);
+
 export const UserRoutes = router;

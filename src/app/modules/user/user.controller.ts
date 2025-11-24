@@ -83,10 +83,24 @@ const getSingleUserById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//get all users
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAllUsersFromDB(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Users data retrieved successfully',
+    data: result.data,
+    pagination: result.pagination,
+  });
+});
+
 export const UserController = {
   createUser,
   createAdmin,
   updateProfile,
   getUserProfile,
   getSingleUserById,
+  getAllUsers,
 };
