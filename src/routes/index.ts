@@ -1,7 +1,8 @@
 import express from 'express';
 import { AuthRoutes } from '../app/modules/auth/auth.route';
 import { UserRoutes } from '../app/modules/user/user.route';
-const router = express.Router();
+import { jobSeekerRoutes } from '../app/modules/jobSeeker/jobSeeker.route';
+const router_v1 = express.Router();
 
 const apiRoutes = [
   {
@@ -12,8 +13,12 @@ const apiRoutes = [
     path: '/auth',
     route: AuthRoutes,
   },
+  {
+    path: '/job-seekers',
+    route: jobSeekerRoutes,
+  },
 ];
 
-apiRoutes.forEach(route => router.use(route.path, route.route));
+apiRoutes.forEach(route => router_v1.use(route.path, route.route));
 
-export default router;
+export default router_v1;

@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import router from './routes';
+import router_v1 from './routes';
 import { Morgan } from './shared/morgen';
 import config from './config';
 const app = express();
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('uploads'));
 
 //router
-app.use('/api/v1', router);
+app.use('/api/v1', router_v1);
 
 //live response
 app.get('/', (req: Request, res: Response) => {
