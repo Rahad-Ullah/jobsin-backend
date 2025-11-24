@@ -27,6 +27,18 @@ const updateJobSeeker = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get my job seeker profile
+const getMyJobSeeker = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobSeekerServices.getJobSeekerByUserId(req.user.id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Job seeker retrieved successfully',
+    data: result,
+  });
+});
+
 // get job seeker by user id
 const getJobSeekerByUserId = catchAsync(async (req: Request, res: Response) => {
   const result = await JobSeekerServices.getJobSeekerByUserId(req.params.id);
@@ -41,5 +53,6 @@ const getJobSeekerByUserId = catchAsync(async (req: Request, res: Response) => {
 
 export const JobSeekerController = {
   updateJobSeeker,
+  getMyJobSeeker,
   getJobSeekerByUserId,
 };

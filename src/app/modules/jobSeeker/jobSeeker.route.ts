@@ -10,11 +10,18 @@ const router = express.Router();
 
 // update job seeker route
 router.patch(
-  '/update-me',
+  '/me',
   auth(USER_ROLES.JOB_SEEKER),
   fileUploadHandler(),
   validateRequest(JobSeekerValidations.jobSeekerSchema),
   JobSeekerController.updateJobSeeker
+);
+
+// get my job seeker route
+router.get(
+  '/me',
+  auth(USER_ROLES.JOB_SEEKER),
+  JobSeekerController.getMyJobSeeker
 );
 
 // get job seeker by user id route
