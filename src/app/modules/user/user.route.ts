@@ -34,4 +34,7 @@ router.patch(
 // get profile
 router.get('/profile', auth(), UserController.getUserProfile);
 
+// get single user by id
+router.get('/single/:id', auth(), UserController.getSingleUserById);
+
 export const UserRoutes = router;

@@ -107,16 +107,7 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
   return null as any;
 };
 
-// ------------- get user profile -------------
-const getUserProfileFromDB = async (id: string): Promise<Partial<IUser>> => {
-  const isExistUser = await User.findById(id);
-  if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
-  }
-
-  return isExistUser;
-};
-
+// ------------- update user by id -------------
 const updateUserByIdIntoDB = async (
   id: string,
   payload: Partial<IUser>
@@ -138,9 +129,30 @@ const updateUserByIdIntoDB = async (
   return updateDoc;
 };
 
+// ------------- get user by id -------------
+const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
+  const isExistUser = await User.findById(id).populate('jobSeeker').populate('employer');
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  return isExistUser;
+};
+
+// ------------- get user profile -------------
+const getUserProfileFromDB = async (id: string): Promise<Partial<IUser>> => {
+  const isExistUser = await User.findById(id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  return isExistUser;
+};
+
 export const UserService = {
   createUserIntoDB,
   createAdminToDB,
+  updateUserByIdIntoDB,
+  getUserByIdFromDB,
   getUserProfileFromDB,
-  updateProfileToDB: updateUserByIdIntoDB,
 };

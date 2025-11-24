@@ -31,18 +31,6 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-//get profile
-const getUserProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getUserProfileFromDB(req.user.id);
-
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Profile data retrieved successfully',
-    data: result,
-  });
-});
-
 //update profile
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
   let image = getSingleFilePath(req.files, 'image');
@@ -61,7 +49,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
     };
   }
 
-  const result = await UserService.updateProfileToDB(req.user.id, payload);
+  const result = await UserService.updateUserByIdIntoDB(req.user.id, payload);
 
   sendResponse(res, {
     success: true,
@@ -71,9 +59,34 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//get profile
+const getUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getUserProfileFromDB(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Profile data retrieved successfully',
+    data: result,
+  });
+});
+
+//get single user by id
+const getSingleUserById = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getUserByIdFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Profile data retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   createAdmin,
-  getUserProfile,
   updateProfile,
+  getUserProfile,
+  getSingleUserById,
 };
