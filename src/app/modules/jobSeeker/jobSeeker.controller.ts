@@ -6,6 +6,7 @@ import {
   getMultipleFilesPath,
   getSingleFilePath,
 } from '../../../shared/getFilePath';
+import { StatusCodes } from 'http-status-codes';
 
 // update job seeker
 const updateJobSeeker = catchAsync(async (req: Request, res: Response) => {
@@ -26,6 +27,19 @@ const updateJobSeeker = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get job seeker by user id
+const getJobSeekerByUserId = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobSeekerServices.getJobSeekerByUserId(req.params.id);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Job seeker retrieved successfully',
+    data: result,
+  });
+});
+
 export const JobSeekerController = {
   updateJobSeeker,
+  getJobSeekerByUserId,
 };

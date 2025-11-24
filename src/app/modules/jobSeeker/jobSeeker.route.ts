@@ -8,12 +8,20 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 
 const router = express.Router();
 
+// update job seeker route
 router.patch(
   '/update-me',
   auth(USER_ROLES.JOB_SEEKER),
   fileUploadHandler(),
   validateRequest(JobSeekerValidations.jobSeekerSchema),
   JobSeekerController.updateJobSeeker
+);
+
+// get job seeker by user id route
+router.get(
+  '/single/:id',
+  auth(),
+  JobSeekerController.getJobSeekerByUserId
 );
 
 export const jobSeekerRoutes = router;

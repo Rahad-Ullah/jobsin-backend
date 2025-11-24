@@ -54,6 +54,13 @@ const updateJobSeekerByUserId = async (
   return result;
 };
 
+// ------------- get job seeker by user id -------------
+const getJobSeekerByUserId = async (userId: string) => {
+  const result = await JobSeeker.findOne({ user: userId });
+  return result;
+}
+
 export const JobSeekerServices = {
   updateJobSeekerByUserId,
+  getJobSeekerByUserId,
 };
