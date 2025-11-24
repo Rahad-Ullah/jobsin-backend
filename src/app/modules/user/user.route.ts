@@ -31,6 +31,13 @@ router.patch(
   UserController.updateProfile
 );
 
+// delete profile
+router.delete(
+  '/profile',
+  auth(),
+  UserController.deleteUserAccount
+);
+
 // toggle user status
 router.patch(
   '/status/:id',

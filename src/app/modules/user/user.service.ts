@@ -155,6 +155,22 @@ const toggleUserStatusById = async (
   return updateDoc;
 };
 
+// ------------- delete user by id -------------
+const deleteUserByIdFromDB = async (id: string) => {
+  const isExistUser = await User.exists({ _id: id });
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const result = await User.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
+
+  return result;
+};
+
 // ------------- get user by id -------------
 const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
   const isExistUser = await User.findById(id)
@@ -199,6 +215,7 @@ export const UserService = {
   createAdminToDB,
   updateUserByIdIntoDB,
   toggleUserStatusById,
+  deleteUserByIdFromDB,
   getUserByIdFromDB,
   getUserProfileFromDB,
   getAllUsersFromDB,
