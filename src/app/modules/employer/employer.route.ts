@@ -15,4 +15,18 @@ router.patch(
   EmployerController.updateMyEmployerProfile
 );
 
+// get my employer profile
+router.get(
+  '/me',
+  auth(USER_ROLES.EMPLOYER),
+  EmployerController.getMyEmployerProfile
+);
+
+// get employer by user id
+router.get(
+  '/single/:id',
+  auth(),
+  EmployerController.getEmployerByUserId
+);
+
 export const employerRoutes = router;

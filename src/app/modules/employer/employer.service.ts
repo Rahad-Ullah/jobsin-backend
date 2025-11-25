@@ -21,6 +21,15 @@ export const updateEmployerByUserId = async (
   return result;
 };
 
+// -------------- get employer by user id --------------
+const getEmployerByUserId = async (
+  userId: string
+): Promise<IEmployer | null> => {
+  const employer = await Employer.findOne({ user: userId });
+  return employer;
+};
+
 export const EmployerServices = {
   updateEmployerByUserId,
+  getEmployerByUserId,
 };
