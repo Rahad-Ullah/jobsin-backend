@@ -8,7 +8,6 @@ export interface IPersonalInfo {
   image: string;
   presentAddress: string;
   permanentAddress: string;
-  license: ILicense;
   aboutMe: string;
 }
 

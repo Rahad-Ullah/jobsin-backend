@@ -46,7 +46,6 @@ const personalInfoSchema = new Schema(
     image: { type: String, default: '' },
     presentAddress: { type: String, default: '' },
     permanentAddress: { type: String, default: '' },
-    license: licenseSchema,
     aboutMe: { type: String, default: '' },
   },
   { _id: false }

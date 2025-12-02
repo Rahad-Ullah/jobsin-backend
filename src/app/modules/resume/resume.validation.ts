@@ -27,10 +27,14 @@ const experienceSchema = z
     isCurrentlyWorking: z.boolean({
       required_error: 'Is currently working is required',
     }),
-    startDate: z.date().refine(d => d < new Date(), {
-      message: 'Start date must be in the past',
-    }),
-    endDate: z.date().nullable().optional(),
+    startDate: z
+      .string()
+      .datetime()
+      .refine(d => new Date(d) < new Date(), {
+        message: 'Start date must be in the past',
+      }),
+    endDate: z.string().datetime().nullable().optional(),
+
     workDetails: z.string().nonempty('Work details cannot be empty'),
     portfolioUrls: z.array(z.string().url()).default([]),
   })
@@ -42,31 +46,34 @@ const personalInfoSchema = z
     email: z.string().email('Email must be valid').default(''),
     phone: z.string().default(''),
     dob: z
-      .date()
-      .refine(d => d < new Date(), {
+      .string()
+      .datetime()
+      .refine(d => new Date(d) < new Date(), {
         message: 'Date of birth must be in the past',
       })
       .nullable()
       .optional(),
+
     image: z.string().default(''),
     presentAddress: z.string().default(''),
     permanentAddress: z.string().default(''),
-    license: licenseSchema,
     aboutMe: z.string().default(''),
   })
   .strict();
 
-export const resumeSchema = z
-  .object({
-    personalInfo: personalInfoSchema,
-    educations: z.array(educationSchema),
-    experiences: z.array(experienceSchema),
-    license: licenseSchema,
-    skills: z.array(z.string()).default([]),
-    extraActivities: z.array(z.string()).default([]),
-    hobbies: z.array(z.string()).default([]),
-  })
-  .strict();
+export const resumeSchema = z.object({
+  body: z
+    .object({
+      personalInfo: personalInfoSchema.optional(),
+      educations: z.array(educationSchema).optional(),
+      experiences: z.array(experienceSchema).optional(),
+      license: licenseSchema.optional(),
+      skills: z.array(z.string()).default([]),
+      extraActivities: z.array(z.string()).default([]),
+      hobbies: z.array(z.string()).default([]),
+    })
+    .strict(),
+});
 
 export const ResumeValidations = {
   resumeSchema,
