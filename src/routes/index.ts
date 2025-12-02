@@ -4,6 +4,7 @@ import { UserRoutes } from '../app/modules/user/user.route';
 import { jobSeekerRoutes } from '../app/modules/jobSeeker/jobSeeker.route';
 import { employerRoutes } from '../app/modules/employer/employer.route';
 import { resumeRoutes } from '../app/modules/resume/resume.route';
+import { categoryRoutes } from '../app/modules/category/category.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -26,6 +27,10 @@ const apiRoutes = [
   {
     path: '/resumes',
     route: resumeRoutes,
+  },
+  {
+    path: '/categories',
+    route: categoryRoutes,
   },
 ];
 
