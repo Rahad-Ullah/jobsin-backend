@@ -19,6 +19,19 @@ const createUpdateResume = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get single resume by user id
+const getResumeByUserId = catchAsync(async (req: Request, res: Response) => {
+  const result = await ResumeServices.getResumeByUserId(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Resume retrieved successfully',
+    data: result,
+  });
+});
+
 export const ResumeController = {
   createUpdateResume,
+  getResumeByUserId,
 };

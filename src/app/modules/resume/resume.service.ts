@@ -25,6 +25,13 @@ const createUpdateResumeToDB = async (
   return result;
 };
 
+// --------------- get single by user id --------------
+const getResumeByUserId = async (userId: string) => {
+  const result = await Resume.findOne({ user: userId });
+  return result;
+}
+
 export const ResumeServices = {
   createUpdateResumeToDB,
+  getResumeByUserId,
 };
