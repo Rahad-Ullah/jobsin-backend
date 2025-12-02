@@ -16,10 +16,9 @@ router.patch(
 );
 
 // get single resume by user id
-router.get(
-  '/single/:id',
-  auth(USER_ROLES.JOB_SEEKER),
-  ResumeController.getResumeByUserId
-);
+router.get('/single/:id', auth(), ResumeController.getResumeByUserId);
+
+// get my resume
+router.get('/me', auth(USER_ROLES.JOB_SEEKER), ResumeController.getMyResume);
 
 export const resumeRoutes = router;

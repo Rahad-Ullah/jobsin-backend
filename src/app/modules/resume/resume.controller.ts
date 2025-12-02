@@ -31,7 +31,20 @@ const getResumeByUserId = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get my resume
+const getMyResume = catchAsync(async (req: Request, res: Response) => {
+  const result = await ResumeServices.getResumeByUserId(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Resume retrieved successfully',
+    data: result,
+  });
+});
+
 export const ResumeController = {
   createUpdateResume,
   getResumeByUserId,
+  getMyResume,
 };
