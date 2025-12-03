@@ -49,7 +49,14 @@ const deleteJob = async (id: string) => {
 
 // --------------- get single job by id --------------
 const getSingleJobById = async (id: string) => {
-  const result = await Job.findById(id);
+  const result = await Job.findById(id).populate({
+    path: 'author',
+    select: 'name email phone address image employer',
+    populate: {
+      path: 'employer',
+      select: 'businessCategory legalForm taxNo deNo about',
+    },
+  });
   return result;
 };
 
@@ -66,7 +73,8 @@ const getAllJobs = async (query: Record<string, unknown>) => {
     .filter()
     .sort()
     .paginate()
-    .fields();
+    .fields()
+    .populate(['author'], { author: 'name email phone address image' });
 
   const [data, pagination] = await Promise.all([
     jobQuery.modelQuery.lean(),
