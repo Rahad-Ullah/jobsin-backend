@@ -32,4 +32,11 @@ router.get(
   ApplicationController.getApplicationsByJobId
 );
 
+// get my applications
+router.get(
+  '/me',
+  auth(USER_ROLES.JOB_SEEKER),
+  ApplicationController.getMyApplications
+);
+
 export const applicationRoutes = router;

@@ -74,10 +74,37 @@ const getApplicationsByJobId = async (
   return { data, pagination };
 };
 
+// ------------- get my applications ------------
+const getApplicationsByUserId = async (
+  id: string,
+  query: Record<string, any>
+) => {
+  const applicationQuery = new QueryBuilder(
+    Application.find({ user: id, isDeleted: false }).populate({
+      path: 'job',
+      select: 'category subCategory jobType experience salaryType salaryAmount',
+      populate: {
+        path: 'author',
+        select: 'name email phone address image',
+      },
+    }),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
+  const [data, pagination] = await Promise.all([
+    applicationQuery.modelQuery.lean(),
+    applicationQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
 
 export const ApplicationServices = {
   createApplicationToDB,
   updateApplicationToDB,
   getApplicationsByJobId,
+  getApplicationsByUserId,
 };
