@@ -54,7 +54,11 @@ const deleteCategory = async (id: string) => {
 
 // --------------- get all categories ---------------
 const getAllCategories = async (query: Record<string, unknown>) => {
-  const categoryQuery = new QueryBuilder(Category.find(), query);
+  const categoryQuery = new QueryBuilder(Category.find(), query)
+    .search(['name'])
+    .sort()
+    .paginate()
+    .fields();
 
   const [data, pagination] = await Promise.all([
     categoryQuery.modelQuery.lean(),
