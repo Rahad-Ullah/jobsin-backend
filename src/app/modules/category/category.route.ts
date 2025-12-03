@@ -15,4 +15,12 @@ router.post(
   CategoryController.createCategory
 );
 
+// update category
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  validateRequest(CategoryValidations.updateCategorySchema),
+  CategoryController.updateCategory
+);
+
 export const categoryRoutes = router;

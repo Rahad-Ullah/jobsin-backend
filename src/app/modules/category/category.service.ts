@@ -15,6 +15,28 @@ const createCategoryToDB = async (
   return result;
 };
 
+// --------------- update category ---------------
+const updateCategory = async (id: string, payload: Partial<ICategory>) => {
+  // check if the category exists
+  const existingCategory = await Category.exists({ _id: id });
+  if (!existingCategory) {
+    throw new Error('Category not found');
+  }
+
+  // check if the updated name already taken
+  if (payload.name) {
+    const existingCategory = await Category.exists({ name: payload.name, _id: { $ne: id } });
+    if (existingCategory) {
+      throw new Error('Category name already taken');
+    }
+  }
+
+  // update category
+  const result = await Category.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+}
+
 export const CategoryServices = {
   createCategoryToDB,
+  updateCategory,
 };
