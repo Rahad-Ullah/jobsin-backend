@@ -18,6 +18,19 @@ const createJob = async (payload: IJob): Promise<IJob> => {
   return result;
 };
 
+// --------------- update job post --------------
+const updateJob = async (id: string, payload: Partial<IJob>) => {
+  // check if the job exists
+  const existingJob = await Job.exists({ _id: id });
+  if (!existingJob) {
+    throw new Error('Job not found');
+  }
+  
+  const result = await Job.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const JobServices = {
   createJob,
+  updateJob,
 };

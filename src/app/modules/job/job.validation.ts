@@ -59,7 +59,7 @@ export const updateJobValidation = z.object({
       subCategory: z.string().optional(),
       jobType: z.nativeEnum(JobType).optional(),
       experience: z.nativeEnum(ExperienceLevel).optional(),
-      deadline: z.date().optional(),
+      deadline: z.string().datetime().optional(),
       salaryType: z.nativeEnum(SalaryType).optional(),
       salaryAmount: z
         .number()

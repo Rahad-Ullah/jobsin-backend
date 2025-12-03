@@ -15,4 +15,12 @@ router.post(
   JobController.createJob
 );
 
+// update job post
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.EMPLOYER),
+  validateRequest(JobValidations.updateJobValidation),
+  JobController.updateJob
+);
+
 export const jobRoutes = router;

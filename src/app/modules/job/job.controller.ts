@@ -19,6 +19,19 @@ const createJob = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update job
+const updateJob = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.updateJob(req.params.id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Job updated successfully',
+    data: result,
+  });
+});
+
 export const JobController = {
   createJob,
+  updateJob,
 };
