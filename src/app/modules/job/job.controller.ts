@@ -67,10 +67,37 @@ const getJobsByEmployerId = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
+// get my jobs
+const getMyJobs = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getJobsByEmployerId(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Jobs retrieved successfully',
+    data: result,
+  });
+})
+
+// get all jobs
+const getAllJobs = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getAllJobs(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Jobs retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+})
+
 export const JobController = {
   createJob,
   updateJob,
   deleteJob,
   getSingleJobById,
   getJobsByEmployerId,
+  getMyJobs,
+  getAllJobs,
 };

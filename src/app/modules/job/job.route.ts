@@ -36,4 +36,10 @@ router.get('/single/:id', JobController.getSingleJobById);
 // get jobs by employer id
 router.get('/employer/:id', auth(), JobController.getJobsByEmployerId);
 
+// get my jobs
+router.get('/me', auth(USER_ROLES.EMPLOYER), JobController.getMyJobs);
+
+// get all jobs
+router.get('/', JobController.getAllJobs);
+
 export const jobRoutes = router;

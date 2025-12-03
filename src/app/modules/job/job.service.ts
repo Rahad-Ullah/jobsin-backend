@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import { Category } from '../category/category.model';
 import { IJob } from './job.interface';
 import { Job } from './job.model';
@@ -25,7 +26,7 @@ const updateJob = async (id: string, payload: Partial<IJob>) => {
   if (!existingJob) {
     throw new Error('Job not found');
   }
-  
+
   const result = await Job.findByIdAndUpdate(id, payload, { new: true });
   return result;
 };
@@ -38,21 +39,42 @@ const deleteJob = async (id: string) => {
     throw new Error('Job not found');
   }
 
-  const result = await Job.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  const result = await Job.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
   return result;
-}
+};
 
-// get single job by id
+// --------------- get single job by id --------------
 const getSingleJobById = async (id: string) => {
   const result = await Job.findById(id);
   return result;
-}
+};
 
-// get jobs by employer id
+// -------------- get jobs by employer id --------------
 const getJobsByEmployerId = async (id: string) => {
   const result = await Job.find({ author: id, isDeleted: false });
   return result;
-}
+};
+
+// -------------- get all jobs with pagination --------------
+const getAllJobs = async (query: Record<string, unknown>) => {
+  const jobQuery = new QueryBuilder(Job.find({ isDeleted: false }), query)
+    .search(['location', 'category', 'subCategory'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    jobQuery.modelQuery.lean(),
+    jobQuery.getPaginationInfo(),
+  ]);
+
+  return { data, pagination };
+};
 
 export const JobServices = {
   createJob,
@@ -60,4 +82,5 @@ export const JobServices = {
   deleteJob,
   getSingleJobById,
   getJobsByEmployerId,
+  getAllJobs,
 };
