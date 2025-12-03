@@ -36,7 +36,20 @@ const updateCategory = async (id: string, payload: Partial<ICategory>) => {
   return result;
 }
 
+// --------------- delete category ---------------
+const deleteCategory = async (id: string) => {
+  // check if the category exists
+  const existingCategory = await Category.exists({ _id: id });
+  if (!existingCategory) {
+    throw new Error('Category not found');
+  }
+  
+  const result = await Category.findByIdAndDelete(id);
+  return result;
+}
+
 export const CategoryServices = {
   createCategoryToDB,
   updateCategory,
+  deleteCategory,
 };

@@ -23,4 +23,11 @@ router.patch(
   CategoryController.updateCategory
 );
 
+// delete category
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  CategoryController.deleteCategory
+);
+
 export const categoryRoutes = router;
