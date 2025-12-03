@@ -39,4 +39,11 @@ router.get(
   ApplicationController.getMyApplications
 );
 
+// get single application by id
+router.get(
+  '/single/:id',
+  auth(),
+  ApplicationController.getSingleApplicationById
+);
+
 export const applicationRoutes = router;

@@ -64,9 +64,22 @@ const getMyApplications = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get single application by id
+const getSingleApplicationById = catchAsync(async (req: Request, res: Response) => {
+  const result = await ApplicationServices.getSingleApplicationById(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Application retrieved successfully',
+    data: result,
+  });
+});
+
 export const ApplicationController = {
   createApplication,
   updateApplication,
   getApplicationsByJobId,
   getMyApplications,
+  getSingleApplicationById,
 };

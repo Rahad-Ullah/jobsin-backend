@@ -102,9 +102,32 @@ const getApplicationsByUserId = async (
   return { data, pagination };
 };
 
+// ------------- get single application by id ------------
+const getSingleApplicationById = async (id: string) => {
+  const result = await Application.findById(id).populate([
+    {
+      path: 'job',
+      populate: {
+        path: 'author',
+        select: 'name email phone address image',
+      },
+    },
+    {
+      path: 'user',
+      select: 'name email phone address image jobSeeker',
+    },
+    {
+      path: 'resume',
+      select: 'educations',
+    },
+  ]);
+  return result;
+};
+
 export const ApplicationServices = {
   createApplicationToDB,
   updateApplicationToDB,
   getApplicationsByJobId,
   getApplicationsByUserId,
+  getSingleApplicationById,
 };
