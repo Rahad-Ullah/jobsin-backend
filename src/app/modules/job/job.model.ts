@@ -45,6 +45,7 @@ const jobSchema = new Schema<IJob, JobModel>(
       enum: Object.values(SalaryType),
       required: true,
     },
+    salaryAmount: { type: Number, required: true },
     description: { type: String, required: true },
     responsibilities: [{ type: String }, { required: true }],
     qualifications: [{ type: String }, { required: true }],

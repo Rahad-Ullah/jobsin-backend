@@ -25,6 +25,7 @@ export interface IJob {
   experience: ExperienceLevel;
   deadline: Date;
   salaryType: SalaryType;
+  salaryAmount: number;
   description: string;
   responsibilities: string[];
   qualifications: string[];
