@@ -38,7 +38,21 @@ const updateApplication = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get applications by job id
+const getApplicationsByJobId = catchAsync(async (req: Request, res: Response) => {
+  const result = await ApplicationServices.getApplicationsByJobId(req.params.id, req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Applications retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+});
+
 export const ApplicationController = {
   createApplication,
   updateApplication,
+  getApplicationsByJobId,
 };

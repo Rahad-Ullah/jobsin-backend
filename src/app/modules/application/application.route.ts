@@ -25,4 +25,11 @@ router.patch(
   ApplicationController.updateApplication
 );
 
+// get applications by job id
+router.get(
+  '/job/:id',
+  auth(USER_ROLES.EMPLOYER),
+  ApplicationController.getApplicationsByJobId
+);
+
 export const applicationRoutes = router;

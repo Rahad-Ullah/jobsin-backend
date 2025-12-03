@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import { Job } from '../job/job.model';
 import { Resume } from '../resume/resume.model';
 import { IApplication } from './application.interface';
@@ -34,7 +35,7 @@ const createApplicationToDB = async (
   return result;
 };
 
-// update application
+// ------------- update application ------------
 const updateApplicationToDB = async (
   id: string,
   payload: Partial<IApplication>
@@ -44,12 +45,39 @@ const updateApplicationToDB = async (
   if (!existingApplication) {
     throw new Error('Application not found');
   }
-  
-  const result = await Application.findByIdAndUpdate(id, payload, { new: true });
+
+  const result = await Application.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
   return result;
 };
+
+// ------------- get applications by job id ------------
+const getApplicationsByJobId = async (
+  id: string,
+  query: Record<string, any>
+) => {
+  const applicationQuery = new QueryBuilder(
+    Application.find({ job: id, isDeleted: false }),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .populate(['user'], { user: 'name email phone address image' })
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    applicationQuery.modelQuery.lean(),
+    applicationQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
+
+
 
 export const ApplicationServices = {
   createApplicationToDB,
   updateApplicationToDB,
+  getApplicationsByJobId,
 };
