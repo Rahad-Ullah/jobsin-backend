@@ -23,6 +23,22 @@ const createApplication = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update application
+const updateApplication = catchAsync(async (req: Request, res: Response) => {
+  const result = await ApplicationServices.updateApplicationToDB(
+    req.params.id,
+    req.body
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Application updated successfully',
+    data: result,
+  });
+});
+
 export const ApplicationController = {
   createApplication,
+  updateApplication,
 };

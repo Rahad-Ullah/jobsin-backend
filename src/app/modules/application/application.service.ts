@@ -34,6 +34,22 @@ const createApplicationToDB = async (
   return result;
 };
 
+// update application
+const updateApplicationToDB = async (
+  id: string,
+  payload: Partial<IApplication>
+) => {
+  // check if the application exists
+  const existingApplication = await Application.exists({ _id: id });
+  if (!existingApplication) {
+    throw new Error('Application not found');
+  }
+  
+  const result = await Application.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const ApplicationServices = {
   createApplicationToDB,
+  updateApplicationToDB,
 };

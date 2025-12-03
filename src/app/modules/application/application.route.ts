@@ -17,4 +17,12 @@ router.post(
   ApplicationController.createApplication
 );
 
+// update application
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER),
+  validateRequest(ApplicationValidations.updateApplicationValidation),
+  ApplicationController.updateApplication
+);
+
 export const applicationRoutes = router;
