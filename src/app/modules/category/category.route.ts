@@ -30,4 +30,10 @@ router.delete(
   CategoryController.deleteCategory
 );
 
+// get all categories
+router.get(
+  '/',
+  CategoryController.getAllCategories
+);
+
 export const categoryRoutes = router;

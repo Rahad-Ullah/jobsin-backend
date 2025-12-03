@@ -1,3 +1,4 @@
+import QueryBuilder from '../../builder/QueryBuilder';
 import { ICategory } from './category.interface';
 import { Category } from './category.model';
 
@@ -25,7 +26,10 @@ const updateCategory = async (id: string, payload: Partial<ICategory>) => {
 
   // check if the updated name already taken
   if (payload.name) {
-    const existingCategory = await Category.exists({ name: payload.name, _id: { $ne: id } });
+    const existingCategory = await Category.exists({
+      name: payload.name,
+      _id: { $ne: id },
+    });
     if (existingCategory) {
       throw new Error('Category name already taken');
     }
@@ -34,7 +38,7 @@ const updateCategory = async (id: string, payload: Partial<ICategory>) => {
   // update category
   const result = await Category.findByIdAndUpdate(id, payload, { new: true });
   return result;
-}
+};
 
 // --------------- delete category ---------------
 const deleteCategory = async (id: string) => {
@@ -43,13 +47,27 @@ const deleteCategory = async (id: string) => {
   if (!existingCategory) {
     throw new Error('Category not found');
   }
-  
+
   const result = await Category.findByIdAndDelete(id);
   return result;
-}
+};
 
+// --------------- get all categories ---------------
+const getAllCategories = async (query: Record<string, unknown>) => {
+  const categoryQuery = new QueryBuilder(Category.find(), query);
+
+  const [data, pagination] = await Promise.all([
+    categoryQuery.modelQuery.lean(),
+    categoryQuery.getPaginationInfo(),
+  ]);
+
+  return { data, pagination };
+};
+
+// --------------- export ---------------
 export const CategoryServices = {
   createCategoryToDB,
   updateCategory,
   deleteCategory,
+  getAllCategories,
 };
