@@ -42,8 +42,22 @@ const deleteJob = async (id: string) => {
   return result;
 }
 
+// get single job by id
+const getSingleJobById = async (id: string) => {
+  const result = await Job.findById(id);
+  return result;
+}
+
+// get jobs by employer id
+const getJobsByEmployerId = async (id: string) => {
+  const result = await Job.find({ author: id, isDeleted: false });
+  return result;
+}
+
 export const JobServices = {
   createJob,
   updateJob,
   deleteJob,
+  getSingleJobById,
+  getJobsByEmployerId,
 };

@@ -30,4 +30,10 @@ router.delete(
   JobController.deleteJob
 );
 
+// get single job by id
+router.get('/single/:id', JobController.getSingleJobById);
+
+// get jobs by employer id
+router.get('/employer/:id', auth(), JobController.getJobsByEmployerId);
+
 export const jobRoutes = router;
