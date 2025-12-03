@@ -1,6 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApplicationServices } from './application.service';
+import catchAsync from '../../../shared/catchAsync';
+import sendResponse from '../../../shared/sendResponse';
+import { StatusCodes } from 'http-status-codes';
+import { getSingleFilePath } from '../../../shared/getFilePath';
+
+// create application
+const createApplication = catchAsync(async (req: Request, res: Response) => {
+  const resume = getSingleFilePath(req.files, 'doc');
+
+  const result = await ApplicationServices.createApplicationToDB({
+    ...req.body,
+    user: req.user.id,
+    resumeUrl: resume,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Application created successfully',
+    data: result,
+  });
+});
 
 export const ApplicationController = {
-  // Controller methods here
+  createApplication,
 };
