@@ -30,7 +30,20 @@ const updateJob = async (id: string, payload: Partial<IJob>) => {
   return result;
 };
 
+// --------------- delete job post --------------
+const deleteJob = async (id: string) => {
+  // check if the job exists
+  const existingJob = await Job.exists({ _id: id });
+  if (!existingJob) {
+    throw new Error('Job not found');
+  }
+
+  const result = await Job.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  return result;
+}
+
 export const JobServices = {
   createJob,
   updateJob,
+  deleteJob,
 };

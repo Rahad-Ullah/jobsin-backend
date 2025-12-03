@@ -23,4 +23,11 @@ router.patch(
   JobController.updateJob
 );
 
+// delete job post
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.EMPLOYER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  JobController.deleteJob
+);
+
 export const jobRoutes = router;
