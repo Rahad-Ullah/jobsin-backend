@@ -24,6 +24,23 @@ const createWishlist = async (payload: IWishlist): Promise<IWishlist> => {
   return result;
 };
 
+// ----------------- delete wishlist -----------------
+const deleteWishlist = async (id: string) => {
+  // check if the wishlist exists
+  const existingWishlist = await Wishlist.exists({ _id: id });
+  if (!existingWishlist) {
+    throw new Error('Wishlist not found');
+  }
+
+  const result = await Wishlist.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
+  return result;
+};
+
 export const WishlistServices = {
   createWishlist,
+  deleteWishlist,
 };

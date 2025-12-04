@@ -10,9 +10,16 @@ const router = express.Router();
 // create wishlist
 router.post(
   '/create',
-  auth(USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER),
+  auth(USER_ROLES.JOB_SEEKER),
   validateRequest(WishlistValidations.createWishlistValidation),
   WishlistController.createWishlist
+);
+
+// delete wishlist
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.JOB_SEEKER),
+  WishlistController.deleteWishlist
 );
 
 export const wishlistRoutes = router;
