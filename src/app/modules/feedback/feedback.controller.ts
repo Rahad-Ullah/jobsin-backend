@@ -31,7 +31,20 @@ const updateFeedback = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get feedback given to me
+const getFeedbackGivenToMe = catchAsync(async (req: Request, res: Response) => {
+  const result = await FeedbackServices.getFeedbackByUserId(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Feedback retrieved successfully',
+    data: result,
+  });
+});
+
 export const FeedbackController = {
   createFeedback,
   updateFeedback,
+  getFeedbackGivenToMe,
 };

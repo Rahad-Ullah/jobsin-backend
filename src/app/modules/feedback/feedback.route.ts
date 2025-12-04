@@ -23,4 +23,7 @@ router.patch(
   FeedbackController.updateFeedback
 );
 
+// get feedback to me
+router.get('/me', auth(USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER), FeedbackController.getFeedbackGivenToMe);
+
 export const feedbackRoutes = router;

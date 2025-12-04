@@ -28,7 +28,17 @@ const updateFeedback = async (id: string, payload: Partial<IFeedback>) => {
   return result;
 };
 
+// --------------- get feedback by user id ---------------
+const getFeedbackByUserId = async (userId: string) => {
+  const result = await Feedback.find({ user: userId }).populate({
+    path: 'reviewer',
+    select: 'name email phone address image',
+  });
+  return result;
+};
+
 export const FeedbackServices = {
   createFeedbackToDB,
   updateFeedback,
+  getFeedbackByUserId,
 };
