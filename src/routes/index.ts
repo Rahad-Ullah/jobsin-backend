@@ -7,6 +7,7 @@ import { resumeRoutes } from '../app/modules/resume/resume.route';
 import { categoryRoutes } from '../app/modules/category/category.route';
 import { jobRoutes } from '../app/modules/job/job.route';
 import { applicationRoutes } from '../app/modules/application/application.route';
+import { wishlistRoutes } from '../app/modules/wishlist/wishlist.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -41,6 +42,10 @@ const apiRoutes = [
   {
     path: '/applications',
     route: applicationRoutes,
+  },
+  {
+    path: '/wishlists',
+    route: wishlistRoutes,
   },
 ];
 

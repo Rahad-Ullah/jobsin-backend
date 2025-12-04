@@ -10,7 +10,6 @@ export const createWishlistValidation = z.object({
   body: z
     .object({
       job: objectIdSchema,
-      isDeleted: z.boolean().default(false),
     })
     .strict(),
 });
