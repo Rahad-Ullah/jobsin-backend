@@ -11,6 +11,7 @@ import { wishlistRoutes } from '../app/modules/wishlist/wishlist.route';
 import { notificationRoutes } from '../app/modules/notification/notification.route';
 import { feedbackRoutes } from '../app/modules/feedback/feedback.route';
 import { verificationRoutes } from '../app/modules/verification/verification.route';
+import { disclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -61,6 +62,10 @@ const apiRoutes = [
   {
     path: '/notifications',
     route: notificationRoutes,
+  },
+  {
+    path: '/disclaimers',
+    route: disclaimerRoutes,
   },
 ];
 
