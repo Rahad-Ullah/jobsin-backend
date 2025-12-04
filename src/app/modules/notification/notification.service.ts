@@ -30,6 +30,40 @@ const getNotificationsByUserId = async (
   };
 };
 
+// read single notification by id
+const readNotification = async (id: string) => {
+  // check if the notification exists
+  const existingNotification = await Notification.exists({ _id: id });
+  if (!existingNotification) {
+    throw new Error('Notification not found');
+  }
+  
+  const result = await Notification.findByIdAndUpdate(
+    id,
+    { isRead: true },
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
+// read all notifications by user id
+const readAllNotifications = async (userId: string) => {
+  const result = await Notification.bulkWrite([
+    {
+      updateMany: {
+        filter: { receiver: userId, isRead: false },
+        update: { $set: { isRead: true } },
+        upsert: false,
+      },
+    },
+  ]);
+  return result;
+};
+
 export const NotificationServices = {
   getNotificationsByUserId,
+  readNotification,
+  readAllNotifications,
 };

@@ -22,6 +22,34 @@ export const getMyNotifications = catchAsync(
   }
 );
 
+// read single notification by id
+export const readNotification = catchAsync(async (req: Request, res: Response) => {
+  const result = await NotificationServices.readNotification(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Notification read successfully',
+    data: result,
+  });
+});
+
+// read all notifications by user id
+export const readAllNotifications = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await NotificationServices.readAllNotifications(req.user.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'All notifications read successfully',
+      data: result,
+    });
+  }
+);
+
 export const NotificationController = {
   getMyNotifications,
+  readNotification,
+  readAllNotifications,
 };
