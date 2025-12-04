@@ -42,7 +42,40 @@ export const updateVerification = catchAsync(
   }
 );
 
+// get my verification
+export const getMyVerifications = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await VerificationServices.getVerificationByUserId(
+      req.user.id
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Verification retrieved successfully',
+      data: result,
+    });
+  }
+);
+
+// get all verifications
+export const getAllVerifications = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await VerificationServices.getAllVerifications(req.query);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Verifications retrieved successfully',
+      data: result?.data,
+      pagination: result?.pagination,
+    });
+  }
+);
+
 export const VerificationController = {
   createVerification,
   updateVerification,
+  getMyVerifications,
+  getAllVerifications,
 };

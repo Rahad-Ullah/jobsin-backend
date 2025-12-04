@@ -25,4 +25,18 @@ router.patch(
   VerificationController.updateVerification
 );
 
+// get my verifications
+router.get(
+  '/me',
+  auth(USER_ROLES.EMPLOYER),
+  VerificationController.getMyVerifications
+);
+
+// get all verifications
+router.get(
+  '/',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  VerificationController.getAllVerifications
+);
+
 export const verificationRoutes = router;
