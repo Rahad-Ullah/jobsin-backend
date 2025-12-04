@@ -40,7 +40,21 @@ const deleteWishlist = async (id: string) => {
   return result;
 };
 
+// ----------------- get wishlist by user id -----------------
+const getWishlistByUserId = async (userId: string) => {
+  const result = await Wishlist.find({ user: userId, isDeleted: false }).populate({
+    path: 'job',
+    select: 'category subCategory jobType experience salaryType salaryAmount author',
+    populate: {
+      path: 'author',
+      select: 'name email phone address image',
+    }
+  });
+  return result;
+};
+
 export const WishlistServices = {
   createWishlist,
   deleteWishlist,
+  getWishlistByUserId,
 };

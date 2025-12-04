@@ -22,4 +22,11 @@ router.delete(
   WishlistController.deleteWishlist
 );
 
+// get my wishlist
+router.get(
+  '/me',
+  auth(USER_ROLES.JOB_SEEKER),
+  WishlistController.getMyWishlist
+);
+
 export const wishlistRoutes = router;
