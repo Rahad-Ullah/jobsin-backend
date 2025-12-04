@@ -12,6 +12,7 @@ import { notificationRoutes } from '../app/modules/notification/notification.rou
 import { feedbackRoutes } from '../app/modules/feedback/feedback.route';
 import { verificationRoutes } from '../app/modules/verification/verification.route';
 import { disclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
+import { contactRoutes } from '../app/modules/contact/contact.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -66,6 +67,10 @@ const apiRoutes = [
   {
     path: '/disclaimers',
     route: disclaimerRoutes,
+  },
+  {
+    path: '/contact',
+    route: contactRoutes,
   },
 ];
 
