@@ -3,6 +3,6 @@ import { SupportController } from './support.controller';
 
 const router = express.Router();
 
-router.get('/', SupportController);
+// router.get('/', SupportController);
 
 export const supportRoutes = router;

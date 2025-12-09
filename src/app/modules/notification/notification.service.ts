@@ -1,6 +1,7 @@
 import { timeAgo } from '../../../shared/timeAgo';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { Notification } from './notification.model';
+import { Types } from 'mongoose';
 
 // get notifications by user id
 const getNotificationsByUserId = async (
@@ -53,7 +54,7 @@ const readAllNotifications = async (userId: string) => {
   const result = await Notification.bulkWrite([
     {
       updateMany: {
-        filter: { receiver: userId, isRead: false },
+        filter: { receiver: new Types.ObjectId(userId), isRead: false },
         update: { $set: { isRead: true } },
         upsert: false,
       },
