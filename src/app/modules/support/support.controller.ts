@@ -36,7 +36,20 @@ const updateSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get single by id
+const getSingleSupportById = catchAsync(async (req: Request, res: Response) => {
+  const result = await SupportServices.getSupportByIdFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Support retrieved successfully',
+    data: result,
+  });
+});
+
 export const SupportController = {
   createSupport,
   updateSupport,
+  getSingleSupportById
 };

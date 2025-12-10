@@ -33,7 +33,17 @@ const updateSupportToDB = async (id: string, payload: Partial<ISupport>) => {
   return result;
 };
 
+// -------------- get by id --------------
+const getSupportByIdFromDB = async (id: string) => {
+  const result = await Support.findById(id);
+  return result;
+};
+
+
+
+
 export const SupportServices = {
   createSupportToDB,
   updateSupportToDB,
+  getSupportByIdFromDB
 };
