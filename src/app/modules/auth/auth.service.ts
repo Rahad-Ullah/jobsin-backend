@@ -67,9 +67,14 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
 //forget password
 const forgetPasswordToDB = async (email: string) => {
-  const isExistUser = await User.isExistUserByEmail(email);
+  const isExistUser = await User.findOne({ email });
   if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, config.node_env === 'development' ? "User doesn't exist!" : "Invalid email");
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      config.node_env === 'development'
+        ? "User doesn't exist!"
+        : 'Invalid email'
+    );
   }
 
   // check if user is deleted

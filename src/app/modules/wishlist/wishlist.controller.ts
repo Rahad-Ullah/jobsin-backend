@@ -1,0 +1,50 @@
+import { Request, Response, NextFunction } from 'express';
+import { WishlistServices } from './wishlist.service';
+import catchAsync from '../../../shared/catchAsync';
+import sendResponse from '../../../shared/sendResponse';
+import { StatusCodes } from 'http-status-codes';
+
+// create wishlist
+const createWishlist = catchAsync(async (req: Request, res: Response) => {
+  const result = await WishlistServices.createWishlist({
+    ...req.body,
+    user: req.user.id,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Wishlist created successfully',
+    data: result,
+  });
+});
+
+// delete wishlist
+const deleteWishlist = catchAsync(async (req: Request, res: Response) => {
+  const result = await WishlistServices.deleteWishlist(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Wishlist deleted successfully',
+    data: result,
+  });
+});
+
+// get my wishlist
+const getMyWishlist = catchAsync(async (req: Request, res: Response) => {
+  const result = await WishlistServices.getWishlistByUserId(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Wishlist retrieved successfully',
+    data: result,
+  });
+});
+
+export const WishlistController = {
+  createWishlist,
+  deleteWishlist,
+  getMyWishlist,
+};

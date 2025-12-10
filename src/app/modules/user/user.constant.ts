@@ -1,7 +1,8 @@
 export enum USER_ROLES {
-  SUPER_ADMIN = 'Super Admin',
+  JOB_SEEKER = 'Job Seeker',
+  EMPLOYER = 'Employer',
   ADMIN = 'Admin',
-  USER = 'User',
+  SUPER_ADMIN = 'Super Admin',
 }
 
 export enum USER_STATUS {

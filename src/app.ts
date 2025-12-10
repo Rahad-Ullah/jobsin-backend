@@ -2,8 +2,9 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
-import router from './routes';
+import router_v1 from './routes';
 import { Morgan } from './shared/morgen';
+import config from './config';
 const app = express();
 
 //morgan
@@ -19,13 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('uploads'));
 
 //router
-app.use('/api/v1', router);
+app.use('/api/v1', router_v1);
 
 //live response
 app.get('/', (req: Request, res: Response) => {
   const date = new Date(Date.now());
   res.send(
-    `<h1 style="text-align:center; color:#173616; font-family:Verdana;">Beep-beep! The server is alive and kicking.</h1>
+    `<h1 style="text-align:center; color:#173616; font-family:Verdana;">Beep-beep! The ${config.server_name} server is alive and kicking.</h1>
     <p style="text-align:center; color:#173616; font-family:Verdana;">${date}</p>
     `
   );

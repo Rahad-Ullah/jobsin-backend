@@ -33,9 +33,41 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       default: '',
     },
+    address: {
+      type: String,
+      default: '',
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+        select: false,
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+        select: false,
+      },
+    },
     image: {
       type: String,
       default: '',
+    },
+    jobSeeker: {
+      type: Schema.Types.ObjectId,
+      ref: 'JobSeeker',
+      default: null,
+    },
+    employer: {
+      type: Schema.Types.ObjectId,
+      ref: 'Employer',
+      default: null,
+    },
+    subscription: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subscription',
+      default: null,
     },
     status: {
       type: String,
@@ -46,9 +78,23 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
+    isAccountVerified: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    googleUserId: {
+      type: String,
+      default: null,
+      select: 0,
+    },
+    appleUserId: {
+      type: String,
+      default: null,
+      select: 0,
     },
     authentication: {
       type: {
@@ -70,15 +116,17 @@ const userSchema = new Schema<IUser, UserModal>(
   },
   { timestamps: true }
 );
+// location index
+userSchema.index({ location: '2dsphere' });
 
 //exist user check
 userSchema.statics.isExistUserById = async (id: string) => {
-  const isExist = await User.findById(id);
+  const isExist = await User.exists({ _id: id });
   return isExist;
 };
 
 userSchema.statics.isExistUserByEmail = async (email: string) => {
-  const isExist = await User.findOne({ email });
+  const isExist = await User.exists({ email });
   return isExist;
 };
 
@@ -95,7 +143,7 @@ userSchema.pre('save', async function (next) {
   //check user
   const isExist = await User.findOne({ email: this.email });
   if (isExist) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
+    throw new ApiError(StatusCodes.CONFLICT, 'Email already exist!');
   }
 
   //password hash
