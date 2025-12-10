@@ -31,4 +31,11 @@ router.get(
   SupportController.getSingleSupportById
 );
 
+// get all support
+router.get(
+  '/',
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  SupportController.getAllSupports
+);
+
 export const supportRoutes = router;

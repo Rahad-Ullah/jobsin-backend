@@ -48,8 +48,22 @@ const getSingleSupportById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all supports
+const getAllSupports = catchAsync(async (req: Request, res: Response) => {
+  const result = await SupportServices.getAllSupportsFromDB(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Supports retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+})
+
 export const SupportController = {
   createSupport,
   updateSupport,
-  getSingleSupportById
+  getSingleSupportById,
+  getAllSupports
 };

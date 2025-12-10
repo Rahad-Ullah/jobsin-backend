@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { ISupport } from './support.interface';
 import { Support } from './support.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // -------------- create support --------------
 const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
@@ -39,11 +40,26 @@ const getSupportByIdFromDB = async (id: string) => {
   return result;
 };
 
+// ------------- get all supports --------------
+const getAllSupportsFromDB = async (query: Record<string, unknown>) => {
+  const supportQuery = new QueryBuilder(Support.find(), query)
+    .search(['name', 'email', 'phone'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
+  const [data, pagination] = await Promise.all([
+    supportQuery.modelQuery.lean(),
+    supportQuery.getPaginationInfo(),
+  ]);
 
+  return { data, pagination };
+};
 
 export const SupportServices = {
   createSupportToDB,
   updateSupportToDB,
-  getSupportByIdFromDB
+  getSupportByIdFromDB,
+  getAllSupportsFromDB,
 };
