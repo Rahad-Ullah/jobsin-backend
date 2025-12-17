@@ -69,6 +69,7 @@ const getJobsByEmployerId = async (
     Job.find({ author: id, isDeleted: false }),
     query
   )
+    .filter()
     .paginate()
     .sort()
     .fields()

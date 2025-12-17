@@ -44,8 +44,7 @@ export const createJobValidation = z.object({
         .array(z.string())
         .min(1, 'At least one qualification is required'),
       aboutCompany: z.string().nonempty('About company is required'),
-      status: z.nativeEnum(JobStatus).default(JobStatus.OPEN),
-      isDeleted: z.boolean().default(false),
+      isHiringRequest: z.boolean().default(false).optional(),
       notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
@@ -70,7 +69,6 @@ export const updateJobValidation = z.object({
       responsibilities: z.array(z.string()).optional(),
       qualifications: z.array(z.string()).optional(),
       aboutCompany: z.string().optional(),
-      isDeleted: z.boolean().optional(),
       notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),

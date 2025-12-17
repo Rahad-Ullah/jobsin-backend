@@ -55,6 +55,7 @@ const jobSchema = new Schema<IJob, JobModel>(
       enum: Object.values(JobStatus),
       default: JobStatus.OPEN,
     },
+    isHiringRequest: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
     notificationSettings: notificationSettingsSchema,
   },

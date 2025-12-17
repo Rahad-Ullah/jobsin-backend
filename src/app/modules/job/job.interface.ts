@@ -31,6 +31,7 @@ export interface IJob {
   qualifications: string[];
   aboutCompany: string;
   status: JobStatus;
+  isHiringRequest: boolean;
   isDeleted: boolean;
   notificationSettings: INotificationSettings;
 }
