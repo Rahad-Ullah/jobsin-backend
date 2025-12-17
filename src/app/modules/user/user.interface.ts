@@ -16,6 +16,7 @@ export type IUser = {
   image?: string;
   jobSeeker?: Types.ObjectId;
   employer?: Types.ObjectId;
+  adminPermissions?: string[];
   subscription: Types.ObjectId;
   status: USER_STATUS;
   isVerified: boolean;

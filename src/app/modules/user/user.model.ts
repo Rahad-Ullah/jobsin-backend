@@ -57,12 +57,13 @@ const userSchema = new Schema<IUser, UserModal>(
     jobSeeker: {
       type: Schema.Types.ObjectId,
       ref: 'JobSeeker',
-      default: null,
     },
     employer: {
       type: Schema.Types.ObjectId,
       ref: 'Employer',
-      default: null,
+    },
+    adminPermissions: {
+      type: [String],
     },
     subscription: {
       type: Schema.Types.ObjectId,

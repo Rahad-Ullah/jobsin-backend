@@ -20,6 +20,10 @@ const createAdminZodSchema = z.object({
       name: z.string({ required_error: 'Name is required' }),
       email: z.string({ required_error: 'Email is required' }),
       password: z.string({ required_error: 'Password is required' }),
+      adminPermissions: z
+        .array(z.string())
+        .nonempty('Admin permissions is required')
+        .min(1, 'At least one admin permission is required'),
     })
     .strict(),
 });
