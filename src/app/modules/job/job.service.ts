@@ -61,9 +61,25 @@ const getSingleJobById = async (id: string) => {
 };
 
 // -------------- get jobs by employer id --------------
-const getJobsByEmployerId = async (id: string) => {
-  const result = await Job.find({ author: id, isDeleted: false });
-  return result;
+const getJobsByEmployerId = async (
+  id: string,
+  query: Record<string, unknown>
+) => {
+  const jobQuery = new QueryBuilder(
+    Job.find({ author: id, isDeleted: false }),
+    query
+  )
+    .paginate()
+    .sort()
+    .fields()
+    .populate(['author'], { author: 'name email phone address image' });
+
+  const [data, pagination] = await Promise.all([
+    jobQuery.modelQuery.lean(),
+    jobQuery.getPaginationInfo(),
+  ]);
+
+  return { data, pagination };
 };
 
 // -------------- get all jobs with pagination --------------
