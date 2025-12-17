@@ -8,6 +8,7 @@ const employerSchema = new Schema<IEmployer, EmployerModel>(
     legalForm: { type: String, default: '' },
     taxNo: { type: String, default: '' },
     deNo: { type: String, default: '' },
+    whatsApp: { type: String, default: '' },
     about: { type: String, default: '' },
   },
   { timestamps: true }

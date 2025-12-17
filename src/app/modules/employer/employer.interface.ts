@@ -7,6 +7,7 @@ export type IEmployer = {
   legalForm: string;
   taxNo: string;
   deNo: string;
+  whatsApp: string;
   about: string;
 };
 
