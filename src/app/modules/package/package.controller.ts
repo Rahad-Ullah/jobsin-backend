@@ -29,10 +29,12 @@ const createPackage = catchAsync(async (req: Request, res: Response) => {
 const updatePackage = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
   // calculate interval price
-  payload.intervalPrice = calculateIntervalPrice(
-    payload.interval as PackageInterval,
-    payload.dailyPrice
-  );
+  if (payload.interval && payload.dailyPrice) {
+    payload.intervalPrice = calculateIntervalPrice(
+      payload.interval as PackageInterval,
+      payload.dailyPrice
+    );
+  }
 
   const result = await PackageServices.updatePackageInDB(
     req.params.id,
@@ -47,7 +49,20 @@ const updatePackage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete package
+const deletePackage = catchAsync(async (req: Request, res: Response) => {
+  const result = await PackageServices.deletePackageFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Package deleted successfully',
+    data: result,
+  });
+});
+
 export const PackageController = {
   createPackage,
   updatePackage,
+  deletePackage,
 };

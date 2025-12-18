@@ -63,6 +63,18 @@ const createPackageToDB = async (
     // Save package in DB
     const result = await Package.create([payload], { session });
 
+    // rollback stripe creation if DB write fails
+    if (!result || !result[0]) {
+      await stripe.prices.update(price.id, { active: false }).catch(() => null);
+      await stripe.products.update(product.id, { active: false }).catch(() => null);
+      await session.abortTransaction();
+      session.endSession();
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to create package'
+      );
+    }
+
     await session.commitTransaction();
     session.endSession();
 
@@ -139,6 +151,22 @@ const updatePackageInDB = async (
       { new: true, session }
     );
 
+    // Compensation: rollback Stripe changes if DB fails
+    if (!updatedPackage) {
+      if (payload.stripePriceId) {
+        await stripe.prices
+          .update(payload.stripePriceId, { active: false })
+          .catch(() => null);
+      }
+      await session.abortTransaction();
+      session.endSession();
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to update package'
+      );
+    }
+
+    // finally: commit transaction
     await session.commitTransaction();
     session.endSession();
 
@@ -150,7 +178,70 @@ const updatePackageInDB = async (
   }
 };
 
+// --------------- delete package service ---------------
+export const deletePackageFromDB = async (
+  id: string,
+  archiveProduct = false
+): Promise<IPackage> => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // check if the package exists
+    const existingPackage = await Package.findOne({
+      _id: id,
+      isDeleted: false,
+    }).session(session);
+    if (!existingPackage) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
+    }
+
+    // db write: soft delete
+    const softDeleted = await Package.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session }
+    );
+    if (!softDeleted) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to update package'
+      );
+    }
+
+    // stripe write: archive price and product
+    try {
+      await stripe.prices.update(existingPackage.stripePriceId, {
+        active: false,
+      });
+      if (archiveProduct) {
+        await stripe.products.update(existingPackage.stripeProductId, {
+          active: false,
+        });
+      }
+    } catch (stripeErr: any) {
+      await session.abortTransaction();
+      session.endSession();
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        `Stripe cleanup failed: ${stripeErr.message}`
+      );
+    }
+
+    // db write: commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return softDeleted;
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
+};
+
 export const PackageServices = {
   createPackageToDB,
   updatePackageInDB,
+  deletePackageFromDB,
 };
