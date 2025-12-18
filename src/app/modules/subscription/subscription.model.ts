@@ -10,8 +10,8 @@ const subscriptionSchema = new Schema<ISubscription>(
     stripeCustomerId: { type: String, required: true },
     stripePriceId: { type: String, required: true },
     price: { type: Number, required: true },
-    currentPeriodStart: { type: Date, required: true },
-    currentPeriodEnd: { type: Date, required: true },
+    currentPeriodStart: { type: Date },
+    currentPeriodEnd: { type: Date },
     cancelAtPeriodEnd: { type: Boolean, default: false },
     status: {
       type: String,

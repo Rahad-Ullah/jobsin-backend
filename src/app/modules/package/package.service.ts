@@ -3,13 +3,8 @@ import ApiError from '../../../errors/ApiError';
 import { IPackage } from './package.interface';
 import { Package } from './package.model';
 import mongoose from 'mongoose';
-import Stripe from 'stripe';
-import config from '../../../config';
 import QueryBuilder from '../../builder/QueryBuilder';
-
-const stripe = new Stripe(config.stripe.secret_key as string, {
-  apiVersion: '2025-12-15.clover',
-});
+import { stripe } from '../../../config/stripe';
 
 // --------------- create package service ---------------
 const createPackageToDB = async (

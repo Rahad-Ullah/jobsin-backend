@@ -87,6 +87,11 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Boolean,
       default: false,
     },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      select: 0,
+    },
     googleUserId: {
       type: String,
       default: null,

@@ -15,6 +15,7 @@ import { disclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
 import { contactRoutes } from '../app/modules/contact/contact.route';
 import { supportRoutes } from '../app/modules/support/support.route';
 import { packageRoutes } from '../app/modules/package/package.route';
+import { subscriptionRoutes } from '../app/modules/subscription/subscription.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -57,6 +58,10 @@ const apiRoutes = [
   {
     path: '/packages',
     route: packageRoutes,
+  },
+  {
+    path: '/subscriptions',
+    route: subscriptionRoutes,
   },
   {
     path: '/feedbacks',

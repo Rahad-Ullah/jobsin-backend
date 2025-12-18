@@ -22,6 +22,7 @@ export type IUser = {
   isVerified: boolean;
   isAccountVerified: boolean;
   isDeleted: boolean;
+  stripeCustomerId?: string;
   googleUserId?: string;
   appleUserId?: string;
   authentication?: {
