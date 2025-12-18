@@ -51,7 +51,7 @@ const updatePackage = catchAsync(async (req: Request, res: Response) => {
 
 // delete package
 const deletePackage = catchAsync(async (req: Request, res: Response) => {
-  const result = await PackageServices.deletePackageFromDB(req.params.id);
+  const result = await PackageServices.deletePackageFromDB(req.params.id, true);
 
   sendResponse(res, {
     success: true,
