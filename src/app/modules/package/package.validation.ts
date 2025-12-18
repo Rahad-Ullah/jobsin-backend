@@ -28,16 +28,16 @@ export const updatePackageValidation = z.object({
         .string({ required_error: 'Name is required' })
         .nonempty('Name is required')
         .optional(),
-      interval: z.nativeEnum(PackageInterval).optional(),
-      intervalCount: z
-        .number()
-        .int()
-        .positive('Interval count must be positive')
-        .optional(),
-      dailyPrice: z
-        .number()
-        .nonnegative('Unit price must be non-negative')
-        .optional(),
+      // interval: z.nativeEnum(PackageInterval).optional(),
+      // intervalCount: z
+      //   .number()
+      //   .int()
+      //   .positive('Interval count must be positive')
+      //   .optional(),
+      // dailyPrice: z
+      //   .number()
+      //   .nonnegative('Unit price must be non-negative')
+      //   .optional(),
       description: z.string().default('').optional(),
       benefits: z.array(z.string()).default([]).optional(),
     })

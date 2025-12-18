@@ -7,11 +7,20 @@ import { PackageValidations } from './package.validation';
 
 const router = express.Router();
 
+// create package
 router.post(
   '/create',
   auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
   validateRequest(PackageValidations.createPackageValidation),
   PackageController.createPackage
+);
+
+// update package
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
+  validateRequest(PackageValidations.updatePackageValidation),
+  PackageController.updatePackage
 );
 
 export const packageRoutes = router;
