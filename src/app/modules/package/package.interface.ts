@@ -6,7 +6,8 @@ export interface IPackage {
   name: string;
   interval: PackageInterval;
   intervalCount: number;
-  unitPrice: number;
+  dailyPrice: number;
+  intervalPrice: number;
   price: number;
   description: string;
   benefits: string[];

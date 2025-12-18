@@ -14,6 +14,7 @@ import { verificationRoutes } from '../app/modules/verification/verification.rou
 import { disclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
 import { contactRoutes } from '../app/modules/contact/contact.route';
 import { supportRoutes } from '../app/modules/support/support.route';
+import { packageRoutes } from '../app/modules/package/package.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -52,6 +53,10 @@ const apiRoutes = [
   {
     path: '/wishlists',
     route: wishlistRoutes,
+  },
+  {
+    path: '/packages',
+    route: packageRoutes,
   },
   {
     path: '/feedbacks',
