@@ -5,6 +5,7 @@ import { Package } from './package.model';
 import mongoose from 'mongoose';
 import Stripe from 'stripe';
 import config from '../../../config';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const stripe = new Stripe(config.stripe.secret_key as string, {
   apiVersion: '2025-12-15.clover',
@@ -66,7 +67,9 @@ const createPackageToDB = async (
     // rollback stripe creation if DB write fails
     if (!result || !result[0]) {
       await stripe.prices.update(price.id, { active: false }).catch(() => null);
-      await stripe.products.update(product.id, { active: false }).catch(() => null);
+      await stripe.products
+        .update(product.id, { active: false })
+        .catch(() => null);
       await session.abortTransaction();
       session.endSession();
       throw new ApiError(
@@ -240,8 +243,28 @@ export const deletePackageFromDB = async (
   }
 };
 
+// --------------- get all packages ---------------
+export const getAllPackagesFromDB = async (query: Record<string, any>) => {
+  const packageQuery = new QueryBuilder(
+    Package.find({ isDeleted: false }),
+    query
+  )
+    .search(['name'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    packageQuery.modelQuery.lean(),
+    packageQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
+
 export const PackageServices = {
   createPackageToDB,
   updatePackageInDB,
   deletePackageFromDB,
+  getAllPackagesFromDB,
 };

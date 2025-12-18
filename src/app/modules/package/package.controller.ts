@@ -61,8 +61,22 @@ const deletePackage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all packages
+const getAllPackages = catchAsync(async (req: Request, res: Response) => {
+  const result = await PackageServices.getAllPackagesFromDB(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Packages retrieved successfully',
+    data: result.data,
+    pagination: result.pagination,
+  });
+});
+
 export const PackageController = {
   createPackage,
   updatePackage,
   deletePackage,
+  getAllPackages,
 };
