@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { StripeWebhookServices } from './stripe.service';
 
 export async function stripeEventHandler(event: Stripe.Event) {
   // Idempotency guard
@@ -21,7 +22,7 @@ export async function stripeEventHandler(event: Stripe.Event) {
   // event routing
   switch (event.type) {
     case 'checkout.session.completed':
-      //   await onSubscriptionCreated(event.data.object);
+      await StripeWebhookServices.onCheckoutSessionCompleted(event);
       break;
 
     case 'customer.subscription.updated':

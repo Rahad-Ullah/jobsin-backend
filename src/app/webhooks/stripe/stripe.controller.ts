@@ -9,6 +9,8 @@ export const stripeWebhookController = (req: Request, res: Response) => {
 
   let event: Stripe.Event;
 
+    console.log('--> inside webhook');
+
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
