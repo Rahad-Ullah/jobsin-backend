@@ -5,11 +5,19 @@ import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import router_v1 from './routes';
 import { Morgan } from './shared/morgen';
 import config from './config';
+import { stripeWebhookController } from './app/webhooks/stripe/stripe.controller';
 const app = express();
 
 //morgan
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
+
+//stripe webhook
+app.post(
+  '/webhooks/stripe',
+  express.raw({ type: 'application/json' }),
+  stripeWebhookController
+);
 
 //body parser
 app.use(cors());
