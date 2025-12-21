@@ -7,9 +7,9 @@ import {
   PaymentStatus,
   SubscriptionStatus,
 } from '../../modules/subscription/subscription.constants';
+import { User } from '../../modules/user/user.model';
 
 const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
-  console.log('--> subscription created webhook');
   try {
     const session = event.data.object as Stripe.Checkout.Session;
     const subscriptionId = session.subscription as string;
@@ -69,6 +69,11 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
         'Subscription creation failed'
       );
     }
+
+    // update user subscription
+    await User.findByIdAndUpdate(session.metadata.userId, {
+      subscription: result._id,
+    });
   } catch (error) {
     console.error('Error onCheckoutSessionCompleted  ~~ ', error);
     throw error;
