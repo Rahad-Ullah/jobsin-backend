@@ -34,10 +34,14 @@ export async function stripeEventHandler(event: Stripe.Event) {
       break;
 
     case 'invoice.paid':
-      //   await onInvoicePaid(event.data.object);
+        await StripeWebhookServices.onInvoicePaid(event);
       break;
 
     case 'invoice.payment_failed':
+      //   await onInvoicePaymentFailed(event.data.object);
+      break;
+
+    case 'invoice.updated':
       //   await onInvoicePaymentFailed(event.data.object);
       break;
 

@@ -8,7 +8,11 @@ import {
   SubscriptionStatus,
 } from '../../modules/subscription/subscription.constants';
 import { User } from '../../modules/user/user.model';
+import { Invoice } from '../../modules/invoice/invoice.model';
+import { IInvoice } from '../../modules/invoice/invoice.interface';
+import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
 
+// on checkout session completed
 const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
   try {
     const session = event.data.object as Stripe.Checkout.Session;
@@ -80,6 +84,61 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
   }
 };
 
+// on invoice paid
+const onInvoicePaid = async (event: Stripe.Event) => {
+  try {
+    const stripeInvoice = event.data.object as Stripe.Invoice;
+    const stripeSubscriptionId = (stripeInvoice as any).subscription as
+      | string
+      | null;
+
+    if (!stripeSubscriptionId) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Subscription ID not found in invoice'
+      );
+    }
+
+    // DB write: update subscription
+    const subscription = await Subscription.findOneAndUpdate(
+      { stripeSubscriptionId: stripeSubscriptionId },
+      {
+        paymentStatus: PaymentStatus.PAID,
+        status: SubscriptionStatus.ACTIVE,
+        currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
+        currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
+      },
+      { new: true }
+    );
+
+    // DB write: create invoice
+    const invoicePayload: Partial<IInvoice> = {
+      user: subscription?.user,
+      subscription: subscription?._id,
+      stripeSubscriptionId: stripeSubscriptionId,
+      stripeInvoiceId: stripeInvoice.id,
+      periodStart: new Date(stripeInvoice.period_start * 1000),
+      periodEnd: new Date(stripeInvoice.period_end * 1000),
+      amount: stripeInvoice.total / 100,
+      currency: stripeInvoice.currency,
+      status: InvoiceStatus.PAID,
+      paidAt: new Date(),
+    };
+
+    const result = await Invoice.create(invoicePayload);
+    if (!result) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Invoice creation failed'
+      );
+    }
+  } catch (error) {
+    console.error('Error onInvoicePaid  ~~ ', error);
+    throw error;
+  }
+};
+
 export const StripeWebhookServices = {
   onCheckoutSessionCompleted,
+  onInvoicePaid,
 };
