@@ -19,7 +19,6 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
     stripeInvoiceId: {
       type: String,
       required: true,
-      unique: true,
       index: true,
     },
     stripeSubscriptionId: {

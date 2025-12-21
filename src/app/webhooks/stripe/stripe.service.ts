@@ -138,7 +138,62 @@ const onInvoicePaid = async (event: Stripe.Event) => {
   }
 };
 
+// on invoice payment failed
+const onInvoicePaymentFailed = async (event: Stripe.Event) => {
+  try {
+    const stripeInvoice = event.data.object as Stripe.Invoice;
+    const stripeSubscriptionId = (stripeInvoice as any).subscription as
+      | string
+      | null;
+
+    if (!stripeSubscriptionId) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Subscription ID not found in invoice'
+      );
+    }
+
+    // DB write: update subscription
+    const subscription = await Subscription.findOneAndUpdate(
+      { stripeSubscriptionId: stripeSubscriptionId },
+      {
+        paymentStatus: PaymentStatus.FAILED,
+        status: SubscriptionStatus.PAST_DUE,
+        currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
+        currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
+      },
+      { new: true }
+    );
+
+    // DB write: create invoice
+    const invoicePayload: Partial<IInvoice> = {
+      user: subscription?.user,
+      subscription: subscription?._id,
+      stripeSubscriptionId: stripeSubscriptionId,
+      stripeInvoiceId: stripeInvoice.id,
+      periodStart: new Date(stripeInvoice.period_start * 1000),
+      periodEnd: new Date(stripeInvoice.period_end * 1000),
+      amount: stripeInvoice.total / 100,
+      currency: stripeInvoice.currency,
+      status: InvoiceStatus.FAILED,
+      paidAt: new Date(),
+    };
+
+    const result = await Invoice.create(invoicePayload);
+    if (!result) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Invoice creation failed'
+      );
+    }
+  } catch (error) {
+    console.error('Error onInvoicePaymentFailed  ~~ ', error);
+    throw error;
+  }
+};
+
 export const StripeWebhookServices = {
   onCheckoutSessionCompleted,
   onInvoicePaid,
+  onInvoicePaymentFailed,
 };
