@@ -238,6 +238,12 @@ export const deletePackageFromDB = async (
   }
 };
 
+// --------------- get single package by id ---------------
+export const getSinglePackageFromDB = async (id: string) => {
+  const result = await Package.findById(id);
+  return result;
+};
+
 // --------------- get all packages ---------------
 export const getAllPackagesFromDB = async (query: Record<string, any>) => {
   const packageQuery = new QueryBuilder(
@@ -261,5 +267,6 @@ export const PackageServices = {
   createPackageToDB,
   updatePackageInDB,
   deletePackageFromDB,
+  getSinglePackageFromDB,
   getAllPackagesFromDB,
 };

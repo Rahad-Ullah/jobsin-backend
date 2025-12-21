@@ -61,6 +61,18 @@ const deletePackage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get single package by id
+const getSinglePackageById = catchAsync(async (req: Request, res: Response) => {
+  const result = await PackageServices.getSinglePackageFromDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Package retrieved successfully',
+    data: result,
+  });
+});
+
 // get all packages
 const getAllPackages = catchAsync(async (req: Request, res: Response) => {
   const result = await PackageServices.getAllPackagesFromDB(req.query);
@@ -78,5 +90,6 @@ export const PackageController = {
   createPackage,
   updatePackage,
   deletePackage,
+  getSinglePackageById,
   getAllPackages,
 };

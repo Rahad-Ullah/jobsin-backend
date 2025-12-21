@@ -30,6 +30,13 @@ router.delete(
   PackageController.deletePackage
 );
 
+// get single package
+router.get(
+  '/:id',
+  auth(),
+  PackageController.getSinglePackageById
+);
+
 // get all packages
 router.get('/', PackageController.getAllPackages);
 
