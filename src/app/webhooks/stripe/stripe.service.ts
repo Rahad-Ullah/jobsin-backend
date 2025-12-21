@@ -157,7 +157,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
     const subscription = await Subscription.findOneAndUpdate(
       { stripeSubscriptionId: stripeSubscriptionId },
       {
-        paymentStatus: PaymentStatus.FAILED,
+        paymentStatus: PaymentStatus.UNPAID,
         status: SubscriptionStatus.PAST_DUE,
         currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
         currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
@@ -175,8 +175,8 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       periodEnd: new Date(stripeInvoice.period_end * 1000),
       amount: stripeInvoice.total / 100,
       currency: stripeInvoice.currency,
-      status: InvoiceStatus.FAILED,
-      paidAt: new Date(),
+      status: InvoiceStatus.RETRYING,
+      paidAt: null,
     };
 
     const result = await Invoice.create(invoicePayload);
@@ -192,8 +192,54 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
   }
 };
 
+// on invoice update
+const onInvoiceUpdate = async (event: Stripe.Event) => {
+  try {
+    const stripeInvoice = event.data.object as Stripe.Invoice;
+    const stripeSubscriptionId = (stripeInvoice as any).subscription as
+      | string
+      | null;
+
+    if (!stripeSubscriptionId) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Subscription ID not found in invoice'
+      );
+    }
+
+    // DB write: update subscription
+    if (
+      stripeInvoice.status === 'uncollectible' ||
+      stripeInvoice.status === 'void'
+    ) {
+      const subscription = await Subscription.findOneAndUpdate(
+        { stripeSubscriptionId: stripeSubscriptionId },
+        {
+          paymentStatus: PaymentStatus.FAILED,
+          status: SubscriptionStatus.PAST_DUE,
+          currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
+          currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
+        },
+        { new: true }
+      );
+
+      // DB write: update invoice
+      await Invoice.updateMany(
+        { stripeInvoiceId: stripeInvoice.id, status: InvoiceStatus.RETRYING },
+        {
+          status: InvoiceStatus.FAILED,
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Error onInvoiceUpdate  ~~ ', error);
+    throw error;
+  }
+};
+
 export const StripeWebhookServices = {
   onCheckoutSessionCompleted,
   onInvoicePaid,
   onInvoicePaymentFailed,
+  onInvoiceUpdate,
 };

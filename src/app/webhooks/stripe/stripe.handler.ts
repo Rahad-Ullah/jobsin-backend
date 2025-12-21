@@ -42,7 +42,7 @@ export async function stripeEventHandler(event: Stripe.Event) {
       break;
 
     case 'invoice.updated':
-      //   await onInvoicePaymentFailed(event.data.object);
+        await StripeWebhookServices.onInvoiceUpdate(event);
       break;
 
     default:
