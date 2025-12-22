@@ -10,7 +10,7 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
     referenceId: { type: String, default: '' },
     isRead: { type: Boolean, default: false },
   },
-  { timestamps: false }
+  { timestamps: true }
 );
 
 export const Notification = model<INotification, NotificationModel>(
