@@ -31,7 +31,7 @@ const createPackageToDB = async (
       });
 
       price = await stripe.prices.create({
-        unit_amount: Math.round((payload.intervalPrice ?? 0) * 100),
+        unit_amount: Math.round((payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100),
         currency: 'usd',
         recurring: {
           interval: payload.interval!,
@@ -54,7 +54,7 @@ const createPackageToDB = async (
     payload.stripePriceId = price.id;
 
     // Calculate price
-    payload.price = (price.unit_amount! / 100) * payload.intervalCount!;
+    payload.price = (price.unit_amount! / 100);
 
     // Save package in DB
     const result = await Package.create([payload], { session });

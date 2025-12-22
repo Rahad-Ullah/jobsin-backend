@@ -21,8 +21,8 @@ export async function stripeEventHandler(event: Stripe.Event) {
 
   // event routing
   switch (event.type) {
-    case 'checkout.session.completed':
-      await StripeWebhookServices.onCheckoutSessionCompleted(event);
+    case 'customer.subscription.created':
+      await StripeWebhookServices.onCustomerSubscriptionCreated(event);
       break;
 
     case 'customer.subscription.updated':
@@ -34,18 +34,17 @@ export async function stripeEventHandler(event: Stripe.Event) {
       break;
 
     case 'invoice.paid':
-        await StripeWebhookServices.onInvoicePaid(event);
+      // await StripeWebhookServices.onInvoicePaid(event);
       break;
 
     case 'invoice.payment_failed':
-        await StripeWebhookServices.onInvoicePaymentFailed(event);
+      // await StripeWebhookServices.onInvoicePaymentFailed(event);
       break;
 
     case 'invoice.updated':
-        await StripeWebhookServices.onInvoiceUpdate(event);
+      // await StripeWebhookServices.onInvoiceUpdate(event);
       break;
 
     default:
-      console.log(`Unhandled event: ${event.type}`);
   }
 }

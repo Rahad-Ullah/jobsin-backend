@@ -13,26 +13,12 @@ import { IInvoice } from '../../modules/invoice/invoice.interface';
 import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
 
 // on checkout session completed
-const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
+const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
   try {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const subscriptionId = session.subscription as string;
-
-    if (!session.subscription || !session.customer) return;
-
-    // check session metadata
-    if (!session.metadata?.userId || !session.metadata?.packageId) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Missing session metadata');
-    }
-
-    // Idempotency guard
-    const existing = await Subscription.findOne({
-      stripeSubscriptionId: session.subscription as string,
-    });
-    if (existing) return;
+    const stripeSubscription = event.data.object as Stripe.Subscription;
 
     const stripeSub: Stripe.Subscription = await stripe.subscriptions.retrieve(
-      subscriptionId,
+      stripeSubscription.id as string,
       {
         expand: ['items.data.price', 'latest_invoice.lines.data.price'],
       }
@@ -40,7 +26,6 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
 
     const stripePrice = stripeSub.items.data[0].price;
     const unitAmount = stripePrice.unit_amount! / 100;
-    const intervalCount = stripePrice.recurring?.interval_count ?? 1;
 
     const invoice = stripeSub.latest_invoice as Stripe.Invoice;
     if (!invoice?.lines?.data?.length) {
@@ -50,12 +35,12 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
 
     // DB write: create subscription
     const payload = {
-      user: session.metadata?.userId,
-      package: session.metadata?.packageId,
-      stripeSubscriptionId: subscriptionId,
-      stripeCustomerId: session.customer as string,
+      user: stripeSub.metadata?.userId,
+      package: stripeSub.metadata?.packageId,
+      stripeSubscriptionId: stripeSub.id,
+      stripeCustomerId: stripeSub.customer as string,
       stripePriceId: stripePrice.id,
-      price: unitAmount * intervalCount,
+      price: unitAmount,
       currentPeriodStart: new Date(period.start * 1000),
       currentPeriodEnd: new Date(period.end * 1000),
       cancelAtPeriodEnd: (stripeSub as any).cancel_at_period_end,
@@ -75,7 +60,7 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
     }
 
     // update user subscription
-    await User.findByIdAndUpdate(session.metadata.userId, {
+    await User.findByIdAndUpdate(stripeSub.metadata?.userId, {
       subscription: result._id,
     });
   } catch (error) {
@@ -88,9 +73,17 @@ const onCheckoutSessionCompleted = async (event: Stripe.Event) => {
 const onInvoicePaid = async (event: Stripe.Event) => {
   try {
     const stripeInvoice = event.data.object as Stripe.Invoice;
-    const stripeSubscriptionId = (stripeInvoice as any).subscription as
+    let stripeSubscriptionId = (stripeInvoice as any).subscription as
       | string
       | null;
+    // Fallback: Checkout Session / parent
+    if (
+      !stripeSubscriptionId &&
+      stripeInvoice.parent?.subscription_details?.subscription
+    ) {
+      stripeSubscriptionId = stripeInvoice.parent.subscription_details
+        .subscription as string;
+    }
 
     if (!stripeSubscriptionId) {
       throw new ApiError(
@@ -238,7 +231,7 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
 };
 
 export const StripeWebhookServices = {
-  onCheckoutSessionCompleted,
+  onCustomerSubscriptionCreated,
   onInvoicePaid,
   onInvoicePaymentFailed,
   onInvoiceUpdate,
