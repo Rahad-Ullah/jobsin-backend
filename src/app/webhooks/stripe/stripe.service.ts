@@ -65,7 +65,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     });
   } catch (error) {
     console.error('Error onCheckoutSessionCompleted  ~~ ', error);
-    throw error;
   }
 };
 
@@ -127,7 +126,6 @@ const onInvoicePaid = async (event: Stripe.Event) => {
     }
   } catch (error) {
     console.error('Error onInvoicePaid  ~~ ', error);
-    throw error;
   }
 };
 
@@ -181,7 +179,6 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
     }
   } catch (error) {
     console.error('Error onInvoicePaymentFailed  ~~ ', error);
-    throw error;
   }
 };
 
@@ -226,7 +223,6 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
     }
   } catch (error) {
     console.error('Error onInvoiceUpdate  ~~ ', error);
-    throw error;
   }
 };
 

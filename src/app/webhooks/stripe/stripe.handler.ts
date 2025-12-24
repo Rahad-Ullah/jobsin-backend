@@ -8,15 +8,6 @@ export async function stripeEventHandler(event: Stripe.Event) {
   if (alreadyProcessed) {
     return;
   }
-  try {
-    await StripeEvent.create({
-      id: event.id,
-      type: event.type,
-    });
-  } catch (err: any) {
-    if (err.code === 11000) return; // already processed
-    throw err;
-  }
 
   console.log('triggering webhook ----> ', event.type);
 
@@ -47,5 +38,16 @@ export async function stripeEventHandler(event: Stripe.Event) {
       break;
 
     default:
+  }
+
+  // log processed event
+  try {
+    await StripeEvent.create({
+      id: event.id,
+      type: event.type,
+    });
+  } catch (err: any) {
+    if (err.code === 11000) return; // already processed
+    throw err;
   }
 }
