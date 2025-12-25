@@ -19,6 +19,22 @@ const createSubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all subscribers
+const getAllSubscribers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await SubscriptionServices.getAllSubscribers(req.query);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Subscribers retrieved successfully',
+      data: result.data,
+      pagination: result.pagination,
+    });
+  }
+);
+
 export const SubscriptionController = {
   createSubscription,
+  getAllSubscribers,
 };

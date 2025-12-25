@@ -7,8 +7,11 @@ import { User } from '../user/user.model';
 import config from '../../../config';
 import { Subscription } from './subscription.model';
 import { SubscriptionStatus } from './subscription.constants';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { USER_ROLES } from '../user/user.constant';
 
-export const createSubscription = async (payload: Partial<ISubscription>) => {
+// create subscription
+const createSubscription = async (payload: Partial<ISubscription>) => {
   // check if the user exists
   const existingUser = await User.findById(payload.user);
   if (!existingUser) {
@@ -82,6 +85,44 @@ export const createSubscription = async (payload: Partial<ISubscription>) => {
   return checkoutSession.url;
 };
 
+// get subscribers
+const getAllSubscribers = async (query: Record<string, unknown>) => {
+  const status = typeof query.status === 'string' ? query.status : undefined;
+
+  // Pre-filter subscriptions
+  const subscriptionIds = await Subscription.find(
+    status ? { status } : {}
+  ).select('_id');
+
+  const subscribersQuery = new QueryBuilder(
+    User.find({
+      role: USER_ROLES.EMPLOYER,
+      subscription: { $in: subscriptionIds.map(s => s._id) },
+    }).populate({
+      path: 'subscription',
+      select:
+        'package price status paymentStatus currentPeriodStart currentPeriodEnd',
+      populate: {
+        path: 'package',
+        select:
+          'name interval dailyPrice intervalPrice intervalCount description benefits',
+      },
+    }),
+    query
+  )
+    .paginate()
+    .sort()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    subscribersQuery.modelQuery.lean(),
+    subscribersQuery.getPaginationInfo(),
+  ]);
+
+  return { data, pagination };
+};
+
 export const SubscriptionServices = {
   createSubscription,
+  getAllSubscribers,
 };

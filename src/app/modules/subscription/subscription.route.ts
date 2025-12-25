@@ -15,4 +15,11 @@ router.post(
   SubscriptionController.createSubscription
 );
 
+// get all subscribers
+router.get(
+  '/subscribers',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  SubscriptionController.getAllSubscribers
+);
+
 export const subscriptionRoutes = router;
