@@ -25,7 +25,10 @@ export const updateEmployerByUserId = async (
 const getEmployerByUserId = async (
   userId: string
 ): Promise<IEmployer | null> => {
-  const employer = await Employer.findOne({ user: userId });
+  const employer = await Employer.findOne({ user: userId }).populate(
+    'user',
+    'name email role image phone address subscription status'
+  );
   return employer;
 };
 
