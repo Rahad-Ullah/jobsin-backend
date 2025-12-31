@@ -56,7 +56,10 @@ const updateJobSeekerByUserId = async (
 
 // ------------- get job seeker by user id -------------
 const getJobSeekerByUserId = async (userId: string) => {
-  const result = await JobSeeker.findOne({ user: userId });
+  const result = await JobSeeker.findOne({ user: userId }).populate(
+    'user',
+    'name email role phone address image'
+  );
   return result;
 }
 
