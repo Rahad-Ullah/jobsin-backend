@@ -12,18 +12,25 @@ router.get(
   AnalyticsController.getOverview
 );
 
-// get analytics
+// get user growth
 router.get(
   '/user-growth',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   AnalyticsController.getYearlyUserGrowth
 );
 
-// get analytics
+// get subscribers growth
 router.get(
   '/subscribers-growth',
   auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
   AnalyticsController.getMonthlySubscribersGrowth
+);
+
+// get revenue growth
+router.get(
+  '/revenue-growth',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  AnalyticsController.getMonthlyRevenueGrowth
 );
 
 export const analyticsRoutes = router;
