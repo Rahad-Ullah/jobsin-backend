@@ -1,3 +1,4 @@
+import { IAppointment } from '../app/modules/appointment/appointment.interface';
 import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
@@ -57,7 +58,48 @@ const resetPassword = (values: IResetPassword) => {
   return data;
 };
 
+const confirmAppointment = (values: IAppointment) => {
+  const data = {
+    to: values.receiver,
+    subject: 'New Appointment Available!',
+    html: `
+      <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
+          <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              
+              <div style="text-align: center;">
+                  <h2 style="color: #277E16; margin-bottom: 10px;">New Appointment Available!</h2>
+                  <p style="font-size: 16px; line-height: 1.5; margin-bottom: 25px;">An appointment is available for you. Kindly confirm it in your JobsinApp account and please come to our address at the scheduled time.</p>
+                  
+                  <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
+                      <p style="margin: 5px 0;"><strong>📅 Date & Time:</strong> ${new Date(
+                        values.scheduledAt
+                      ).toLocaleString()}</p>
+                      ${
+                        values.address &&
+                        `<p style="margin: 5px 0;"><strong>📍 Address:</strong> ${values.address}</p>`
+                      }
+                      <p style="margin: 5px 0;"><strong>✉️ Message:</strong> ${
+                        values.message
+                      }</p>
+                  </div>
+
+                  <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
+                    If you need to reschedule or cancel this appointment, please log in to your account or contact support.
+                  </p>
+              </div>
+          </div>
+          <div style="text-align: center; margin-top: 20px; color: #aaa; font-size: 12px;">
+              © 2026 JobsinApp. All rights reserved.
+          </div>
+      </body>
+    `,
+  };
+  return data;
+};
+
 export const emailTemplate = {
   createAccount,
   resetPassword,
+  confirmAppointment,
 };
