@@ -75,6 +75,19 @@ const createAppointmentToDB = async (
   return result;
 };
 
+// --------------- update appointment ---------------
+const updateAppointmentToDB = async (id: string, payload: Partial<IAppointment>) => {
+  // check if the appointment exists
+  const existingAppointment = await Appointment.exists({ _id: id });
+  if (!existingAppointment) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Appointment not found');
+  }
+  
+  const result = await Appointment.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
 export const AppointmentServices = {
   createAppointmentToDB,
+  updateAppointmentToDB,
 };

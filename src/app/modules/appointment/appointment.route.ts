@@ -15,4 +15,12 @@ router.post(
   AppointmentController.createAppointment
 );
 
+// update appointment
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.EMPLOYER, USER_ROLES.JOB_SEEKER),
+  validateRequest(AppointmentValidations.updateAppointmentZodSchema),
+  AppointmentController.updateAppointment
+);
+
 export const appointmentRoutes = router;
