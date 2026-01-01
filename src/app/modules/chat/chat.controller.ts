@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { ChatServices } from './chat.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
-import { StatusCodes } from 'http-status-codes';
 
 // create chat
 const createChat = catchAsync(
@@ -50,5 +49,4 @@ export const ChatController = {
   createChat,
   deleteChat,
   getMyChats,
-  // getOnlineChats,
 };

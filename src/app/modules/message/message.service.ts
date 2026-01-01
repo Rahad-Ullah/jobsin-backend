@@ -70,7 +70,7 @@ export const getChatMessages = async (
   // get messages
   const MessageQuery = new QueryBuilder(
     Message.find({ chat: chatId })
-      .populate('sender', 'name image')
+      .populate('sender', 'name image isDeleted')
       .sort({ createdAt: -1 }),
     query
   )
@@ -86,7 +86,7 @@ export const getChatMessages = async (
   const messagesWithStatus = messages.map((message: any) => {
     return {
       ...message,
-      seen: message.seenBy?.length === existingChat?.participants?.length,
+      isSeen: message.seenBy?.length === existingChat?.participants?.length,
     };
   });
 

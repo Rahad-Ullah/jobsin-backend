@@ -1,11 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 import { IChat } from './chat.interface';
 import { Chat } from './chat.model';
-import QueryBuilder from '../../builder/QueryBuilder';
-// import { IMessage } from '../message/message.interface';
-// import { Message } from '../message/message.model';
-import { IUser } from '../user/user.interface';
-import { User } from '../user/user.model';
 import ApiError from '../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
 import { Message } from '../message/message.model';
@@ -104,5 +99,4 @@ export const ChatServices = {
   createChatIntoDB,
   deleteChatFromDB,
   getMyChatsFromDB,
-  // getOnlineChatsFromDB,
 };
