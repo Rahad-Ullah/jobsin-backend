@@ -18,6 +18,7 @@ import { packageRoutes } from '../app/modules/package/package.route';
 import { subscriptionRoutes } from '../app/modules/subscription/subscription.route';
 import { ChatRoutes } from '../app/modules/chat/chat.route';
 import { MessageRoutes } from '../app/modules/message/message.route';
+import { analyticsRoutes } from '../app/modules/analytics/analytics.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -76,6 +77,10 @@ const apiRoutes = [
   {
     path: '/feedbacks',
     route: feedbackRoutes,
+  },
+  {
+    path: '/analytics',
+    route: analyticsRoutes,
   },
   {
     path: '/verifications',
