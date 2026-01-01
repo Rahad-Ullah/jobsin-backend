@@ -17,8 +17,7 @@ router.post(
 // delete chat
 router.delete('/:id', auth(), ChatController.deleteChat);
 
-// router.get('/', auth(), ChatController.getMyChats);
-
-// router.get('/online', auth(), ChatController.getOnlineChats);
+// get my chats
+router.get('/', auth(), ChatController.getMyChats);
 
 export const ChatRoutes = router;

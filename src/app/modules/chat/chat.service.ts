@@ -8,6 +8,8 @@ import { IUser } from '../user/user.interface';
 import { User } from '../user/user.model';
 import ApiError from '../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
+import { Message } from '../message/message.model';
+import { IMessage } from '../message/message.interface';
 
 // ---------------- create chat ----------------
 export const createChatIntoDB = async (user: JwtPayload, payload: IChat) => {
@@ -45,77 +47,62 @@ const deleteChatFromDB = async (chatId: string) => {
 };
 
 // ---------------- get my chats / get by id ----------------
-// const getMyChatsFromDB = async (
-//   user: JwtPayload,
-//   query: Record<string, any>
-// ) => {
-//   const chats = await Chat.find({ participants: { $in: [user.id] } })
-//     .populate({
-//       path: 'participants',
-//       select: 'name email username image isOnline',
-//       match: {
-//         isDeleted: false,
-//         _id: { $ne: user.id }, // Exclude user.id in the populated participants
-//         ...(query?.searchTerm && {
-//           name: { $regex: query?.searchTerm, $options: 'i' },
-//         }),
-//       }, // Apply $regex only if search is valid },
-//     })
-//     .select('participants updatedAt')
-//     .sort('-updatedAt');
+const getMyChatsFromDB = async (
+  user: JwtPayload,
+  query: Record<string, any>
+) => {
+  const chats = await Chat.find({ participants: { $in: [user.id] } })
+    .populate({
+      path: 'participants',
+      select: 'name image isDeleted',
+      match: {
+        // isDeleted: false,
+        _id: { $ne: user.id }, // Exclude the current user from the populated participants
+        ...(query?.searchTerm && {
+          name: { $regex: query?.searchTerm, $options: 'i' },
+        }),
+      }, // Apply $regex only if search is valid },
+    })
+    .select('participants updatedAt')
+    .sort('-updatedAt');
 
-//   // Filter out chats where no participants match the search (empty participants)
-//   const filteredChats = chats?.filter(
-//     (chat: any) => chat?.participants?.length > 0
-//   );
+  // Filter out chats where no participants match the search (empty participants)
+  const filteredChats = chats?.filter(
+    (chat: any) => chat?.participants?.length > 0
+  );
 
-//   //Use Promise.all to get the last message for each chat
-//   const chatList = await Promise.all(
-//     filteredChats?.map(async (chat: any) => {
-//       const data = chat?.toObject();
+  //Use Promise.all to get the last message for each chat
+  const chatList = await Promise.all(
+    filteredChats?.map(async (chat: any) => {
+      const data = chat?.toObject();
 
-//       const lastMessage: IMessage | null = await Message.findOne({
-//         chat: chat?._id,
-//       })
-//         .sort({ createdAt: -1 })
-//         .select('text image createdAt sender');
+      const lastMessage: IMessage | null = await Message.findOne({
+        chat: chat?._id,
+      })
+        .sort({ createdAt: -1 })
+        .select('text image createdAt sender');
 
-//       // find unread messages count
-//       const unreadCount = await Message.countDocuments({
-//         chat: chat?._id,
-//         seenBy: { $nin: [user.id] },
-//       });
+      // find unread messages count
+      const unreadCount = await Message.countDocuments({
+        chat: chat?._id,
+        seenBy: { $nin: [user.id] },
+      });
 
-//       return {
-//         ...data,
-//         participants: data.participants,
-//         unreadCount: unreadCount || 0,
-//         lastMessage: lastMessage || null,
-//       };
-//     })
-//   );
+      return {
+        ...data,
+        participants: data.participants,
+        unreadCount: unreadCount || 0,
+        lastMessage: lastMessage || null,
+      };
+    })
+  );
 
-//   return chatList;
-// };
-
-// ---------------- get online chats ----------------
-// const getOnlineChatsFromDB = async (
-//   user: JwtPayload,
-//   query: Record<string, any>
-// ) => {
-//   const myChats = await getMyChatsFromDB(user, query);
-
-//   // get only online chats
-//   const onlineChats = myChats.filter(
-//     chat => chat.participants.some((p: IUser) => p.isOnline) // check if any participant is online
-//   );
-
-//   return onlineChats;
-// };
+  return chatList;
+};
 
 export const ChatServices = {
   createChatIntoDB,
   deleteChatFromDB,
-  // getMyChatsFromDB,
+  getMyChatsFromDB,
   // getOnlineChatsFromDB,
 };

@@ -58,7 +58,8 @@ export const getChatMessages = async (
     _id: chatId,
     participants: { $in: [user?.id] },
   });
-  if (!existingChat) throw new ApiError(401, 'Chat not found');
+  if (!existingChat)
+    throw new ApiError(401, 'Chat not found or you are not a participant');
 
   // update seen status those messages are not seen by the user
   await Message.updateMany(

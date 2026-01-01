@@ -32,37 +32,23 @@ const deleteChat = catchAsync(
   }
 );
 
-// // getMy chat
-// const getMyChats = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const result = await ChatServices.getMyChatsFromDB(req.user, req.query);
+// getMy chat
+const getMyChats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ChatServices.getMyChatsFromDB(req.user, req.query);
 
-//     sendResponse(res, {
-//       success: true,
-//       statusCode: 200,
-//       message: 'Chats retrieved successfully',
-//       data: result,
-//     });
-//   }
-// );
-
-// // get online chats
-// const getOnlineChats = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const result = await ChatServices.getOnlineChatsFromDB(req.user, req.query);
-
-//     sendResponse(res, {
-//       success: true,
-//       statusCode: StatusCodes.OK,
-//       message: 'Online chats retrieved successfully',
-//       data: result,
-//     });
-//   }
-// );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: 'Chats retrieved successfully',
+      data: result,
+    });
+  }
+);
 
 export const ChatController = {
   createChat,
   deleteChat,
-  // getMyChats,
+  getMyChats,
   // getOnlineChats,
 };
