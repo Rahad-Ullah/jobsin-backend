@@ -16,6 +16,19 @@ const getOverview = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get yearly user growth
+const getYearlyUserGrowth = catchAsync(async (req: Request, res: Response) => {
+  const result = await AnalyticsServices.getYearlyUserGrowth(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Analytics retrieved successfully',
+    data: result,
+  });
+});
+
 export const AnalyticsController = {
   getOverview,
+  getYearlyUserGrowth,
 };
