@@ -8,6 +8,7 @@ import { AppointmentStatus } from './appointment.constants';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import { USER_ROLES } from '../user/user.constant';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // ------------- create appointment -------------
 const createAppointmentToDB = async (
@@ -76,18 +77,79 @@ const createAppointmentToDB = async (
 };
 
 // --------------- update appointment ---------------
-const updateAppointmentToDB = async (id: string, payload: Partial<IAppointment>) => {
+const updateAppointmentToDB = async (
+  id: string,
+  payload: Partial<IAppointment>
+) => {
   // check if the appointment exists
   const existingAppointment = await Appointment.exists({ _id: id });
   if (!existingAppointment) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Appointment not found');
   }
-  
-  const result = await Appointment.findByIdAndUpdate(id, payload, { new: true });
+
+  const result = await Appointment.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
   return result;
+};
+
+// -------------- get appointments by user id --------------
+const getAppointmentsByUserId = async (
+  userId: string,
+  query: Record<string, any>
+) => {
+  const appQuery = new QueryBuilder(
+    Appointment.find({ receiver: userId, isDeleted: false }).populate({
+      path: 'sender',
+      select: 'name email phone image',
+    }),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    appQuery.modelQuery.lean(),
+    appQuery.getPaginationInfo(),
+  ]);
+  return {
+    data,
+    pagination,
+  };
+};
+
+// -------------- get appointment request by user id --------------
+const getAppointmentRequestByUserId = async (
+  userId: string,
+  query: Record<string, any>
+) => {
+  const appQuery = new QueryBuilder(
+    Appointment.find({ sender: userId, isDeleted: false }).populate({
+      path: 'receiver',
+      select: 'name email phone image',
+    }),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    appQuery.modelQuery.lean(),
+    appQuery.getPaginationInfo(),
+  ]);
+  return {
+    data,
+    pagination,
+  };
 };
 
 export const AppointmentServices = {
   createAppointmentToDB,
   updateAppointmentToDB,
+  getAppointmentsByUserId,
+  getAppointmentRequestByUserId,
 };

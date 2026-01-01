@@ -33,7 +33,43 @@ const updateAppointment = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get my appointments
+const getMyAppointments = catchAsync(async (req: Request, res: Response) => {
+  const result = await AppointmentServices.getAppointmentsByUserId(
+    req.user.id,
+    req.query
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Appointments retrieved successfully',
+    data: result.data,
+    pagination: result.pagination,
+  });
+});
+
+// get my appointment requests
+const getMyAppointmentRequests = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await AppointmentServices.getAppointmentRequestByUserId(
+      req.user.id,
+      req.query
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Appointments retrieved successfully',
+      data: result.data,
+      pagination: result.pagination,
+    });
+  }
+);
+
 export const AppointmentController = {
   createAppointment,
   updateAppointment,
+  getMyAppointments,
+  getMyAppointmentRequests,
 };

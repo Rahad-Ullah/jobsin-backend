@@ -23,4 +23,18 @@ router.patch(
   AppointmentController.updateAppointment
 );
 
+// get my appointments
+router.get(
+  '/me',
+  auth(USER_ROLES.EMPLOYER, USER_ROLES.JOB_SEEKER),
+  AppointmentController.getMyAppointments
+);
+
+// get my appointment requests
+router.get(
+  '/requests/me',
+  auth(USER_ROLES.EMPLOYER, USER_ROLES.JOB_SEEKER),
+  AppointmentController.getMyAppointmentRequests
+);
+
 export const appointmentRoutes = router;
