@@ -16,6 +16,7 @@ import { contactRoutes } from '../app/modules/contact/contact.route';
 import { supportRoutes } from '../app/modules/support/support.route';
 import { packageRoutes } from '../app/modules/package/package.route';
 import { subscriptionRoutes } from '../app/modules/subscription/subscription.route';
+import { ChatRoutes } from '../app/modules/chat/chat.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -54,6 +55,10 @@ const apiRoutes = [
   {
     path: '/wishlists',
     route: wishlistRoutes,
+  },
+  {
+    path: '/chats',
+    route: ChatRoutes,
   },
   {
     path: '/packages',
