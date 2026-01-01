@@ -19,4 +19,11 @@ router.get(
   AnalyticsController.getYearlyUserGrowth
 );
 
+// get analytics
+router.get(
+  '/subscribers-growth',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  AnalyticsController.getMonthlySubscribersGrowth
+);
+
 export const analyticsRoutes = router;
