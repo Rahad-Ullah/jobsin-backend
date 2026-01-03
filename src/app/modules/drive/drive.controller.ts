@@ -34,6 +34,18 @@ const updateDrive = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete drive
+const deleteDrive = catchAsync(async (req: Request, res: Response) => {
+  const result = await DriveServices.deleteDriveToDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Drive deleted successfully',
+    data: result,
+  });
+});
+
 // get my drive files
 const getMyDrives = catchAsync(async (req: Request, res: Response) => {
   const result = await DriveServices.getDrivesByUserId(req.user.id, req.query);
@@ -50,5 +62,6 @@ const getMyDrives = catchAsync(async (req: Request, res: Response) => {
 export const DriveController = {
   createDrive,
   updateDrive,
+  deleteDrive,
   getMyDrives,
 };

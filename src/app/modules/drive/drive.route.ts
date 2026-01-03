@@ -24,6 +24,9 @@ router.patch(
   DriveController.updateDrive
 );
 
+// delete drive
+router.delete('/:id', auth(), DriveController.deleteDrive);
+
 // get my drives
 router.get('/my-drives', auth(), DriveController.getMyDrives);
 

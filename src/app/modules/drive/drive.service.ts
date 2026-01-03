@@ -3,6 +3,7 @@ import ApiError from '../../../errors/ApiError';
 import { IDrive } from './drive.interface';
 import { Drive } from './drive.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import unlinkFile from '../../../shared/unlinkFile';
 
 // --------------- create drive ---------------
 const createDriveToDB = async (payload: Partial<IDrive>): Promise<IDrive> => {
@@ -25,6 +26,24 @@ const updateDriveToDB = async (id: string, payload: Partial<IDrive>) => {
   }
 
   const result = await Drive.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+};
+
+// -------------- delete drive --------------
+const deleteDriveToDB = async (id: string) => {
+  // check if the drive exists
+  const existingDrive = await Drive.findById(id);
+  if (!existingDrive) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Drive not found');
+  }
+
+  const result = await Drive.findByIdAndDelete(id, { new: true }).lean();
+
+  // unlink file
+  if (existingDrive.url && result?.url) {
+    unlinkFile(existingDrive.url);
+  }
+
   return result;
 };
 
@@ -53,5 +72,6 @@ const getDrivesByUserId = async (
 export const DriveServices = {
   createDriveToDB,
   updateDriveToDB,
+  deleteDriveToDB,
   getDrivesByUserId,
 };
