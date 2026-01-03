@@ -20,6 +20,7 @@ router.post(
 router.patch(
   '/rename/:id',
   auth(),
+  fileUploadHandler(),
   validateRequest(DriveValidations.updateDriveValidation),
   DriveController.updateDrive
 );
