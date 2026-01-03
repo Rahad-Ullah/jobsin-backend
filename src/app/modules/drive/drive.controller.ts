@@ -22,6 +22,19 @@ const createDrive = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update drive
+const updateDrive = catchAsync(async (req: Request, res: Response) => {
+  const result = await DriveServices.updateDriveToDB(req.params.id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Drive updated successfully',
+    data: result,
+  });
+});
+
 export const DriveController = {
   createDrive,
+  updateDrive,
 };

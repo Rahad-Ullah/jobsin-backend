@@ -15,6 +15,19 @@ const createDriveToDB = async (payload: Partial<IDrive>): Promise<IDrive> => {
   return result;
 };
 
+// -------------- update drive --------------
+const updateDriveToDB = async (id: string, payload: Partial<IDrive>) => {
+  // check if the drive exists
+  const existingDrive = await Drive.exists({ _id: id });
+  if (!existingDrive) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Drive not found');
+  }
+
+  const result = await Drive.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+}
+
 export const DriveServices = {
   createDriveToDB,
+  updateDriveToDB,
 };

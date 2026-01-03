@@ -16,4 +16,12 @@ router.post(
   DriveController.createDrive
 );
 
+// update drive
+router.patch(
+  '/rename/:id',
+  auth(),
+  validateRequest(DriveValidations.updateDriveValidation),
+  DriveController.updateDrive
+);
+
 export const driveRoutes = router;
