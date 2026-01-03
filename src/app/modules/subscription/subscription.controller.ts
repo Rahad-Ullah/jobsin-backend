@@ -19,6 +19,20 @@ const createSubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// gift subscription
+const giftSubscription = catchAsync(async (req: Request, res: Response) => {
+  const result = await SubscriptionServices.giftSubscription({
+    ...req.body,
+  });
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Subscription gifted successfully',
+    data: result,
+  });
+});
+
 // get all subscribers
 const getAllSubscribers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -36,5 +50,6 @@ const getAllSubscribers = catchAsync(
 
 export const SubscriptionController = {
   createSubscription,
+  giftSubscription,
   getAllSubscribers,
 };

@@ -6,9 +6,9 @@ const subscriptionSchema = new Schema<ISubscription>(
   {
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     package: { type: Schema.Types.ObjectId, ref: 'Package', required: true },
-    stripeSubscriptionId: { type: String, required: true },
-    stripeCustomerId: { type: String, required: true },
-    stripePriceId: { type: String, required: true },
+    stripeSubscriptionId: { type: String, default: null },
+    stripeCustomerId: { type: String, default: null },
+    stripePriceId: { type: String, default: null },
     price: { type: Number, required: true },
     currentPeriodStart: { type: Date, default: null },
     currentPeriodEnd: { type: Date, default: null },

@@ -15,6 +15,14 @@ router.post(
   SubscriptionController.createSubscription
 );
 
+// gift subscription
+router.post(
+  '/gift',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  validateRequest(SubscriptionValidations.giftSubscriptionSchema),
+  SubscriptionController.giftSubscription
+);
+
 // get all subscribers
 router.get(
   '/subscribers',

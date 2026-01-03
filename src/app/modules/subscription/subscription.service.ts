@@ -6,9 +6,10 @@ import ApiError from '../../../errors/ApiError';
 import { User } from '../user/user.model';
 import config from '../../../config';
 import { Subscription } from './subscription.model';
-import { SubscriptionStatus } from './subscription.constants';
+import { PaymentStatus, SubscriptionStatus } from './subscription.constants';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { USER_ROLES } from '../user/user.constant';
+import { calculateExpireDate } from '../../../util/calculateExpireDate';
 
 // create subscription
 const createSubscription = async (payload: Partial<ISubscription>) => {
@@ -85,6 +86,83 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   return checkoutSession.url;
 };
 
+// gift subscription
+const giftSubscription = async (payload: Partial<ISubscription>) => {
+  // check if the user exists
+  const existingUser = await User.findById(payload.user);
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+
+  // create new Stripe customer if not exist
+  if (!existingUser.stripeCustomerId) {
+    const customer = await stripe.customers.create({
+      email: existingUser.email || '',
+      name: existingUser.name,
+      metadata: { userId: existingUser._id.toString() },
+    });
+
+    existingUser.stripeCustomerId = customer.id;
+    await User.findByIdAndUpdate(existingUser._id, {
+      stripeCustomerId: customer.id,
+    });
+
+    if (!existingUser?.stripeCustomerId) {
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        'Failed to create Stripe customer'
+      );
+    }
+  }
+
+  // check if the package exists
+  const pkg = await Package.findOne({
+    _id: payload.package,
+    isDeleted: false,
+  });
+  if (!pkg) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
+  }
+
+  // check if the user already has an active subscription
+  const hasActiveSubscription = await Subscription.exists({
+    user: payload.user,
+    package: payload.package,
+    status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+  });
+
+  if (hasActiveSubscription) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'User already has an active subscription for this package'
+    );
+  }
+
+  // DB write: create subscription
+  const expiryDate = calculateExpireDate(pkg.interval, pkg.intervalCount);
+  payload = {
+    ...payload,
+    price: 0,
+    currentPeriodStart: new Date(),
+    currentPeriodEnd: expiryDate,
+    cancelAtPeriodEnd: true,
+    status: SubscriptionStatus.TRIALING,
+    paymentStatus: PaymentStatus.UNPAID,
+  };
+
+  const result = await Subscription.create(payload);
+  if (!result) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
+  }
+
+  // update user subscription
+  await User.findByIdAndUpdate(existingUser._id, {
+    subscription: result._id,
+  });
+
+  return result;
+};
+
 // get subscribers
 const getAllSubscribers = async (query: Record<string, unknown>) => {
   const status = typeof query.status === 'string' ? query.status : undefined;
@@ -124,5 +202,6 @@ const getAllSubscribers = async (query: Record<string, unknown>) => {
 
 export const SubscriptionServices = {
   createSubscription,
+  giftSubscription,
   getAllSubscribers,
 };
