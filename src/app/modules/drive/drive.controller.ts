@@ -34,7 +34,21 @@ const updateDrive = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get my drive files
+const getMyDrives = catchAsync(async (req: Request, res: Response) => {
+  const result = await DriveServices.getDrivesByUserId(req.user.id, req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Drives retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+});
+
 export const DriveController = {
   createDrive,
   updateDrive,
+  getMyDrives,
 };

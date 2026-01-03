@@ -24,4 +24,7 @@ router.patch(
   DriveController.updateDrive
 );
 
+// get my drives
+router.get('/my-drives', auth(), DriveController.getMyDrives);
+
 export const driveRoutes = router;
