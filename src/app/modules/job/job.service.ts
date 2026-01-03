@@ -85,9 +85,17 @@ const getJobsByEmployerId = async (
 
 // -------------- get all jobs with pagination --------------
 const getAllJobs = async (query: Record<string, unknown>) => {
-  const jobQuery = new QueryBuilder(Job.find({ isDeleted: false }), query)
+  const jobQuery = new QueryBuilder(
+    Job.find({
+      isDeleted: false,
+      ...(query.salaryAmount
+        ? { salaryAmount: { $lte: Number(query.salaryAmount) } }
+        : {}),
+    }),
+    query
+  )
     .search(['location', 'category', 'subCategory'])
-    .filter()
+    .filter(['salaryAmount'])
     .sort()
     .paginate()
     .fields()
