@@ -3,6 +3,8 @@ import ApiError from '../../../errors/ApiError';
 import { ISupport } from './support.interface';
 import { Support } from './support.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 
 // -------------- create support --------------
 const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
@@ -23,14 +25,32 @@ const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
 };
 
 // -------------- update support --------------
-const updateSupportToDB = async (id: string, payload: Partial<ISupport>) => {
+const updateSupportToDB = async (
+  id: string,
+  payload: Partial<ISupport> & { reply?: string }
+) => {
   // check if the support exists
-  const existingSupport = await Support.exists({ _id: id });
+  const existingSupport = await Support.findById(id).lean();
   if (!existingSupport) {
     throw new Error('Support not found');
   }
 
   const result = await Support.findByIdAndUpdate(id, payload, { new: true });
+
+  // send reply mail
+  if (payload.reply) {
+    const template = emailTemplate.supportReply({
+      ...existingSupport,
+      reply: payload.reply,
+    });
+
+    await emailHelper.sendEmail({
+      to: existingSupport.email,
+      subject: template.subject,
+      html: template.html,
+    });
+  }
+
   return result;
 };
 

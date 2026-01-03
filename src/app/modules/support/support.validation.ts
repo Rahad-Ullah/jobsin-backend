@@ -23,6 +23,7 @@ export const updateSupportValidation = z.object({
   body: z
     .object({
       status: z.nativeEnum(SupportStatus).optional(),
+      reply: z.string().nonempty('Reply cannot be empty').optional(),
     })
     .strict(),
 });

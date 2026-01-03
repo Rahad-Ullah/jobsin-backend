@@ -1,4 +1,5 @@
 import { IAppointment } from '../app/modules/appointment/appointment.interface';
+import { ISupport } from '../app/modules/support/support.interface';
 import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
@@ -89,8 +90,44 @@ const confirmAppointment = (values: IAppointment) => {
                   </p>
               </div>
           </div>
-          <div style="text-align: center; margin-top: 20px; color: #aaa; font-size: 12px;">
-              © 2026 JobsinApp. All rights reserved.
+      </body>
+    `,
+  };
+  return data;
+};
+
+const supportReply = (values: ISupport & { reply: string }) => {
+  const data = {
+    to: values.email,
+    subject: 'Support Update',
+    html: `
+      <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
+          <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              
+              <div style="">
+                  <h2 style="color: #277E16; margin-bottom: 10px; text-align: center;">Support Update</h2>
+                  <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                      Hi <strong>${values.name || 'there'}</strong>,<br><br>
+                      Thank you for reaching out to the JobsinApp support team. We have reviewed your inquiry.
+                  </p>
+                  
+                  <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
+                      <p style="margin: 5px 0; color: #277E16; font-weight: bold;">Our Response:</p>
+                      <p style="margin: 10px 0; line-height: 1.5;">
+                          ${values.reply}
+                      </p>
+                  </div>
+
+                  <p style="font-size: 15px; line-height: 1.5; margin-bottom: 25px;">
+                      If you have any further questions or if this doesn't fully resolve your issue, please simply reply to this email or visit our help center.
+                  </p>
+
+                  <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
+                      Best regards,<br>
+                      <strong>The JobsinApp Support Team</strong>
+                  </p>
+              </div>
           </div>
       </body>
     `,
@@ -102,4 +139,5 @@ export const emailTemplate = {
   createAccount,
   resetPassword,
   confirmAppointment,
+  supportReply,
 };
