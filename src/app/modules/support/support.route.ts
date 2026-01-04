@@ -16,6 +16,15 @@ router.post(
   SupportController.createSupport
 );
 
+// create for logged in user
+router.post(
+  '/create/logged-in-user',
+  auth(USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER),
+  fileUploadHandler(),
+  validateRequest(SupportValidations.createSupportForLoggedInUserValidation),
+  SupportController.createSupportForLoggedInUser
+);
+
 // update support
 router.patch(
   '/update/:id',

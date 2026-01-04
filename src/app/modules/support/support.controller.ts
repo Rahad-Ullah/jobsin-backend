@@ -21,6 +21,24 @@ const createSupport = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// create for logged in user
+const createSupportForLoggedInUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const image = getSingleFilePath(req.files, 'image');
+    const result = await SupportServices.createSupportForLoggedInUser(req.user.id, {
+      ...req.body,
+      attachment: image,
+    });
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Support created successfully',
+      data: result,
+    });
+  }
+);
+
 // update support
 const updateSupport = catchAsync(async (req: Request, res: Response) => {
   const result = await SupportServices.updateSupportToDB(
@@ -63,6 +81,7 @@ const getAllSupports = catchAsync(async (req: Request, res: Response) => {
 
 export const SupportController = {
   createSupport,
+  createSupportForLoggedInUser,
   updateSupport,
   getSingleSupportById,
   getAllSupports,

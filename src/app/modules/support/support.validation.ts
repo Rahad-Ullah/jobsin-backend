@@ -18,6 +18,16 @@ export const createSupportValidation = z.object({
     .strict(),
 });
 
+// create for logged in user
+export const createSupportForLoggedInUserValidation = z.object({
+  body: z
+    .object({
+      message: z.string().nonempty('Message is required'),
+      attachment: z.string().default(''),
+    })
+    .strict(),
+});
+
 // Support update schema (PATCH)
 export const updateSupportValidation = z.object({
   body: z
@@ -30,5 +40,6 @@ export const updateSupportValidation = z.object({
 
 export const SupportValidations = {
   createSupportValidation,
+  createSupportForLoggedInUserValidation,
   updateSupportValidation,
 };

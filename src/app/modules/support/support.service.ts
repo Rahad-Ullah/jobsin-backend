@@ -5,18 +5,54 @@ import { Support } from './support.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { User } from '../user/user.model';
+import { SupportStatus } from './support.constants';
 
 // -------------- create support --------------
 const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
   // check if the user submitted a support within 6 hours
-  const existingSupport = await Support.findOne({
+  const existingSupports = await Support.countDocuments({
     email: payload.email,
+    status: SupportStatus.PENDING,
     createdAt: { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) },
   });
-  if (existingSupport) {
+  if (existingSupports >= 3) {
     throw new ApiError(
       StatusCodes.CONFLICT,
-      'Already processing your another request. Please try again later.'
+      'We are processing your another requests. Please try again later.'
+    );
+  }
+
+  const result = await Support.create(payload);
+  return result;
+};
+
+// -------------- create support for logged in user --------------
+const createSupportForLoggedInUser = async (
+  userId: string,
+  payload: ISupport
+): Promise<ISupport> => {
+  // check if the user exists
+  const existingUser = await User.findById(userId);
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+
+  payload.name = existingUser.name;
+  payload.email = existingUser.email;
+  payload.phone = existingUser.phone;
+  payload.address = existingUser.address;
+
+  // check if the user submitted a support within 6 hours
+  const existingSupports = await Support.countDocuments({
+    email: existingUser.email,
+    status: SupportStatus.PENDING,
+    createdAt: { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) },
+  });
+  if (existingSupports >= 3) {
+    throw new ApiError(
+      StatusCodes.CONFLICT,
+      'We are processing your another requests. Please try again later.'
     );
   }
 
@@ -79,6 +115,7 @@ const getAllSupportsFromDB = async (query: Record<string, unknown>) => {
 
 export const SupportServices = {
   createSupportToDB,
+  createSupportForLoggedInUser,
   updateSupportToDB,
   getSupportByIdFromDB,
   getAllSupportsFromDB,
