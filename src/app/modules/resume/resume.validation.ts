@@ -54,7 +54,7 @@ const personalInfoSchema = z
       .nullable()
       .optional(),
 
-    image: z.string().default(''),
+    image: z.string().default('').optional(),
     presentAddress: z.string().default(''),
     permanentAddress: z.string().default(''),
     aboutMe: z.string().default(''),

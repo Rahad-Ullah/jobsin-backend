@@ -1,26 +1,48 @@
+import unlinkFile from '../../../shared/unlinkFile';
 import { User } from '../user/user.model';
 import { IResume } from './resume.interface';
 import { Resume } from './resume.model';
 
 // --------------- create/update resume ---------------
 const createUpdateResumeToDB = async (
-  payload: Partial<IResume>
+  payload: Partial<IResume> & { image?: string }
 ): Promise<IResume> => {
-  // check if the user exists
   const existingUser = await User.findById(payload.user);
   if (!existingUser) {
     throw new Error('User not found');
   }
 
-  // create or update resume
+  // 1️⃣ get old resume BEFORE update
+  const oldResume = await Resume.findOne({ user: payload.user }).select(
+    'personalInfo.image'
+  );
+
+  const oldImage = oldResume?.personalInfo?.image;
+
+  // 2️⃣ build update document
+  const updateDoc: any = { ...payload };
+
+  if (payload.image) {
+    updateDoc.$set = {
+      'personalInfo.image': payload.image,
+    };
+    delete updateDoc.image;
+  }
+
+  // 3️⃣ update / create resume
   const result = await Resume.findOneAndUpdate(
     { user: payload.user },
-    payload,
+    updateDoc,
     {
       new: true,
       upsert: true,
     }
   );
+
+  // 4️⃣ unlink ONLY the old image
+  if (payload.image && oldImage && oldImage !== payload.image) {
+    unlinkFile(oldImage);
+  }
 
   return result;
 };
@@ -29,7 +51,7 @@ const createUpdateResumeToDB = async (
 const getResumeByUserId = async (userId: string) => {
   const result = await Resume.findOne({ user: userId });
   return result;
-}
+};
 
 export const ResumeServices = {
   createUpdateResumeToDB,

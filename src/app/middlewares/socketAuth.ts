@@ -15,7 +15,8 @@ interface JwtPayload {
 export const socketAuth = (socket: Socket, next: (err?: Error) => void) => {
   try {
     // Check both handshake.auth and handshake.headers
-    const token = socket.handshake.auth?.auth || socket.handshake.headers?.auth;
+    const token =
+      socket.handshake.auth?.token || socket.handshake.headers?.token;
 
     if (!token) {
       return next(

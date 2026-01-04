@@ -4,6 +4,7 @@ import auth from '../../middlewares/auth';
 import { USER_ROLES } from '../user/user.constant';
 import validateRequest from '../../middlewares/validateRequest';
 import { ResumeValidations } from './resume.validation';
+import fileUploadHandler from '../../middlewares/fileUploadHandler';
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 router.patch(
   '/update',
   auth(USER_ROLES.JOB_SEEKER),
+  fileUploadHandler(),
   validateRequest(ResumeValidations.resumeSchema),
   ResumeController.createUpdateResume
 );
