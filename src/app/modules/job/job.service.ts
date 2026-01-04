@@ -1,10 +1,17 @@
 import QueryBuilder from '../../builder/QueryBuilder';
 import { Category } from '../category/category.model';
+import { User } from '../user/user.model';
 import { IJob } from './job.interface';
 import { Job } from './job.model';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
+  // check if author exists
+  const existingUser = await User.findById(payload.author).select('location');
+  if (!existingUser) {
+    throw new Error('User not found');
+  }
+
   // check if category is valid
   const existingCategory = await Category.findOne({ name: payload.category });
   if (!existingCategory) {
@@ -14,6 +21,9 @@ const createJob = async (payload: IJob): Promise<IJob> => {
   if (!existingCategory?.subCategories.includes(payload.subCategory)) {
     throw new Error('Invalid sub category');
   }
+
+  // inherit location from author
+  payload.location = existingUser.location;
 
   const result = await Job.create(payload);
   return result;
@@ -85,17 +95,37 @@ const getJobsByEmployerId = async (
 
 // -------------- get all jobs with pagination --------------
 const getAllJobs = async (query: Record<string, unknown>) => {
-  const jobQuery = new QueryBuilder(
-    Job.find({
-      isDeleted: false,
-      ...(query.salaryAmount
-        ? { salaryAmount: { $lte: Number(query.salaryAmount) } }
-        : {}),
-    }),
-    query
-  )
-    .search(['location', 'category', 'subCategory'])
-    .filter(['salaryAmount'])
+  const filter: Record<string, any> = { isDeleted: false };
+  // Nearby search (lat, lng, radius)
+  if (query.radius && query.lat && query.lng) {
+    const lat = parseFloat(query.lat as string);
+    const long = parseFloat(query.lng as string);
+    const radiusKm = parseFloat(query.radius as string); // radius in kilometers
+
+    if (
+      !isNaN(radiusKm) &&
+      radiusKm > 0 &&
+      lat !== undefined &&
+      long !== undefined
+    ) {
+      const EARTH_RADIUS = 6378.1; // km
+      const radiusInRadians = radiusKm / EARTH_RADIUS;
+
+      filter.location = {
+        $geoWithin: {
+          $centerSphere: [[long, lat], radiusInRadians],
+        },
+      };
+    }
+  }
+
+  if (query.salaryAmount) {
+    filter.salaryAmount = { $lte: Number(query.salaryAmount) };
+  }
+
+  const jobQuery = new QueryBuilder(Job.find(filter), query)
+    .search(['category', 'subCategory'])
+    .filter(['salaryAmount', 'location', 'lat', 'lng', 'radius'])
     .sort()
     .paginate()
     .fields()

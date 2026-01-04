@@ -29,6 +29,18 @@ const jobSchema = new Schema<IJob, JobModel>(
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     category: { type: String, required: true },
     subCategory: { type: String, required: true },
+    location: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+        select: false,
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
     jobType: {
       type: String,
       enum: Object.values(JobType),

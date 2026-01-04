@@ -21,6 +21,10 @@ export interface IJob {
   author: Types.ObjectId;
   category: string;
   subCategory: string;
+  location: {
+    type: 'Point';
+    coordinates: number[];
+  };
   jobType: JobType;
   experience: ExperienceLevel;
   deadline: Date;
