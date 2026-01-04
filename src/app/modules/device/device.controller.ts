@@ -19,6 +19,18 @@ const createDevice = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// remove device
+const removeDevice = catchAsync(async (req: Request, res: Response) => {
+  const result = await DeviceServices.removeDeviceById(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Device deleted successfully',
+    data: result,
+  });
+});
+
 // get devices
 const getDevices = catchAsync(async (req: Request, res: Response) => {
   const result = await DeviceServices.getDevicesByUserId(req.user.id);
@@ -33,5 +45,6 @@ const getDevices = catchAsync(async (req: Request, res: Response) => {
 
 export const DeviceController = {
   createDevice,
+  removeDevice,
   getDevices,
 };

@@ -14,6 +14,9 @@ router.post(
   DeviceController.createDevice
 );
 
+// remove device
+router.delete('/:id', auth(), DeviceController.removeDevice);
+
 // get devices
 router.get('/me', auth(), DeviceController.getDevices);
 
