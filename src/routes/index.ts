@@ -21,6 +21,7 @@ import { MessageRoutes } from '../app/modules/message/message.route';
 import { analyticsRoutes } from '../app/modules/analytics/analytics.route';
 import { appointmentRoutes } from '../app/modules/appointment/appointment.route';
 import { driveRoutes } from '../app/modules/drive/drive.route';
+import { deviceRoutes } from '../app/modules/device/device.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -75,6 +76,10 @@ const apiRoutes = [
   {
     path: '/drives',
     route: driveRoutes,
+  },
+  {
+    path: '/devices',
+    route: deviceRoutes,
   },
   {
     path: '/packages',

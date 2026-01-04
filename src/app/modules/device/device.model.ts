@@ -7,7 +7,7 @@ const deviceSchema = new Schema<IDevice, DeviceModel>(
     ip: { type: String, required: true },
     model: { type: String, required: true },
     os: { type: String, required: true },
-    loginAt: { type: Date, required: true },
+    loginAt: { type: Date, default: new Date() },
   },
   { timestamps: true }
 );
