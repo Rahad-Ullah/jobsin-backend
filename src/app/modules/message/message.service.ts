@@ -86,6 +86,7 @@ export const getChatMessages = async (
   const messagesWithStatus = messages.map((message: any) => {
     return {
       ...message,
+      isMyMessage: message.sender._id.toString() === user?.id,
       isSeen: message.seenBy?.length === existingChat?.participants?.length,
     };
   });
