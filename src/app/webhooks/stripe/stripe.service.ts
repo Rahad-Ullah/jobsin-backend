@@ -27,11 +27,11 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     const stripePrice = stripeSub.items.data[0].price;
     const unitAmount = stripePrice.unit_amount! / 100;
 
-    const invoice = stripeSub.latest_invoice as Stripe.Invoice;
-    if (!invoice?.lines?.data?.length) {
+    const stripeInvoice = stripeSub.latest_invoice as Stripe.Invoice;
+    if (!stripeInvoice?.lines?.data?.length) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Invoice lines not found');
     }
-    const period = invoice.lines.data[0].period;
+    const period = stripeInvoice.lines.data[0].period;
 
     // DB write: create subscription
     const payload = {
@@ -59,10 +59,30 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       );
     }
 
-    // update user subscription
+    // DB write: update user subscription
     await User.findByIdAndUpdate(stripeSub.metadata?.userId, {
       subscription: result._id,
     });
+
+    // DB write: create invoice
+    const invoicePayload: IInvoice = {
+      user: result.user,
+      subscription: result._id,
+      stripeInvoiceId: stripeInvoice.id,
+      stripeSubscriptionId: stripeSub.id,
+      periodStart: new Date(period.start * 1000),
+      periodEnd: new Date(period.end * 1000),
+      amount: unitAmount,
+      currency: stripeSub.currency,
+      status: InvoiceStatus.PAID,
+      paidAt: new Date(),
+      invoicePdfUrl: stripeInvoice.invoice_pdf,
+      hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
+    };
+    const invoiceResult = await Invoice.create(invoicePayload);
+    if (!invoiceResult) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invoice creation failed');
+    }
   } catch (error) {
     console.error('Error onCheckoutSessionCompleted  ~~ ', error);
   }
@@ -91,6 +111,14 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       );
     }
 
+    // check if subscription exists
+    const existingSubscription = await Subscription.exists({
+      stripeSubscriptionId: stripeSubscriptionId,
+    }).lean();
+    if (!existingSubscription) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
+    }
+
     // DB write: update subscription
     const subscription = await Subscription.findOneAndUpdate(
       { stripeSubscriptionId: stripeSubscriptionId },
@@ -115,6 +143,8 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       currency: stripeInvoice.currency,
       status: InvoiceStatus.PAID,
       paidAt: new Date(),
+      invoicePdfUrl: stripeInvoice.invoice_pdf,
+      hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
 
     const result = await Invoice.create(invoicePayload);
@@ -142,6 +172,14 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
         StatusCodes.BAD_REQUEST,
         'Subscription ID not found in invoice'
       );
+    }
+
+    // check if subscription exists
+    const existingSubscription = await Subscription.exists({
+      stripeSubscriptionId: stripeSubscriptionId,
+    }).lean();
+    if (!existingSubscription) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
     }
 
     // DB write: update subscription
@@ -197,12 +235,20 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
       );
     }
 
+    // check if subscription exists
+    const existingSubscription = await Subscription.exists({
+      stripeSubscriptionId: stripeSubscriptionId,
+    }).lean();
+    if (!existingSubscription) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
+    }
+
     // DB write: update subscription
     if (
       stripeInvoice.status === 'uncollectible' ||
       stripeInvoice.status === 'void'
     ) {
-      const subscription = await Subscription.findOneAndUpdate(
+      await Subscription.findOneAndUpdate(
         { stripeSubscriptionId: stripeSubscriptionId },
         {
           paymentStatus: PaymentStatus.FAILED,

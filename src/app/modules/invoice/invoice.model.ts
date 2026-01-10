@@ -53,6 +53,14 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
       type: Date,
       default: null,
     },
+    invoicePdfUrl: {
+      type: String,
+      default: null,
+    },
+    hostedInvoiceUrl: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

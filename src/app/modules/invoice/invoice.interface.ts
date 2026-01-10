@@ -14,6 +14,8 @@ export interface IInvoice {
   currency: string;
   status: InvoiceStatus;
   paidAt?: Date | null;
+  invoicePdfUrl?: string | null;
+  hostedInvoiceUrl?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
