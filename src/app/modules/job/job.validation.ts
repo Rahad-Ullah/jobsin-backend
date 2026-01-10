@@ -69,6 +69,7 @@ export const updateJobValidation = z.object({
       responsibilities: z.array(z.string()).optional(),
       qualifications: z.array(z.string()).optional(),
       aboutCompany: z.string().optional(),
+      status: z.nativeEnum(JobStatus).optional(),
       notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
