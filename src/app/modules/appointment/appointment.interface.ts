@@ -9,6 +9,7 @@ export interface IAppointment {
   scheduledAt: Date;
   address: string;
   message: string;
+  cancelReason: string;
   status: AppointmentStatus;
   isDeleted: boolean;
   createdAt?: Date;

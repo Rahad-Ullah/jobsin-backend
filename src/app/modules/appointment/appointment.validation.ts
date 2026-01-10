@@ -34,6 +34,7 @@ export const updateAppointmentZodSchema = z.object({
       status: z.nativeEnum(AppointmentStatus, {
         required_error: 'Valid status is required',
       }),
+      cancelReason: z.string().optional(),
     })
     .strict(),
 });

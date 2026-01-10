@@ -31,6 +31,10 @@ const appointmentSchema = new Schema<IAppointment, AppointmentModel>(
       type: String,
       required: true,
     },
+    cancelReason: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
       enum: Object.values(AppointmentStatus),
