@@ -20,6 +20,7 @@ export interface IJobSeeker {
   resumeUrl?: string;
   resume?: Types.ObjectId;
   attachments: string[];
+  isProfileVisible: boolean;
 }
 
 export type JobSeekerModel = Model<IJobSeeker>;

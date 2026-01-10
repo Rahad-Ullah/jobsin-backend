@@ -1,4 +1,6 @@
 import unlinkFile from '../../../shared/unlinkFile';
+import { Application } from '../application/application.model';
+import { Job } from '../job/job.model';
 import { IJobSeeker } from './jobSeeker.interface';
 import { JobSeeker } from './jobSeeker.model';
 
@@ -61,9 +63,36 @@ const getJobSeekerByUserId = async (userId: string) => {
     'name email role phone address image'
   );
   return result;
-}
+};
+
+// ------------ get job seeker with privacy -------------
+const getJobSeekerWithPrivacy = async (
+  jobSeekerId: string,
+  employerId: string
+) => {
+  const result = await JobSeeker.findOne({ user: jobSeekerId })
+    .populate('user', 'name email role phone address image')
+    .lean();
+
+  if (result?.isProfileVisible === false) {
+    const employerJobs = await Job.find({ author: employerId })
+      .select('_id')
+      .lean();
+
+    const applications = await Application.countDocuments({
+      user: jobSeekerId,
+      _id: { $in: employerJobs.map(job => job._id) },
+      isDeleted: false,
+    });
+
+    return { ...result, isProfileVisible: applications > 0 };
+  }
+
+  return result;
+};
 
 export const JobSeekerServices = {
   updateJobSeekerByUserId,
   getJobSeekerByUserId,
+  getJobSeekerWithPrivacy,
 };

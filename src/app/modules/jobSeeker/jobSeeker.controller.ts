@@ -7,6 +7,7 @@ import {
   getSingleFilePath,
 } from '../../../shared/getFilePath';
 import { StatusCodes } from 'http-status-codes';
+import { USER_ROLES } from '../user/user.constant';
 
 // update job seeker
 const updateJobSeeker = catchAsync(async (req: Request, res: Response) => {
@@ -41,7 +42,15 @@ const getMyJobSeeker = catchAsync(async (req: Request, res: Response) => {
 
 // get job seeker by user id
 const getJobSeekerByUserId = catchAsync(async (req: Request, res: Response) => {
-  const result = await JobSeekerServices.getJobSeekerByUserId(req.params.id);
+  let result;
+  if (req.user.role === USER_ROLES.EMPLOYER) {
+    result = await JobSeekerServices.getJobSeekerWithPrivacy(
+      req.params.id,
+      req.user.id
+    );
+  } else {
+    result = await JobSeekerServices.getJobSeekerByUserId(req.params.id);
+  }
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
