@@ -4,9 +4,6 @@ import { z } from 'zod';
 export const createDeviceValidation = z.object({
   body: z
     .object({
-      ip: z
-        .string({ required_error: 'IP cannot be empty' })
-        .nonempty('IP is required'),
       model: z
         .string({ required_error: 'Model is required' })
         .nonempty('Model cannot be empty'),

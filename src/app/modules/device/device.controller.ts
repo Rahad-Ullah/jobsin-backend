@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { DeviceServices } from './device.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
@@ -9,6 +9,7 @@ const createDevice = catchAsync(async (req: Request, res: Response) => {
   const result = await DeviceServices.createDeviceToDB({
     ...req.body,
     user: req.user.id,
+    ip: req.ip,
   });
 
   sendResponse(res, {
