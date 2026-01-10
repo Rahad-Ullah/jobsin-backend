@@ -1,6 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
 import { InvoiceServices } from './invoice.service';
+import catchAsync from '../../../shared/catchAsync';
+import sendResponse from '../../../shared/sendResponse';
+import { StatusCodes } from 'http-status-codes';
+
+// get invoices by user id
+const getMyInvoices = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await InvoiceServices.getInvoicesByUserIdFromDB(
+      req.user.id,
+      req.query
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Invoices fetched successfully',
+      data: result.data,
+      pagination: result.pagination,
+    });
+  }
+);
 
 export const InvoiceController = {
-  // Controller methods here
+  getMyInvoices,
 };

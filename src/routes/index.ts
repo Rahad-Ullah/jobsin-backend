@@ -22,6 +22,7 @@ import { analyticsRoutes } from '../app/modules/analytics/analytics.route';
 import { appointmentRoutes } from '../app/modules/appointment/appointment.route';
 import { driveRoutes } from '../app/modules/drive/drive.route';
 import { deviceRoutes } from '../app/modules/device/device.route';
+import { invoiceRoutes } from '../app/modules/invoice/invoice.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -88,6 +89,10 @@ const apiRoutes = [
   {
     path: '/subscriptions',
     route: subscriptionRoutes,
+  },
+  {
+    path: '/invoices',
+    route: invoiceRoutes,
   },
   {
     path: '/feedbacks',
