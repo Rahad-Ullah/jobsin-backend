@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ApplicationStatus } from './application.constants';
+import { SalaryType } from '../job/job.constants';
 
 const objectIdSchema = z.string().refine(val => /^[0-9a-fA-F]{24}$/.test(val), {
   message: 'Invalid ObjectId format',
@@ -12,6 +13,7 @@ export const createApplicationValidation = z.object({
       job: objectIdSchema,
       doc: z.string().optional(),
       isResume: z.boolean().default(false),
+      salaryType: z.nativeEnum(SalaryType),
       expectedSalary: z
         .number({ required_error: 'Expected salary is required' })
         .positive('Expected salary must be positive'),

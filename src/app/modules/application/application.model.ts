@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IApplication, ApplicationModel } from './application.interface';
 import { ApplicationStatus } from './application.constants';
+import { SalaryType } from '../job/job.constants';
 
 const applicationSchema = new Schema<IApplication, ApplicationModel>(
   {
@@ -8,6 +9,11 @@ const applicationSchema = new Schema<IApplication, ApplicationModel>(
     job: { type: Schema.Types.ObjectId, ref: 'Job', required: true },
     resumeUrl: { type: String, default: '' },
     resume: { type: Schema.Types.ObjectId, ref: 'Resume', default: null },
+    salaryType: {
+      type: String,
+      enum: SalaryType,
+      required: true,
+    },
     expectedSalary: { type: Number, required: true },
     status: {
       type: String,

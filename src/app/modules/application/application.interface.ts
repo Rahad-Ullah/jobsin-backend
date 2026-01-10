@@ -1,5 +1,6 @@
 import { Model, Types } from 'mongoose';
 import { ApplicationStatus } from './application.constants';
+import { SalaryType } from '../job/job.constants';
 
 export interface IApplication {
   _id: Types.ObjectId;
@@ -7,6 +8,7 @@ export interface IApplication {
   job: Types.ObjectId;
   resumeUrl: string;
   resume: Types.ObjectId;
+  salaryType: SalaryType;
   expectedSalary: number;
   status: ApplicationStatus;
   isDeleted: boolean;
