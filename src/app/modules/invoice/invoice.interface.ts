@@ -6,8 +6,9 @@ import { InvoiceStatus } from './invoice.constants';
 export interface IInvoice {
   user: Types.ObjectId;
   subscription: Types.ObjectId;
-  stripeInvoiceId: string;
   stripeSubscriptionId: string;
+  stripeInvoiceId: string;
+  invoiceNumber: string;
   periodStart: Date;
   periodEnd: Date;
   amount: number;

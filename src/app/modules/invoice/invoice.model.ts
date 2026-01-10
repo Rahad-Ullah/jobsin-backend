@@ -16,12 +16,17 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
       required: true,
       index: true,
     },
+    stripeSubscriptionId: {
+      type: String,
+      required: true,
+      index: true,
+    },
     stripeInvoiceId: {
       type: String,
       required: true,
       index: true,
     },
-    stripeSubscriptionId: {
+    invoiceNumber: {
       type: String,
       required: true,
       index: true,

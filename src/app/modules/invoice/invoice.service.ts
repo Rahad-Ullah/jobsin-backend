@@ -23,6 +23,7 @@ const getInvoicesByUserIdFromDB = async (
     ]),
     query
   )
+    .search(['invoiceNumber', 'user.email', 'user.phone'])
     .filter()
     .sort()
     .paginate()
