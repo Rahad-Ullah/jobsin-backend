@@ -64,9 +64,6 @@ const getApplicationsByJobId = async (
         select: 'name email phone address image jobSeeker',
         populate: {
           path: 'jobSeeker',
-          populate: {
-            path: 'resume',
-          },
         },
       },
       {

@@ -1,4 +1,5 @@
 import unlinkFile from '../../../shared/unlinkFile';
+import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { User } from '../user/user.model';
 import { IResume } from './resume.interface';
 import { Resume } from './resume.model';
@@ -43,6 +44,13 @@ const createUpdateResumeToDB = async (
   if (payload.image && oldImage && oldImage !== payload.image) {
     unlinkFile(oldImage);
   }
+
+  // 5️⃣ update job seeker
+  await JobSeeker.findOneAndUpdate(
+    { user: existingUser._id },
+    { resume: result._id },
+    { new: true }
+  );
 
   return result;
 };
