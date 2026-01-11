@@ -12,4 +12,11 @@ router.get(
   InvoiceController.getMyInvoices
 );
 
+// get all invoices
+router.get(
+  '/',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  InvoiceController.getAllInvoices
+);
+
 export const invoiceRoutes = router;

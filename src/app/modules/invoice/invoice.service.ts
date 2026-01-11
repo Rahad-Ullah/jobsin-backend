@@ -17,7 +17,39 @@ const getInvoicesByUserIdFromDB = async (
         select: 'package price status paymentStatus',
         populate: {
           path: 'package',
-          select: 'name interval intervalPrice intervalCount price',
+          select: 'name interval intervalPrice intervalCount',
+        },
+      },
+    ]),
+    query
+  )
+    .search(['invoiceNumber', 'user.email', 'user.phone'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    invoiceQuery.modelQuery.lean(),
+    invoiceQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
+
+// ------------- get all invoices -------------
+const getAllInvoicesFromDB = async (query: Record<string, any>) => {
+  const invoiceQuery = new QueryBuilder(
+    Invoice.find().populate([
+      {
+        path: 'user',
+        select: 'name email phone address image',
+      },
+      {
+        path: 'subscription',
+        select: 'package price status paymentStatus',
+        populate: {
+          path: 'package',
+          select: 'name interval intervalPrice intervalCount',
         },
       },
     ]),
@@ -38,4 +70,5 @@ const getInvoicesByUserIdFromDB = async (
 
 export const InvoiceServices = {
   getInvoicesByUserIdFromDB,
+  getAllInvoicesFromDB,
 };

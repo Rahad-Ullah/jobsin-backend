@@ -22,6 +22,20 @@ const getMyInvoices = catchAsync(
   }
 );
 
+// get all invoices
+const getAllInvoices = catchAsync(async (req: Request, res: Response) => {
+  const result = await InvoiceServices.getAllInvoicesFromDB(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Invoices fetched successfully',
+    data: result.data,
+    pagination: result.pagination,
+  });
+});
+
 export const InvoiceController = {
   getMyInvoices,
+  getAllInvoices,
 };
