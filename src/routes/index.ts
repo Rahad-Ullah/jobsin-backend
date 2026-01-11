@@ -23,6 +23,7 @@ import { appointmentRoutes } from '../app/modules/appointment/appointment.route'
 import { driveRoutes } from '../app/modules/drive/drive.route';
 import { deviceRoutes } from '../app/modules/device/device.route';
 import { invoiceRoutes } from '../app/modules/invoice/invoice.route';
+import { workerRoutes } from '../app/modules/worker/worker.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -77,6 +78,10 @@ const apiRoutes = [
   {
     path: '/drives',
     route: driveRoutes,
+  },
+  {
+    path: '/workers',
+    route: workerRoutes,
   },
   {
     path: '/devices',
