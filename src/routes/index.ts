@@ -24,6 +24,7 @@ import { driveRoutes } from '../app/modules/drive/drive.route';
 import { deviceRoutes } from '../app/modules/device/device.route';
 import { invoiceRoutes } from '../app/modules/invoice/invoice.route';
 import { workerRoutes } from '../app/modules/worker/worker.route';
+import { shiftPlanRoutes } from '../app/modules/shiftPlan/shiftPlan.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -82,6 +83,10 @@ const apiRoutes = [
   {
     path: '/workers',
     route: workerRoutes,
+  },
+  {
+    path: '/shift-plans',
+    route: shiftPlanRoutes,
   },
   {
     path: '/devices',
