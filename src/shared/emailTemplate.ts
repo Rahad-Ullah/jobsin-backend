@@ -134,10 +134,51 @@ const supportReply = (values: ISupport & { reply: string }) => {
   };
   return data;
 };
+// payment failed
+const paymentFailed = (values: any) => {
+  const data = {
+    to: values.email,
+    subject: values.subject,
+    html: `
+      <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
+        <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+            <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+            
+            <div>
+                <h2 style="color: #D93025; margin-bottom: 10px; text-align: center;">Payment Failed</h2>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Hi <strong>${values.name || 'there'}</strong>,<br><br>
+                    We were unable to process the payment for your <strong>${values.packageName || 'JobsinApp Subscription'}</strong>. This can sometimes happen due to an expired card, insufficient funds, or a bank restriction.
+                </p>
+                
+                <div style="background-color: #fff5f5; border: 1px solid #f8d7da; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 25px;">
+                    <p style="margin: 5px 0; color: #D93025; font-weight: bold;">What happened?</p>
+                    <p style="margin: 10px 0; line-height: 1.5; font-size: 15px;">
+                        Our last attempt on <strong>${new Date().toLocaleDateString()}</strong> failed. To maintain your access to premium features, please update your billing information.
+                    </p>
+                    <a href="${values.billingUrl || '#'}" style="display: inline-block; padding: 12px 25px; background-color: #277E16; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Update Payment Method</a>
+                </div>
+
+                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 25px;">
+                    Don't worry, your account is still active for now. However, if the payment isn't resolved soon, your subscription may be downgraded to the free tier.
+                </p>
+
+                <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
+                    Best regards,<br>
+                    <strong>The JobsinApp Billing Team</strong>
+                </p>
+            </div>
+        </div>
+      </body>
+    `,
+  };
+  return data;
+};
 
 export const emailTemplate = {
   createAccount,
   resetPassword,
   confirmAppointment,
   supportReply,
+  paymentFailed,
 };

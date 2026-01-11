@@ -11,6 +11,8 @@ import { User } from '../../modules/user/user.model';
 import { Invoice } from '../../modules/invoice/invoice.model';
 import { IInvoice } from '../../modules/invoice/invoice.interface';
 import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 
 // on checkout session completed
 const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
@@ -194,7 +196,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
         currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
       },
       { new: true }
-    );
+    ).populate('user package');
 
     // DB write: create invoice
     const invoicePayload: Partial<IInvoice> = {
@@ -217,6 +219,23 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
         StatusCodes.INTERNAL_SERVER_ERROR,
         'Invoice creation failed'
       );
+    }
+
+    // send email to user
+    if ((subscription?.user as any)?.email) {
+      const template = emailTemplate.paymentFailed({
+        subject: 'Payment Failed',
+        name: (subscription?.user as any)?.name,
+        email: (subscription?.user as any)?.email,
+        packageName: (subscription?.package as any)?.name,
+        billingUrl: stripeInvoice.hosted_invoice_url,
+      });
+
+      await emailHelper.sendEmail({
+        to: (subscription?.user as any)?.email,
+        subject: template.subject,
+        html: template.html,
+      });
     }
   } catch (error) {
     console.error('Error onInvoicePaymentFailed  ~~ ', error);
