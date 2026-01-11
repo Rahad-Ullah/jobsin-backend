@@ -58,13 +58,31 @@ const getApplicationsByJobId = async (
   query: Record<string, any>
 ) => {
   const applicationQuery = new QueryBuilder(
-    Application.find({ job: id, isDeleted: false }),
+    Application.find({ job: id, isDeleted: false }).populate([
+      {
+        path: 'user',
+        select: 'name email phone address image jobSeeker',
+        populate: {
+          path: 'jobSeeker',
+          populate: {
+            path: 'resume',
+          },
+        },
+      },
+      {
+        path: 'job',
+        select:
+          'category subCategory jobType experience salaryType salaryAmount',
+      },
+      {
+        path: 'resume',
+      },
+    ]),
     query
   )
     .filter()
     .sort()
     .paginate()
-    .populate(['user'], { user: 'name email phone address image' })
     .fields();
 
   const [data, pagination] = await Promise.all([
