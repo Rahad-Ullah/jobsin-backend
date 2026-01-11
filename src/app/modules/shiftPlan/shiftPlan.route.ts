@@ -15,4 +15,12 @@ router.post(
   ShiftPlanController.createShiftPlan
 );
 
+// update shift plan
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.EMPLOYER),
+  validateRequest(ShiftPlanValidations.updateShiftPlanValidation),
+  ShiftPlanController.updateShiftPlan
+);
+
 export const shiftPlanRoutes = router;

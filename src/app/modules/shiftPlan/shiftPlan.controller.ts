@@ -19,6 +19,19 @@ const createShiftPlan = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update shift plan
+const updateShiftPlan = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShiftPlanServices.updateShiftPlan(req.params.id, req.body, req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Shift plan updated successfully',
+    data: result,
+  });
+});
+
 export const ShiftPlanController = {
   createShiftPlan,
+  updateShiftPlan,
 };

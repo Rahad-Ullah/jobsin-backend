@@ -41,6 +41,35 @@ const createShiftPlanValidation = z.object({
   // ),
 });
 
+// update shift plan validation
+const updateShiftPlanValidation = z.object({
+  body: z.object({
+    worker: z.string().length(24, 'Invalid worker id').optional(),
+    shift: z.nativeEnum(ShiftType).optional(),
+    startTime: z
+      .string({ required_error: 'Start time is required' })
+      .nonempty('Start time cannot be empty')
+      .optional(),
+    endTime: z.string({ required_error: 'End time is required' })
+      .nonempty('End time cannot be empty')
+      .optional(),
+    days: z
+      .array(
+        z
+          .string()
+          .datetime()
+          .refine(date => new Date(date) > new Date(), {
+            message: 'Date must be in the future',
+          })
+      )
+      .min(1, 'At least 1 day is required')
+      .optional(),
+    tasks: z.array(z.string()).optional(),
+    remarks: z.string().optional(),
+  }),
+});
+
 export const ShiftPlanValidations = {
   createShiftPlanValidation,
+  updateShiftPlanValidation,
 };
