@@ -56,9 +56,22 @@ const getShiftPlanByAuthorId = catchAsync(async (req: Request, res: Response) =>
   });
 });
 
+// get single shift plan by id
+const getSingleShiftPlanById = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShiftPlanServices.getShiftPlanById(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Shift plan retrieved successfully',
+    data: result,
+  });
+});
+
 export const ShiftPlanController = {
   createShiftPlan,
   updateShiftPlan,
   deleteShiftPlan,
   getShiftPlanByAuthorId,
+  getSingleShiftPlanById,
 };

@@ -37,4 +37,11 @@ router.get(
   ShiftPlanController.getShiftPlanByAuthorId
 );
 
+// get shift plan by id
+router.get(
+  '/single/:id',
+  auth(USER_ROLES.EMPLOYER),
+  ShiftPlanController.getSingleShiftPlanById
+);
+
 export const shiftPlanRoutes = router;

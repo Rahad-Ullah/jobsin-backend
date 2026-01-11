@@ -93,9 +93,17 @@ const getShiftPlanByAuthorId = async (
   return { data, pagination };
 };
 
+export const getShiftPlanById = async (
+  id: string
+): Promise<IShiftPlan | null> => {
+  const result = await ShiftPlan.findById(id).populate('worker');
+  return result;
+};
+
 export const ShiftPlanServices = {
   createShiftPlanToDB,
   updateShiftPlan,
   deleteShiftPlan,
   getShiftPlanByAuthorId,
+  getShiftPlanById,
 };
