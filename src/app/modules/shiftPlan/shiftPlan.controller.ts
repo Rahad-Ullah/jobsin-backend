@@ -31,7 +31,34 @@ const updateShiftPlan = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete shift plan
+const deleteShiftPlan = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShiftPlanServices.deleteShiftPlan(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Shift plan deleted successfully',
+    data: result,
+  });
+});
+
+// get shift plan by author id
+const getShiftPlanByAuthorId = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShiftPlanServices.getShiftPlanByAuthorId(req.user.id, req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Shift plan retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+});
+
 export const ShiftPlanController = {
   createShiftPlan,
   updateShiftPlan,
+  deleteShiftPlan,
+  getShiftPlanByAuthorId,
 };

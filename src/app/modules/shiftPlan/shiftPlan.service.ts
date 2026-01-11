@@ -3,6 +3,7 @@ import ApiError from '../../../errors/ApiError';
 import { IShiftPlan } from './shiftPlan.interface';
 import { ShiftPlan } from './shiftPlan.model';
 import { Worker } from '../worker/worker.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 // ------------ create shift plan --------------
 const createShiftPlanToDB = async (
@@ -59,7 +60,42 @@ const updateShiftPlan = async (
   return result;
 };
 
+// ------------- delete shift plan --------------
+const deleteShiftPlan = async (id: string): Promise<IShiftPlan | null> => {
+  // check if the shift plan exists
+  const existingShiftPlan = await ShiftPlan.exists({ _id: id });
+  if (!existingShiftPlan) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Shift plan not found');
+  }
+
+  const result = await ShiftPlan.findByIdAndDelete(id);
+  return result;
+};
+
+// ------------- get shift plan by author id -------------
+const getShiftPlanByAuthorId = async (
+  authorId: string,
+  query: Record<string, unknown>
+) => {
+  const planQuery = new QueryBuilder(
+    ShiftPlan.find({ author: authorId }).populate('worker'),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const [data, pagination] = await Promise.all([
+    planQuery.modelQuery.lean(),
+    planQuery.getPaginationInfo(),
+  ]);
+  return { data, pagination };
+};
+
 export const ShiftPlanServices = {
   createShiftPlanToDB,
   updateShiftPlan,
+  deleteShiftPlan,
+  getShiftPlanByAuthorId,
 };

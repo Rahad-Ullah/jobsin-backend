@@ -23,4 +23,18 @@ router.patch(
   ShiftPlanController.updateShiftPlan
 );
 
+// delete shift plan
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.EMPLOYER),
+  ShiftPlanController.deleteShiftPlan
+);
+
+// get my shift plans
+router.get(
+  '/me',
+  auth(USER_ROLES.EMPLOYER),
+  ShiftPlanController.getShiftPlanByAuthorId
+);
+
 export const shiftPlanRoutes = router;
