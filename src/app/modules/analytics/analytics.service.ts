@@ -203,20 +203,24 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
 const getMonthlyRevenueGrowth = async (query: Record<string, any>) => {
   const year = Number(query.year || new Date().getFullYear());
 
-  const result = await Subscription.aggregate([
+  const result = await Invoice.aggregate([
     {
       $facet: {
+        // 1. Total lifetime revenue from all paid invoices
         totalRevenue: [
+          { $match: { status: InvoiceStatus.PAID } },
           {
             $group: {
               _id: null,
-              count: { $sum: '$price' },
+              amount: { $sum: '$amount' },
             },
           },
         ],
+        // 2. Monthly breakdown for the requested year
         monthlyData: [
           {
             $match: {
+              status: InvoiceStatus.PAID,
               createdAt: {
                 $gte: new Date(year, 0, 1),
                 $lt: new Date(year + 1, 0, 1),
@@ -226,7 +230,7 @@ const getMonthlyRevenueGrowth = async (query: Record<string, any>) => {
           {
             $group: {
               _id: { $month: '$createdAt' },
-              count: { $sum: '$price' },
+              amount: { $sum: '$amount' },
             },
           },
           { $sort: { _id: 1 } },
@@ -235,10 +239,9 @@ const getMonthlyRevenueGrowth = async (query: Record<string, any>) => {
     },
   ]);
 
-  const totalRevenue = result[0].totalRevenue[0]?.count || 0;
+  const totalRevenue = result[0].totalRevenue[0]?.amount || 0;
   const rawMonthlyStats = result[0].monthlyData;
 
-  // --- Fill empty months with zero ---
   const monthNames = [
     'Jan',
     'Feb',
@@ -254,31 +257,30 @@ const getMonthlyRevenueGrowth = async (query: Record<string, any>) => {
     'Dec',
   ];
 
+  // Fill empty months with zero
   const monthlyStats = Array.from({ length: 12 }, (_, i) => {
-    const monthNumber = i + 1; // Months are 1-12 in MongoDB
+    const monthNumber = i + 1;
     const monthData = rawMonthlyStats.find(
       (item: any) => item._id === monthNumber
     );
 
     return {
       month: monthNames[i],
-      count: monthData ? monthData.count : 0,
+      count: monthData ? Math.round(monthData.amount * 100) / 100 : 0,
     };
   });
 
-  // Calculate total new users for THIS specific year from the filled data
-  const totalNewRevenueThisYear = monthlyStats.reduce(
-    (acc: number, curr: any) => acc + curr.count,
-    0
-  );
+  const totalRevenueThisYear =
+    monthlyStats.reduce((acc: number, curr: any) => acc + curr.count, 0) || 0;
 
+  // Growth calculation: How much of our lifetime revenue came from this year?
   const growthPercentage =
-    totalRevenue > 0 ? (totalNewRevenueThisYear / totalRevenue) * 100 : 0;
+    totalRevenue > 0 ? (totalRevenueThisYear / totalRevenue) * 100 : 0;
 
   return {
     year,
-    totalNewRevenueThisYear,
-    totalRevenue,
+    totalRevenueThisYear: Number(totalRevenueThisYear.toFixed(2)),
+    totalRevenue: Number(totalRevenue.toFixed(2)),
     growthPercentage: Number(growthPercentage.toFixed(2)),
     monthlyStats,
   };
