@@ -1,4 +1,5 @@
 import QueryBuilder from '../../builder/QueryBuilder';
+import { Application } from '../application/application.model';
 import { Category } from '../category/category.model';
 import { User } from '../user/user.model';
 import { IJob } from './job.interface';
@@ -59,15 +60,26 @@ const deleteJob = async (id: string) => {
 
 // --------------- get single job by id --------------
 const getSingleJobById = async (id: string) => {
-  const result = await Job.findById(id).populate({
-    path: 'author',
-    select: 'name email phone address image employer',
-    populate: {
-      path: 'employer',
-      select: 'businessCategory legalForm taxNo deNo about',
-    },
-  });
-  return result;
+  const [job, applicationCount] = await Promise.all([
+    Job.findById(id)
+      .populate({
+        path: 'author',
+        select: 'name email phone address image employer',
+        populate: {
+          path: 'employer',
+          select: 'businessCategory legalForm taxNo deNo about',
+        },
+      })
+      .lean(),
+    Application.countDocuments({ job: id }),
+  ]);
+
+  if (!job) return null;
+
+  return {
+    ...job,
+    totalApplications: applicationCount,
+  };
 };
 
 // -------------- get jobs by employer id --------------
