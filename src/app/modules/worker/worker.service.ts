@@ -17,6 +17,30 @@ const createWorkerToDB = async (
   return result;
 };
 
+// -------------- delete worker --------------
+const deleteWorker = async (id: string): Promise<IWorker | null> => {
+  // check if the worker exists
+  const existingWorker = await Worker.exists({ _id: id });
+  if (!existingWorker) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Worker not found');
+  }
+  
+  const result = await Worker.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    { new: true }
+  );
+  return result;
+};
+
+// ------------- get workers by employer id --------------
+const getWorkersByEmployerId = async (id: string): Promise<IWorker[]> => {
+  const result = await Worker.find({ author: id, isDeleted: false }).lean();
+  return result;
+}
+
 export const WorkerServices = {
   createWorkerToDB,
+  deleteWorker,
+  getWorkersByEmployerId,
 };
