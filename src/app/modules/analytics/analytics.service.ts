@@ -1,3 +1,5 @@
+import { InvoiceStatus } from '../invoice/invoice.constants';
+import { Invoice } from '../invoice/invoice.model';
 import { Subscription } from '../subscription/subscription.model';
 import { USER_ROLES } from '../user/user.constant';
 import { User } from '../user/user.model';
@@ -7,11 +9,23 @@ const getOverview = async () => {
   const jobSeekers = User.countDocuments({ role: USER_ROLES.JOB_SEEKER });
   const employers = User.countDocuments({ role: USER_ROLES.EMPLOYER });
   const subscribers = Subscription.countDocuments();
-  const revenue = Subscription.aggregate([
+  const revenue = await Invoice.aggregate([
+    {
+      $match: {
+        status: InvoiceStatus.PAID,
+      },
+    },
     {
       $group: {
         _id: null,
-        totalRevenue: { $sum: '$price' },
+        totalRevenue: { $sum: '$amount' },
+      },
+    },
+    {
+      // Round to 2 decimal places
+      $project: {
+        _id: 0,
+        totalRevenue: { $round: ['$totalRevenue', 2] },
       },
     },
   ]);
@@ -187,89 +201,87 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
 
 // -------------- get monthly revenue growth --------------
 const getMonthlyRevenueGrowth = async (query: Record<string, any>) => {
-    const year = Number(query.year || new Date().getFullYear());
+  const year = Number(query.year || new Date().getFullYear());
 
-    const result = await Subscription.aggregate([
-      {
-        $facet: {
-          totalRevenue: [
-            {
-              $group: {
-                _id: null,
-                count: { $sum: '$price' },
+  const result = await Subscription.aggregate([
+    {
+      $facet: {
+        totalRevenue: [
+          {
+            $group: {
+              _id: null,
+              count: { $sum: '$price' },
+            },
+          },
+        ],
+        monthlyData: [
+          {
+            $match: {
+              createdAt: {
+                $gte: new Date(year, 0, 1),
+                $lt: new Date(year + 1, 0, 1),
               },
             },
-          ],
-          monthlyData: [
-            {
-              $match: {
-                createdAt: {
-                  $gte: new Date(year, 0, 1),
-                  $lt: new Date(year + 1, 0, 1),
-                },
-              },
+          },
+          {
+            $group: {
+              _id: { $month: '$createdAt' },
+              count: { $sum: '$price' },
             },
-            {
-              $group: {
-                _id: { $month: '$createdAt' },
-                count: { $sum: '$price' },
-              },
-            },
-            { $sort: { _id: 1 } },
-          ],
-        },
-      }
-    ])
+          },
+          { $sort: { _id: 1 } },
+        ],
+      },
+    },
+  ]);
 
-    const totalRevenue = result[0].totalRevenue[0]?.count || 0;
-    const rawMonthlyStats = result[0].monthlyData;
+  const totalRevenue = result[0].totalRevenue[0]?.count || 0;
+  const rawMonthlyStats = result[0].monthlyData;
 
-    // --- Fill empty months with zero ---
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+  // --- Fill empty months with zero ---
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
 
-    const monthlyStats = Array.from({ length: 12 }, (_, i) => {
-      const monthNumber = i + 1; // Months are 1-12 in MongoDB
-      const monthData = rawMonthlyStats.find(
-        (item: any) => item._id === monthNumber
-      );
-
-      return {
-        month: monthNames[i],
-        count: monthData ? monthData.count : 0,
-      };
-    });
-
-    // Calculate total new users for THIS specific year from the filled data
-    const totalNewRevenueThisYear = monthlyStats.reduce(
-      (acc: number, curr: any) => acc + curr.count,
-      0
+  const monthlyStats = Array.from({ length: 12 }, (_, i) => {
+    const monthNumber = i + 1; // Months are 1-12 in MongoDB
+    const monthData = rawMonthlyStats.find(
+      (item: any) => item._id === monthNumber
     );
 
-    const growthPercentage =
-      totalRevenue > 0
-        ? (totalNewRevenueThisYear / totalRevenue) * 100
-        : 0;
-
     return {
-      year,
-      totalNewRevenueThisYear,
-      totalRevenue,
-      growthPercentage: Number(growthPercentage.toFixed(2)),
-      monthlyStats,
+      month: monthNames[i],
+      count: monthData ? monthData.count : 0,
     };
+  });
+
+  // Calculate total new users for THIS specific year from the filled data
+  const totalNewRevenueThisYear = monthlyStats.reduce(
+    (acc: number, curr: any) => acc + curr.count,
+    0
+  );
+
+  const growthPercentage =
+    totalRevenue > 0 ? (totalNewRevenueThisYear / totalRevenue) * 100 : 0;
+
+  return {
+    year,
+    totalNewRevenueThisYear,
+    totalRevenue,
+    growthPercentage: Number(growthPercentage.toFixed(2)),
+    monthlyStats,
+  };
 };
 
 export const AnalyticsServices = {
