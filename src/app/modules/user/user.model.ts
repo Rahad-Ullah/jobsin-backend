@@ -108,6 +108,14 @@ const userSchema = new Schema<IUser, UserModal>(
           type: Boolean,
           default: false,
         },
+        is2FAEmailActive: {
+          type: Boolean,
+          default: false,
+        },
+        twoFactorCode: {
+          type: Number,
+          default: null,
+        },
         oneTimeCode: {
           type: Number,
           default: null,

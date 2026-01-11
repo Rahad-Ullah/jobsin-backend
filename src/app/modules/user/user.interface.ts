@@ -27,6 +27,8 @@ export type IUser = {
   appleUserId?: string;
   authentication?: {
     isResetPassword: boolean;
+    is2FAEmailActive: boolean;
+    twoFactorCode: number;
     oneTimeCode: number;
     expireAt: Date;
   };

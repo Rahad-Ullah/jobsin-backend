@@ -21,9 +21,16 @@ import { USER_STATUS } from '../user/user.constant';
 //------------------ login service ------------------
 const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
-  const isExistUser = await User.findOne({ email }).select('+password');
+  const isExistUser = await User.findOne({ email }).select(
+    '+password +authentication'
+  );
   if (!isExistUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, config.node_env === 'development' ? "User doesn't exist!" : 'Invalid email or password');
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      config.node_env === 'development'
+        ? "User doesn't exist!"
+        : 'Invalid email or password'
+    );
   }
 
   // check if user is deleted
@@ -52,17 +59,49 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
   //check match password
   if (!(await User.isMatchPassword(password, isExistUser.password))) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, config.node_env === 'development' ? 'Password is incorrect!' : 'Invalid email or password');
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      config.node_env === 'development'
+        ? 'Password is incorrect!'
+        : 'Invalid email or password'
+    );
   }
 
-  //create access token
-  const accessToken = jwtHelper.createToken(
-    { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
-    config.jwt.jwt_secret as Secret,
-    config.jwt.jwt_expire_in as string
-  );
+  let data, message;
 
-  return { accessToken, role: isExistUser.role };
+  // if 2fa is active, send otp
+  if (isExistUser.authentication?.is2FAEmailActive && isExistUser.email) {
+    const otp = generateOTP(6);
+    const values = {
+      name: isExistUser.name,
+      otp,
+      email: isExistUser.email!,
+    };
+    const createAccountTemplate = emailTemplate.createAccount(values);
+    emailHelper.sendEmail(createAccountTemplate);
+
+    // Save authentication info
+    const authentication = {
+      twoFactorCode: otp,
+      expireAt: new Date(Date.now() + 3 * 60000),
+    };
+    await User.findOneAndUpdate({ email }, { $set: { authentication } });
+
+    data = { role: isExistUser.role };
+    message = 'Please check your email and enter otp to login';
+  } else {
+    // otherwise create access token
+    const accessToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    );
+
+    data = { accessToken, role: isExistUser.role };
+    message = 'Login successfully!';
+  }
+
+  return { data, message };
 };
 
 //forget password
@@ -141,6 +180,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   let data;
 
   if (!isExistUser.isVerified) {
+    // if request is for verify email
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
@@ -149,7 +189,24 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       }
     );
     message = 'Email verify successfully';
+  } else if (isExistUser.authentication?.twoFactorCode) {
+    // if request is for 2fa login
+    await User.findOneAndUpdate(
+      { _id: isExistUser._id },
+      {
+        authentication: { twoFactorCode: null, expireAt: null },
+      }
+    );
+    //create access token
+    const accessToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    );
+    data = accessToken;
+    message = 'Login Successful';
   } else {
+    // if request is for reset password
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
