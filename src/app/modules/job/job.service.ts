@@ -102,7 +102,20 @@ const getJobsByEmployerId = async (
     jobQuery.getPaginationInfo(),
   ]);
 
-  return { data, pagination };
+  // get application count and attach with each job
+  const jobsWithApplicationCount = await Promise.all(
+    data.map(async (job: any) => {
+      const applicationCount = await Application.countDocuments({
+        job: job._id,
+      });
+      return {
+        ...job,
+        totalApplications: applicationCount,
+      };
+    })
+  );
+
+  return { data: jobsWithApplicationCount, pagination };
 };
 
 // -------------- get all jobs with pagination --------------
