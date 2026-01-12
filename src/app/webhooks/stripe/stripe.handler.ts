@@ -9,8 +9,6 @@ export async function stripeEventHandler(event: Stripe.Event) {
     return;
   }
 
-  console.log('triggering webhook ----> ', event.type);
-
   // event routing
   switch (event.type) {
     case 'customer.subscription.created':

@@ -4,6 +4,7 @@ import { User } from '../user/user.model';
 import { IEmployer } from './employer.interface';
 import { Employer } from './employer.model';
 import { IUser } from '../user/user.interface';
+import unlinkFile from '../../../shared/unlinkFile';
 
 // -------------- update employer service by user id --------------
 export const updateEmployerByUserId = async (
@@ -29,24 +30,34 @@ export const updateEmployerByUserId = async (
 const updateEmployerUserProfile = async (
   userId: string,
   payload: Partial<IEmployer> & Partial<IUser>
-): Promise<IEmployer | null> => {
+) => {
   // check if the user exists
   const existingUser = await User.findById(userId);
   if (!existingUser) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   }
 
-  const { name, phone, address, ...employerData } = payload;
+  const { name, phone, address, image, ...employerData } = payload;
 
-  await User.findByIdAndUpdate(userId, { name, phone, address });
-
-  const result = await Employer.findOneAndUpdate(
-    { user: userId },
-    employerData,
-    {
-      new: true,
-    }
+  const result = await User.findByIdAndUpdate(
+    userId,
+    { name, phone, address, image },
+    { new: true }
   );
+
+  await Employer.findOneAndUpdate({ user: userId }, employerData, {
+    new: true,
+  });
+
+  // unlink old file
+  if (
+    payload.image &&
+    existingUser.image &&
+    result?.image !== existingUser.image
+  ) {
+    unlinkFile(existingUser.image);
+  }
+
   return result;
 };
 

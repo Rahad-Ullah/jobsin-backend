@@ -3,6 +3,7 @@ import { EmployerServices } from './employer.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
+import { getSingleFilePath } from '../../../shared/getFilePath';
 
 // update my employer profile
 export const updateMyEmployerProfile = catchAsync(
@@ -24,6 +25,10 @@ export const updateMyEmployerProfile = catchAsync(
 // update my employer profile
 export const updateEmployerUserProfile = catchAsync(
   async (req: Request, res: Response) => {
+    const image = getSingleFilePath(req.files, 'image');
+    if (image) {
+      req.body.image = image;
+    }
     const result = await EmployerServices.updateEmployerUserProfile(
       req.user.id,
       req.body
