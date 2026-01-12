@@ -21,6 +21,23 @@ export const updateMyEmployerProfile = catchAsync(
   }
 );
 
+// update my employer profile
+export const updateEmployerUserProfile = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await EmployerServices.updateEmployerUserProfile(
+      req.user.id,
+      req.body
+    );
+
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: 'Employer profile updated successfully',
+      data: result,
+    });
+  }
+);
+
 // get my employer profile
 export const getMyEmployerProfile = catchAsync(
   async (req: Request, res: Response) => {
@@ -51,6 +68,7 @@ const getEmployerByUserId = catchAsync(
 
 export const EmployerController = {
   updateMyEmployerProfile,
+  updateEmployerUserProfile,
   getMyEmployerProfile,
   getEmployerByUserId,
 };

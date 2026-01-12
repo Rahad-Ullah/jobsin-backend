@@ -15,6 +15,14 @@ router.patch(
   EmployerController.updateMyEmployerProfile
 );
 
+// update my employer profile
+router.patch(
+  '/profile',
+  auth(USER_ROLES.EMPLOYER),
+  validateRequest(EmployerValidations.updateEmployerSchema),
+  EmployerController.updateMyEmployerProfile
+);
+
 // get my employer profile
 router.get(
   '/me',

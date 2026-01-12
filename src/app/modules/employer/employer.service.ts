@@ -1,5 +1,9 @@
+import { StatusCodes } from 'http-status-codes';
+import ApiError from '../../../errors/ApiError';
+import { User } from '../user/user.model';
 import { IEmployer } from './employer.interface';
 import { Employer } from './employer.model';
+import { IUser } from '../user/user.interface';
 
 // -------------- update employer service by user id --------------
 export const updateEmployerByUserId = async (
@@ -21,6 +25,31 @@ export const updateEmployerByUserId = async (
   return result;
 };
 
+// -------------- update employer user profile --------------
+const updateEmployerUserProfile = async (
+  userId: string,
+  payload: Partial<IEmployer> & Partial<IUser>
+): Promise<IEmployer | null> => {
+  // check if the user exists
+  const existingUser = await User.findById(userId);
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+
+  const { name, phone, address, ...employerData } = payload;
+
+  await User.findByIdAndUpdate(userId, { name, phone, address });
+
+  const result = await Employer.findOneAndUpdate(
+    { user: userId },
+    employerData,
+    {
+      new: true,
+    }
+  );
+  return result;
+};
+
 // -------------- get employer by user id --------------
 const getEmployerByUserId = async (
   userId: string
@@ -34,5 +63,6 @@ const getEmployerByUserId = async (
 
 export const EmployerServices = {
   updateEmployerByUserId,
+  updateEmployerUserProfile,
   getEmployerByUserId,
 };
