@@ -82,10 +82,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
     // Save authentication info
     const authentication = {
-      twoFactorCode: otp,
-      expireAt: new Date(Date.now() + 3 * 60000),
+      'authentication.twoFactorCode': otp,
+      'authentication.expireAt': new Date(Date.now() + 3 * 60000),
     };
-    await User.findOneAndUpdate({ email }, { $set: { authentication } });
+    await User.findOneAndUpdate({ email }, { $set: authentication });
 
     data = { role: isExistUser.role };
     message = 'Please check your email and enter otp to login';
@@ -143,10 +143,10 @@ const forgetPasswordToDB = async (email: string) => {
 
   //save to DB
   const authentication = {
-    oneTimeCode: otp,
-    expireAt: new Date(Date.now() + 3 * 60000),
+    'authentication.oneTimeCode': otp,
+    'authentication.expireAt': new Date(Date.now() + 3 * 60000),
   };
-  await User.findOneAndUpdate({ email }, { $set: { authentication } });
+  await User.findOneAndUpdate({ email }, { $set: authentication });
 };
 
 //verify email
@@ -180,24 +180,28 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   let data;
 
   if (!isExistUser.isVerified) {
-    // if request is for verify email
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
-        isVerified: true,
-        authentication: { oneTimeCode: null, expireAt: null },
+        $set: {
+          isVerified: true,
+          'authentication.oneTimeCode': null,
+          'authentication.expireAt': null,
+        },
       }
     );
     message = 'Email verify successfully';
   } else if (isExistUser.authentication?.twoFactorCode) {
-    // if request is for 2fa login
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
-        authentication: { twoFactorCode: null, expireAt: null },
+        $set: {
+          'authentication.twoFactorCode': null,
+          'authentication.expireAt': null,
+        },
       }
     );
-    //create access token
+
     const accessToken = jwtHelper.createToken(
       { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
       config.jwt.jwt_secret as Secret,
@@ -206,19 +210,17 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
     data = accessToken;
     message = 'Login Successful';
   } else {
-    // if request is for reset password
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
-        authentication: {
-          isResetPassword: true,
-          oneTimeCode: null,
-          expireAt: null,
+        $set: {
+          'authentication.isResetPassword': true,
+          'authentication.oneTimeCode': null,
+          'authentication.expireAt': null,
         },
       }
     );
 
-    //create token ;
     const createToken = cryptoToken();
     await ResetToken.create({
       user: isExistUser._id,
@@ -278,9 +280,9 @@ const resetPasswordToDB = async (
   );
 
   const updateData = {
-    password: hashPassword,
-    authentication: {
-      isResetPassword: false,
+    $set: {
+      password: hashPassword,
+      'authentication.isResetPassword': false,
     },
   };
 

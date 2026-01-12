@@ -111,11 +111,16 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 // ------------- update user by id -------------
 const updateUserByIdIntoDB = async (
   id: string,
-  payload: Partial<IUser>
+  payload: Partial<IUser> & any
 ): Promise<Partial<IUser | null>> => {
   const isExistUser = await User.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  if (payload.is2FAEmailActive !== undefined) {
+    payload['authentication.is2FAEmailActive'] = payload.is2FAEmailActive;
+    delete payload.is2FAEmailActive;
   }
 
   const updateDoc = await User.findByIdAndUpdate(id, payload, {
