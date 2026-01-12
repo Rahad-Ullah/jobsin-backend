@@ -13,6 +13,8 @@ const shiftPlanSchema = new Schema<IShiftPlan, ShiftPlanModel>({
   remarks: { type: String, default: '' },
 });
 
+shiftPlanSchema.index({ author: 1, days: 1 });
+
 export const ShiftPlan = model<IShiftPlan, ShiftPlanModel>(
   'ShiftPlan',
   shiftPlanSchema

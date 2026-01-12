@@ -77,11 +77,20 @@ const getShiftPlanByAuthorId = async (
   authorId: string,
   query: Record<string, unknown>
 ) => {
+  const filter: Record<string, any> = { author: authorId };
+  if (query.startDate) {
+    filter.days = { $elemMatch: { $gte: new Date(query.startDate as string) } };
+  }
+
+  if (query.endDate) {
+    filter.days = { $elemMatch: { $lte: new Date(query.endDate as string) } };
+  }
+
   const planQuery = new QueryBuilder(
-    ShiftPlan.find({ author: authorId }).populate('worker'),
+    ShiftPlan.find(filter).populate('worker'),
     query
   )
-    .filter()
+    .filter(['startDate', 'endDate'])
     .sort()
     .paginate()
     .fields();
