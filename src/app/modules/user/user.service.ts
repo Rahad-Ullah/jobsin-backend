@@ -112,7 +112,7 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 const updateUserByIdIntoDB = async (
   id: string,
   payload: Partial<IUser> & any
-): Promise<Partial<IUser | null>> => {
+) => {
   const isExistUser = await User.findById(id);
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -125,14 +125,21 @@ const updateUserByIdIntoDB = async (
 
   const updateDoc = await User.findByIdAndUpdate(id, payload, {
     new: true,
-  });
+  })
+    .select('+authentication')
+    .lean();
 
   //unlink file here
   if (payload.image && isExistUser.image) {
     unlinkFile(isExistUser.image);
   }
 
-  return updateDoc;
+  return {
+    ...updateDoc,
+    authentication: {
+      is2FAEmailActive: updateDoc!.authentication?.is2FAEmailActive,
+    },
+  };
 };
 
 // ------------- update user status by id -------------
@@ -178,27 +185,27 @@ const deleteUserByIdFromDB = async (id: string) => {
 
 // ------------- get user by id -------------
 const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
-  const isExistUser = await User.findById(id)
+  const result = await User.findById(id)
     .populate('jobSeeker')
     .populate('employer');
-  if (!isExistUser) {
+  if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
-  return isExistUser;
+  return result;
 };
 
 // ------------- get user profile -------------
 const getUserProfileFromDB = async (id: string) => {
-  const isExistUser = await User.findById(id).select('+authentication').lean();
-  if (!isExistUser) {
+  const result = await User.findById(id).select('+authentication').lean();
+  if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
 
   return {
-    ...isExistUser,
+    ...result,
     authentication: {
-      is2FAEmailActive: isExistUser.authentication?.is2FAEmailActive,
+      is2FAEmailActive: result.authentication?.is2FAEmailActive,
     },
   };
 };
