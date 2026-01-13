@@ -66,6 +66,17 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// change admin password request
+const changeAdminPasswordRequest = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.changeAdminPasswordRequest(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Please check your email. We have sent you a one-time passcode (OTP).',
+  })
+});
+
 // change admin password
 const changeAdminPassword = catchAsync(async (req: Request, res: Response) => {
   await AuthService.changeAdminPasswordToDB(req.user, req.body);
@@ -83,5 +94,6 @@ export const AuthController = {
   forgetPassword,
   resetPassword,
   changePassword,
+  changeAdminPasswordRequest,
   changeAdminPassword,
 };

@@ -337,13 +337,57 @@ const changePasswordToDB = async (
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
 
+const changeAdminPasswordRequest = async (userId: string) => {
+  const isExistUser = await User.findById(userId);
+  if (!isExistUser) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "User doesn't exist, Please try again"
+    );
+  }
+
+  // check if user is deleted
+  if (isExistUser.isDeleted) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'It looks like your account has been deleted or deactivated.'
+    );
+  }
+
+  //check user status
+  if (isExistUser.status !== USER_STATUS.ACTIVE) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'It looks like your account has been suspended or deactivated.'
+    );
+  }
+
+  //send mail
+  const otp = generateOTP(6);
+  const value = {
+    otp,
+    email: isExistUser.email,
+  };
+  const forgetPassword = emailTemplate.resetPassword(value);
+  emailHelper.sendEmail(forgetPassword);
+
+  //save to DB
+  const authentication = {
+    'authentication.oneTimeCode': otp,
+    'authentication.expireAt': new Date(Date.now() + 3 * 60000),
+  };
+  await User.findByIdAndUpdate(userId, { $set: authentication });
+};
+
 // admin password change
 const changeAdminPasswordToDB = async (
   user: JwtPayload,
   payload: IChangePassword & { oneTimeCode: number }
 ) => {
   const { currentPassword, newPassword, confirmPassword } = payload;
-  const existingUser = await User.findById(user.id).select('+password +authentication');
+  const existingUser = await User.findById(user.id).select(
+    '+password +authentication'
+  );
   if (!existingUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -394,5 +438,6 @@ export const AuthService = {
   forgetPasswordToDB,
   resetPasswordToDB,
   changePasswordToDB,
+  changeAdminPasswordRequest,
   changeAdminPasswordToDB,
 };

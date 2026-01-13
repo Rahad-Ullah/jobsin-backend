@@ -36,6 +36,13 @@ router.post(
   AuthController.changePassword
 );
 
+// change admin password request
+router.post(
+  '/change-admin-password-request',
+  auth(),
+  AuthController.changeAdminPasswordRequest
+);
+
 // change admin password
 router.post(
   '/change-admin-password',
