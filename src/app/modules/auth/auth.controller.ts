@@ -66,10 +66,22 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// change admin password
+const changeAdminPassword = catchAsync(async (req: Request, res: Response) => {
+  await AuthService.changeAdminPasswordToDB(req.user, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Your password has been successfully changed',
+  });
+});
+
 export const AuthController = {
   verifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,
   changePassword,
+  changeAdminPassword,
 };

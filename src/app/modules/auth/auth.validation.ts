@@ -66,10 +66,33 @@ const createChangePasswordZodSchema = z.object({
   }),
 });
 
+// change admin password
+const createChangeAdminPasswordZodSchema = z.object({
+  body: z.object({
+    oneTimeCode: z
+      .number({ required_error: 'One time code is required' })
+      .nonnegative('One time code must be a positive number'),
+    currentPassword: z
+      .string({
+        required_error: 'Current Password is required',
+      })
+      .nonempty("Current Password can't be empty!"),
+    newPassword: z
+      .string({ required_error: 'New Password is required' })
+      .nonempty("New Password can't be empty!"),
+    confirmPassword: z
+      .string({
+        required_error: 'Confirm Password is required',
+      })
+      .nonempty("Confirm Password can't be empty!"),
+  }),
+});
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
+  createChangeAdminPasswordZodSchema,
 };

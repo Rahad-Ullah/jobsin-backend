@@ -36,4 +36,12 @@ router.post(
   AuthController.changePassword
 );
 
+// change admin password
+router.post(
+  '/change-admin-password',
+  auth(),
+  validateRequest(AuthValidation.createChangeAdminPasswordZodSchema),
+  AuthController.changeAdminPassword
+);
+
 export const AuthRoutes = router;

@@ -337,10 +337,62 @@ const changePasswordToDB = async (
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
 
+// admin password change
+const changeAdminPasswordToDB = async (
+  user: JwtPayload,
+  payload: IChangePassword & { oneTimeCode: number }
+) => {
+  const { currentPassword, newPassword, confirmPassword } = payload;
+  const existingUser = await User.findById(user.id).select('+password +authentication');
+  if (!existingUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  //current password match
+  if (
+    currentPassword &&
+    !(await User.isMatchPassword(currentPassword, existingUser.password))
+  ) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Password is incorrect');
+  }
+
+  //newPassword and current password
+  if (currentPassword === newPassword) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Please give different password from current password'
+    );
+  }
+  //new password and confirm password check
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "Password and Confirm password doesn't matched"
+    );
+  }
+
+  // one time code check
+  if (payload.oneTimeCode !== existingUser.authentication?.oneTimeCode) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'OTP code is incorrect');
+  }
+
+  //hash password
+  const hashPassword = await bcrypt.hash(
+    newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+
+  const updateData = {
+    password: hashPassword,
+  };
+  await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
+};
+
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
   changePasswordToDB,
+  changeAdminPasswordToDB,
 };
