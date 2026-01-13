@@ -19,6 +19,18 @@ const createWorker = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update worker
+const updateWorker = catchAsync(async (req: Request, res: Response) => {
+  const result = await WorkerServices.updateWorker(req.params.id, req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Worker updated successfully',
+    data: result,
+  });
+});
+
 // delete worker
 const deleteWorker = catchAsync(async (req: Request, res: Response) => {
   const result = await WorkerServices.deleteWorker(req.params.id);
@@ -45,6 +57,7 @@ const getMyWorkers = catchAsync(async (req: Request, res: Response) => {
 
 export const WorkerController = {
   createWorker,
+  updateWorker,
   deleteWorker,
   getMyWorkers,
 };

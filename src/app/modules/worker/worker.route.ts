@@ -15,6 +15,14 @@ router.post(
   WorkerController.createWorker
 );
 
+// update worker
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.EMPLOYER),
+  validateRequest(WorkerValidations.updateWorkerValidation),
+  WorkerController.updateWorker
+);
+
 // delete worker
 router.delete('/:id', auth(USER_ROLES.EMPLOYER), WorkerController.deleteWorker);
 
