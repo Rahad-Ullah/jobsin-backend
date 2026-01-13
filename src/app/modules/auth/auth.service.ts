@@ -82,7 +82,8 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
     // Save authentication info
     const authentication = {
-      'authentication.twoFactorCode': otp,
+      'authentication.is2FAProcessing': true,
+      'authentication.oneTimeCode': otp,
       'authentication.expireAt': new Date(Date.now() + 3 * 60000),
     };
     await User.findOneAndUpdate({ email }, { $set: authentication });
@@ -191,12 +192,12 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       }
     );
     message = 'Email verify successfully';
-  } else if (isExistUser.authentication?.twoFactorCode) {
+  } else if (isExistUser.authentication?.is2FAProcessing) {
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
       {
         $set: {
-          'authentication.twoFactorCode': null,
+          'authentication.oneTimeCode': null,
           'authentication.expireAt': null,
         },
       }

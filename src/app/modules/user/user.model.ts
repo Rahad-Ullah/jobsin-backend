@@ -112,8 +112,8 @@ const userSchema = new Schema<IUser, UserModal>(
           type: Boolean,
           default: false,
         },
-        twoFactorCode: {
-          type: Number,
+        is2FAProcessing: {
+          type: Boolean,
           default: null,
         },
         oneTimeCode: {
