@@ -6,7 +6,7 @@ import { Application } from './application.model';
 
 // ------------- create application -------------
 const createApplicationToDB = async (
-  payload: Partial<IApplication> & { isResume: boolean }
+  payload: Partial<IApplication> & { isResume: boolean | string }
 ): Promise<IApplication> => {
   // check if the job exists
   const existingJob = await Job.exists({ _id: payload.job });
@@ -24,7 +24,8 @@ const createApplicationToDB = async (
   }
 
   // find and set resume url
-  if (payload.isResume) {
+  if (payload.isResume === 'true' || payload.isResume === true) {
+    console.log('I am from resume block');
     const resume = await Resume.findOne({ user: payload.user });
     if (resume) {
       payload.resume = resume._id;

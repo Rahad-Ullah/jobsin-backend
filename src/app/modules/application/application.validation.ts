@@ -12,9 +12,11 @@ export const createApplicationValidation = z.object({
     .object({
       job: objectIdSchema,
       doc: z.string().optional(),
-      isResume: z.boolean().default(false),
+      isResume: z
+        .preprocess(val => val === 'true' || val === true, z.boolean())
+        .default(false),
       salaryType: z.nativeEnum(SalaryType),
-      expectedSalary: z
+      expectedSalary: z.coerce
         .number({ required_error: 'Expected salary is required' })
         .positive('Expected salary must be positive'),
     })
