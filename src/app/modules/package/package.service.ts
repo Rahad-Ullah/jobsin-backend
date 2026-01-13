@@ -17,6 +17,7 @@ const createPackageToDB = async (
     // Check if package exists
     const existingPackage = await Package.exists({
       name: payload.name,
+      isDeleted: false,
     }).session(session);
     if (existingPackage) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Package already exists');
@@ -31,7 +32,9 @@ const createPackageToDB = async (
       });
 
       price = await stripe.prices.create({
-        unit_amount: Math.round((payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100),
+        unit_amount: Math.round(
+          (payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100
+        ),
         currency: 'usd',
         recurring: {
           interval: payload.interval!,
@@ -54,7 +57,7 @@ const createPackageToDB = async (
     payload.stripePriceId = price.id;
 
     // Calculate price
-    payload.price = (price.unit_amount! / 100);
+    payload.price = price.unit_amount! / 100;
 
     // Save package in DB
     const result = await Package.create([payload], { session });
@@ -104,6 +107,7 @@ const updatePackageInDB = async (
       const isNameTaken = await Package.exists({
         name: payload.name,
         _id: { $ne: id },
+        isDeleted: false,
       }).session(session);
       if (isNameTaken) {
         throw new ApiError(
