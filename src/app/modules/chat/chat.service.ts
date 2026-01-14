@@ -43,10 +43,28 @@ const deleteChatFromDB = async (chatId: string) => {
 
 // ---------------- get single chat by id ----------------
 const getSingleChatFromDB = async (chatId: string, userId: string) => {
-  const result = await Chat.findById(chatId).populate('participants', 'name image');
-  if(result){
-    const anotherParticipant = result?.participants?.find((participant: any) => participant?._id.toString() !== userId);
-    return {...result?.toObject(), anotherParticipant};
+  const result = await Chat.findById(chatId).populate(
+    'participants',
+    'name image'
+  );
+
+  // check if the user is a participant
+  if (
+    !result?.participants?.find(
+      (participant: any) => participant?._id.toString() === userId
+    )
+  ) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'You are not a participant of this chat!'
+    );
+  }
+
+  if (result) {
+    const anotherParticipant = result?.participants?.find(
+      (participant: any) => participant?._id.toString() !== userId
+    );
+    return { ...result?.toObject(), anotherParticipant };
   }
   return null;
 };
