@@ -16,7 +16,9 @@ import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
-import { USER_STATUS } from '../user/user.constant';
+import { USER_ROLES, USER_STATUS } from '../user/user.constant';
+import { JobSeeker } from '../jobSeeker/jobSeeker.model';
+import { Employer } from '../employer/employer.model';
 
 //------------------ login service ------------------
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -67,6 +69,14 @@ const loginUserFromDB = async (payload: ILoginData) => {
     );
   }
 
+  // check if user profile is fulfilled
+  let isProfileFulfilled = true;
+  if (isExistUser.role === USER_ROLES.JOB_SEEKER) {
+    isProfileFulfilled = await JobSeeker.isProfileFulfilled(isExistUser._id);
+  } else if (isExistUser.role === USER_ROLES.EMPLOYER) {
+    isProfileFulfilled = await Employer.isProfileFulfilled(isExistUser._id);
+  }
+
   let data, message;
 
   // if 2fa is active, send otp
@@ -88,7 +98,11 @@ const loginUserFromDB = async (payload: ILoginData) => {
     };
     await User.findOneAndUpdate({ email }, { $set: authentication });
 
-    data = { role: isExistUser.role };
+    data = {
+      role: isExistUser.role,
+      isProfileFulfilled:
+        isProfileFulfilled && (await User.isProfileFulfilled(isExistUser._id)),
+    };
     message = 'Please check your email and enter otp to login';
   } else {
     // otherwise create access token
@@ -98,7 +112,12 @@ const loginUserFromDB = async (payload: ILoginData) => {
       config.jwt.jwt_expire_in as string
     );
 
-    data = { accessToken, role: isExistUser.role };
+    data = {
+      accessToken,
+      role: isExistUser.role,
+      isProfileFulfilled:
+        isProfileFulfilled && (await User.isProfileFulfilled(isExistUser._id)),
+    };
     message = 'Login successfully!';
   }
 

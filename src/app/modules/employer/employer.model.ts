@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { IEmployer, EmployerModel } from './employer.interface';
 
 const employerSchema = new Schema<IEmployer, EmployerModel>(
@@ -13,6 +13,25 @@ const employerSchema = new Schema<IEmployer, EmployerModel>(
   },
   { timestamps: true }
 );
+
+// check if employer profile is fulfilled
+employerSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
+  const employer = await Employer.findOne({ user: userId });
+  const arr = [
+    employer?.businessCategory,
+    employer?.legalForm,
+    employer?.taxNo,
+    employer?.deNo,
+    employer?.whatsApp,
+    employer?.about,
+  ];
+  for (let item of arr) {
+    if (!item) {
+      return false;
+    }
+  }
+  return true;
+};
 
 export const Employer = model<IEmployer, EmployerModel>(
   'Employer',

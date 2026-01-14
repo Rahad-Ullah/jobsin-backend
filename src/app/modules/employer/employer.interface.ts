@@ -11,4 +11,6 @@ export type IEmployer = {
   about: string;
 };
 
-export type EmployerModel = Model<IEmployer>;
+export type EmployerModel = {
+  isProfileFulfilled(userId: Types.ObjectId): boolean;
+} & Model<IEmployer>;

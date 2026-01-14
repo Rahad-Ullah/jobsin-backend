@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { IJobSeeker, JobSeekerModel } from './jobSeeker.interface';
 import { SalaryType } from './jobSeeker.constants';
 
@@ -31,6 +31,24 @@ const jobSeekerSchema = new Schema<IJobSeeker, JobSeekerModel>(
   },
   { timestamps: true }
 );
+
+// check if employer profile is fulfilled
+jobSeekerSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
+  const jobSeeker = await JobSeeker.findOne({ user: userId });
+  const arr = [
+    jobSeeker?.overview,
+    jobSeeker?.about,
+    jobSeeker?.experiences?.length,
+    jobSeeker?.resumeUrl,
+    jobSeeker?.attachments?.length,
+  ];
+  for (let item of arr) {
+    if (!item) {
+      return false;
+    }
+  }
+  return true;
+};
 
 export const JobSeeker = model<IJobSeeker, JobSeekerModel>(
   'JobSeeker',

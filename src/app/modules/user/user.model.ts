@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { IUser, UserModal } from './user.interface';
@@ -150,6 +150,18 @@ userSchema.statics.isMatchPassword = async (
   hashPassword: string
 ): Promise<boolean> => {
   return await bcrypt.compare(password, hashPassword);
+};
+
+// check if user profile is fulfilled
+userSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
+  const user = await User.findById(userId);
+  const arr = [user?.name, user?.image, user?.phone, user?.address];
+  for (let item of arr) {
+    if (!item) {
+      return false;
+    }
+  }
+  return true;
 };
 
 //check user

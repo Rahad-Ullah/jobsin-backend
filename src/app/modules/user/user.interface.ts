@@ -38,4 +38,5 @@ export type UserModal = {
   isExistUserById(id: string): any;
   isExistUserByEmail(email: string): any;
   isMatchPassword(password: string, hashPassword: string): boolean;
+  isProfileFulfilled(userId: Types.ObjectId): boolean;
 } & Model<IUser>;

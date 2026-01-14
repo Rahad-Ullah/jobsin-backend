@@ -23,4 +23,6 @@ export interface IJobSeeker {
   isProfileVisible: boolean;
 }
 
-export type JobSeekerModel = Model<IJobSeeker>;
+export type JobSeekerModel = {
+  isProfileFulfilled(userId: Types.ObjectId): boolean;
+} & Model<IJobSeeker>;
