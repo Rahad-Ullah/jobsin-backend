@@ -31,6 +31,20 @@ const deleteChat = catchAsync(
   }
 );
 
+// get single chat
+const getSingleChat = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ChatServices.getSingleChatFromDB(req.params.id, req.user.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: 'Chat retrieved successfully',
+      data: result,
+    });
+  }
+);
+
 // getMy chat
 const getMyChats = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -48,5 +62,6 @@ const getMyChats = catchAsync(
 export const ChatController = {
   createChat,
   deleteChat,
+  getSingleChat,
   getMyChats,
 };

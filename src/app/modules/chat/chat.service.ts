@@ -41,6 +41,16 @@ const deleteChatFromDB = async (chatId: string) => {
   return result;
 };
 
+// ---------------- get single chat by id ----------------
+const getSingleChatFromDB = async (chatId: string, userId: string) => {
+  const result = await Chat.findById(chatId).populate('participants', 'name image');
+  if(result){
+    const anotherParticipant = result?.participants?.find((participant: any) => participant?._id.toString() !== userId);
+    return {...result?.toObject(), anotherParticipant};
+  }
+  return null;
+};
+
 // ---------------- get my chats / get by id ----------------
 const getMyChatsFromDB = async (
   user: JwtPayload,
@@ -98,5 +108,6 @@ const getMyChatsFromDB = async (
 export const ChatServices = {
   createChatIntoDB,
   deleteChatFromDB,
+  getSingleChatFromDB,
   getMyChatsFromDB,
 };
