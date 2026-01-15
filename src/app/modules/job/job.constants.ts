@@ -13,7 +13,7 @@ export enum JobType {
 }
 
 export enum SalaryType {
-  DAY = 'Day',
+  HOUR = 'Hour',
   MONTH = 'Month',
   YEAR = 'Year',
 }

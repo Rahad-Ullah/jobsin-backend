@@ -1,5 +1,5 @@
 export enum SalaryType {
-    DAY = 'Day',
-    MONTH = 'Month',
-    YEAR = 'Year'
+  HOUR = 'Hour',
+  MONTH = 'Month',
+  YEAR = 'Year',
 }
