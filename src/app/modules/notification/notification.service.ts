@@ -1,5 +1,7 @@
+import { sendNotifications } from '../../../helpers/notificationHelper';
 import { timeAgo } from '../../../shared/timeAgo';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { User } from '../user/user.model';
 import { Notification } from './notification.model';
 import { Types } from 'mongoose';
 
@@ -38,7 +40,7 @@ const readNotification = async (id: string) => {
   if (!existingNotification) {
     throw new Error('Notification not found');
   }
-  
+
   const result = await Notification.findByIdAndUpdate(
     id,
     { isRead: true },
@@ -63,8 +65,26 @@ const readAllNotifications = async (userId: string) => {
   return result;
 };
 
+// ----------------- create test notification -----------------
+const createTestNotification = async (userId: string) => {
+  // check if user exists
+  const user = await User.exists({ _id: userId }).lean();
+  if (!user) {
+    throw new Error('User does not exist');
+  }
+
+  await sendNotifications({
+    type: 'testNotification',
+    title: 'Test Notification',
+    message: 'This is a test notification',
+    receiver: user._id,
+    referenceId: userId,
+  });
+};
+
 export const NotificationServices = {
   getNotificationsByUserId,
   readNotification,
   readAllNotifications,
+  createTestNotification,
 };

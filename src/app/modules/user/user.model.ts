@@ -155,7 +155,7 @@ userSchema.statics.isMatchPassword = async (
 // check if user profile is fulfilled
 userSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
   const user = await User.findById(userId);
-  const arr = [user?.name, user?.image, user?.phone, user?.address];
+  const arr = [user?.name, user?.image];
   for (let item of arr) {
     if (!item) {
       return false;
