@@ -30,6 +30,13 @@ router.delete(
   JobController.deleteJob
 );
 
+// send hiring post to admin
+router.post(
+  '/send-hiring-post/:id',
+  auth(USER_ROLES.EMPLOYER),
+  JobController.sendHiringPostToAdmin
+);
+
 // get single job by id
 router.get('/single/:id', JobController.getSingleJobById);
 

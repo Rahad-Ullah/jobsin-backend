@@ -1,6 +1,12 @@
+import { StatusCodes } from 'http-status-codes';
+import config from '../../../config';
+import ApiError from '../../../errors/ApiError';
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { Application } from '../application/application.model';
 import { Category } from '../category/category.model';
+import { USER_ROLES } from '../user/user.constant';
 import { User } from '../user/user.model';
 import { IJob } from './job.interface';
 import { Job } from './job.model';
@@ -53,9 +59,40 @@ const deleteJob = async (id: string) => {
   const result = await Job.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
   return result;
+};
+
+// --------------- send hiring post to admin --------------
+const sendHiringPostToAdmin = async (jobId: string) => {
+  // check if job exists
+  const existingJob = await Job.findById(jobId).populate('author');
+  if (!existingJob) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Job not found');
+  }
+  // get admin email with fallback to super admin
+  let adminEmail = config.super_admin.email;
+  if (!adminEmail) {
+    const admin = await User.findOne({ role: USER_ROLES.SUPER_ADMIN }).select(
+      'email',
+    );
+    adminEmail = admin?.email;
+  }
+
+  // send mail
+  if (adminEmail) {
+    const template = emailTemplate.hiringRequestToAdmin(
+      existingJob,
+      existingJob.author as any,
+      adminEmail,
+    );
+    await emailHelper.sendEmail({
+      to: adminEmail,
+      subject: template.subject,
+      html: template.html,
+    });
+  }
 };
 
 // --------------- get single job by id --------------
@@ -85,11 +122,11 @@ const getSingleJobById = async (id: string) => {
 // -------------- get jobs by employer id --------------
 const getJobsByEmployerId = async (
   id: string,
-  query: Record<string, unknown>
+  query: Record<string, unknown>,
 ) => {
   const jobQuery = new QueryBuilder(
     Job.find({ author: id, isDeleted: false }),
-    query
+    query,
   )
     .filter()
     .paginate()
@@ -112,7 +149,7 @@ const getJobsByEmployerId = async (
         ...job,
         totalApplications: applicationCount,
       };
-    })
+    }),
   );
 
   return { data: jobsWithApplicationCount, pagination };
@@ -168,6 +205,7 @@ export const JobServices = {
   createJob,
   updateJob,
   deleteJob,
+  sendHiringPostToAdmin,
   getSingleJobById,
   getJobsByEmployerId,
   getAllJobs,

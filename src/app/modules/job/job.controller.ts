@@ -43,6 +43,18 @@ const deleteJob = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// hiring post to admin
+const sendHiringPostToAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.sendHiringPostToAdmin(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Hiring post sent successfully',
+    data: result,
+  });
+});
+
 // get single job by id
 const getSingleJobById = catchAsync(async (req: Request, res: Response) => {
   const result = await JobServices.getSingleJobById(req.params.id);
@@ -101,6 +113,7 @@ export const JobController = {
   createJob,
   updateJob,
   deleteJob,
+  sendHiringPostToAdmin,
   getSingleJobById,
   getJobsByEmployerId,
   getMyJobs,

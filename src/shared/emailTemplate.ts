@@ -1,5 +1,7 @@
 import { IAppointment } from '../app/modules/appointment/appointment.interface';
+import { IJob } from '../app/modules/job/job.interface';
 import { ISupport } from '../app/modules/support/support.interface';
+import { IUser } from '../app/modules/user/user.interface';
 import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
@@ -74,7 +76,7 @@ const confirmAppointment = (values: IAppointment) => {
                   
                   <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
                       <p style="margin: 5px 0;"><strong>📅 Date & Time:</strong> ${new Date(
-                        values.scheduledAt
+                        values.scheduledAt,
                       ).toLocaleString()}</p>
                       ${
                         values.address &&
@@ -175,10 +177,102 @@ const paymentFailed = (values: any) => {
   return data;
 };
 
+const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
+  const data = {
+    to: email,
+    subject: `Hiring Request: ${employer.name} - ${job.category}`,
+    html: `
+      <body style="font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
+        <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div style="font-size: 18px; line-height: 1.4;">
+                    <h2 style="margin: 0; font-size: 20px;">Personnel Placement Agreement</h2>
+                    <p style="margin: 10px 0 0 0;">
+                        <strong>Client</strong><br>
+                        ${employer.name}<br>
+                        ${employer.address}
+                    </p>
+                    <p style="margin: 10px 0 0 0;">
+                        <strong>Recruiter</strong><br>
+                        JobsinApp<br>
+                    </p>
+                </div>
+                <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="width: 120px;" />
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 16px; margin-bottom: 5px;">Contract Content</h3>
+                <p style="font-size: 13px; line-height: 1.5; margin: 0;">The Client Commissions The Recruiter To Search For Suitable Candidates For A Position To Be Filled In Their Company. This Agreement Governs The Conditions of the Personnel Placement And The Mutual Rights And Obligations Of The Contracting Parties.</p>
+            </div>
+
+            <div style="font-size: 13px; line-height: 1.5;">
+                <h4 style="margin: 15px 0 5px 0;">1 Subject Of The Agreement</h4>
+                <p style="margin: 0;">The Recruiter Undertakes To Search For And Present Suitable Candidates To The Client For A Position Advertised By The Client.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">2 Recruiter's Services</h4>
+                <p style="margin: 0;">1. The Recruiter Will Identify Suitable Candidates... 2. Conduct Preliminary Selection... 3. Provide List of Candidates.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">3 Client's Obligations</h4>
+                <p style="margin: 0;">The Client Shall Provide All Necessary Information... Review Candidates... Conduct Interviews and Inform the Recruiter of Any Hiring Decision.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">4 Fees And Payment Terms</h4>
+                <p style="margin: 0;"><strong>Placement Fee:</strong> The Client Agrees To Pay A Placement Fee Of 25% Of The Agreed Gross Annual Salary Of The Candidate. <br>
+                <strong>Payment Deadline:</strong> No Later Than 14 Days After The Start Of Employment.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">5 Guarantees And Refunds</h4>
+                <p style="margin: 0;">Replacement Provided Free Of Charge Within 3 Months. 50% Refund Between 3 To 6 Months.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">6 Confidentiality And Data Protection</h4>
+                <p style="margin: 0;">Both Parties Agree To Treat All Personal Data In Accordance With BDSG and GDPR.</p>
+            </div>
+
+            <div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
+                <h2 style="margin: 0 0 10px 0; font-size: 22px;">Job Details</h2>
+                <p style="margin: 0; color: #666;">${employer.address}</p>
+                <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${job.subCategory}</h3>
+                <p style="margin: 0; font-size: 14px;"><strong>${job.jobType}</strong></p>
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">$${job.salaryAmount}/${job.salaryType}</p>
+                <p style="margin: 0; color: #888; font-size: 12px;">📅 ${new Date(job.deadline).toLocaleDateString()}</p>
+
+                <h4 style="margin: 20px 0 5px 0;">Job Description</h4>
+                <p style="margin: 0; font-size: 13px;">${job.description}</p>
+
+                <h4 style="margin: 15px 0 5px 0;">Responsibilities</h4>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                    ${job.responsibilities.map(res => `<li>${res}</li>`).join('')}
+                </ul>
+
+                <h4 style="margin: 15px 0 5px 0;">Qualifications</h4>
+                <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+                    ${job.qualifications.map(qual => `<li>${qual}</li>`).join('')}
+                </ul>
+            </div>
+
+            <div style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
+                <div style="width: 45%;">
+                    <p style="margin: 0; font-size: 12px; color: #888;">Place</p>
+                    <p style="margin: 0; font-size: 14px;"><strong>${employer.address || 'Online'}</strong></p>
+                </div>
+                <div style="width: 45%;">
+                    <p style="margin: 0; font-size: 12px; color: #888;">Date</p>
+                    <p style="margin: 0; font-size: 14px;"><strong>${new Date().toLocaleDateString()}</strong></p>
+                </div>
+            </div>
+            <p style="font-size: 11px; font-style: italic; margin-top: 5px;">The Contract Was Confirmed By the Client And Has Thus Come Into Effect.</p>
+
+        </div>
+      </body>
+    `,
+  };
+  return data;
+};
+
 export const emailTemplate = {
   createAccount,
   resetPassword,
   confirmAppointment,
   supportReply,
   paymentFailed,
+  hiringRequestToAdmin
 };
