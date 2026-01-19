@@ -4,10 +4,13 @@ import { IShiftPlan } from './shiftPlan.interface';
 import { ShiftPlan } from './shiftPlan.model';
 import { Worker } from '../worker/worker.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { IWorker } from '../worker/worker.interface';
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 
 // ------------ create shift plan --------------
 const createShiftPlanToDB = async (
-  payload: IShiftPlan
+  payload: IShiftPlan,
 ): Promise<IShiftPlan> => {
   // check if the worker exists
   const existingWorker = await Worker.exists({ _id: payload.worker });
@@ -23,7 +26,7 @@ const createShiftPlanToDB = async (
 const updateShiftPlan = async (
   id: string,
   payload: Partial<IShiftPlan>,
-  author: string
+  author: string,
 ) => {
   // check if the shift plan exists
   const existingShiftPlan = await ShiftPlan.exists({ _id: id });
@@ -53,10 +56,32 @@ const deleteShiftPlan = async (id: string): Promise<IShiftPlan | null> => {
   return result;
 };
 
+// ------------- send shift plan to worker --------------
+const sendShiftPlanToWorker = async (shiftPlanId: string) => {
+  // check if plan exists
+  const existingPlan =
+    await ShiftPlan.findById(shiftPlanId).populate('author worker');
+  if (!existingPlan) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Shift plan not found');
+  }
+
+  const worker = existingPlan.worker as any as IWorker;
+
+  // send mail
+  if (worker.email) {
+    const template = emailTemplate.shiftPlanToWorker(worker, existingPlan);
+    await emailHelper.sendEmail({
+      to: worker.email,
+      subject: template.subject,
+      html: template.html,
+    });
+  }
+};
+
 // ------------- get shift plan by author id -------------
 const getShiftPlanByAuthorId = async (
   authorId: string,
-  query: Record<string, unknown>
+  query: Record<string, unknown>,
 ) => {
   const filter: Record<string, any> = { author: authorId };
   if (query.startDate) {
@@ -69,7 +94,7 @@ const getShiftPlanByAuthorId = async (
 
   const planQuery = new QueryBuilder(
     ShiftPlan.find(filter).populate('worker'),
-    query
+    query,
   )
     .filter(['startDate', 'endDate'])
     .sort()
@@ -84,7 +109,7 @@ const getShiftPlanByAuthorId = async (
 };
 
 export const getShiftPlanById = async (
-  id: string
+  id: string,
 ): Promise<IShiftPlan | null> => {
   const result = await ShiftPlan.findById(id).populate('worker');
   return result;
@@ -94,6 +119,7 @@ export const ShiftPlanServices = {
   createShiftPlanToDB,
   updateShiftPlan,
   deleteShiftPlan,
+  sendShiftPlanToWorker,
   getShiftPlanByAuthorId,
   getShiftPlanById,
 };

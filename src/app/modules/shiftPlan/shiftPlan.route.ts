@@ -30,6 +30,13 @@ router.delete(
   ShiftPlanController.deleteShiftPlan
 );
 
+// send shift plan to worker
+router.post(
+  '/send-worker/:id',
+  auth(USER_ROLES.EMPLOYER),
+  ShiftPlanController.sendShiftPlanToWorker
+);
+
 // get my shift plans
 router.get(
   '/me',

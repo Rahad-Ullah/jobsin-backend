@@ -43,6 +43,18 @@ const deleteShiftPlan = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// send shift plan to worker
+const sendShiftPlanToWorker = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShiftPlanServices.sendShiftPlanToWorker(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Shift plan sent to worker successfully',
+    data: result,
+  });
+});
+
 // get shift plan by author id
 const getShiftPlanByAuthorId = catchAsync(async (req: Request, res: Response) => {
   const result = await ShiftPlanServices.getShiftPlanByAuthorId(req.user.id, req.query);
@@ -72,6 +84,7 @@ export const ShiftPlanController = {
   createShiftPlan,
   updateShiftPlan,
   deleteShiftPlan,
+  sendShiftPlanToWorker,
   getShiftPlanByAuthorId,
   getSingleShiftPlanById,
 };

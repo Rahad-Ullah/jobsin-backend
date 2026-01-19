@@ -1,7 +1,9 @@
 import { IAppointment } from '../app/modules/appointment/appointment.interface';
 import { IJob } from '../app/modules/job/job.interface';
+import { IShiftPlan } from '../app/modules/shiftPlan/shiftPlan.interface';
 import { ISupport } from '../app/modules/support/support.interface';
 import { IUser } from '../app/modules/user/user.interface';
+import { IWorker } from '../app/modules/worker/worker.interface';
 import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
@@ -268,11 +270,106 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
   return data;
 };
 
+const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
+  // Extract month/year for the title from the first plan date
+  const firstPlanDate = shiftPlan.plans[0]?.days[0] || new Date();
+  const planMonthYear = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
+  }).format(firstPlanDate);
+
+  const data = {
+    to: worker.email,
+    subject: `Your Shift Plan for ${planMonthYear}`,
+    html: `
+      <body style="font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
+        <div style="max-width: 800px; margin: 0 auto;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center;">
+               <div style="background-color: #f0f0f0; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                  <span style="font-size: 18px;">←</span>
+               </div>
+               <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Shift Plan View</h1>
+            </div>
+            <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="JobsinApp Logo" style="width: 80px;" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 15px;">
+            <div>
+              <p style="margin: 5px 0;"><strong>Name</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${worker.name}</p>
+              <p style="margin: 5px 0;"><strong>Address</strong> &nbsp;: ${worker.address}</p>
+            </div>
+            <div>
+              <p style="margin: 5px 0;"><strong>Email</strong> &nbsp;&nbsp;&nbsp;&nbsp;: ${worker.email}</p>
+              <p style="margin: 5px 0;"><strong>Contact</strong> &nbsp;: ${worker.phone}</p>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 25px;">
+            <h2 style="font-size: 18px; margin: 0;">Plan For ${planMonthYear}</h2>
+            <p style="color: #666; margin: 5px 0;">Holiday Weekend</p>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+            <thead>
+              <tr style="color: #333;">
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Date</th>
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Day</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">From — Until</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Timeline</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${shiftPlan.plans
+                .map(plan =>
+                  plan.days
+                    .map(date => {
+                      const d = new Date(date);
+                      return `
+                    <tr style="border-bottom: none;">
+                      <td style="padding: 12px 0;">${d.toLocaleDateString('de-DE')}</td>
+                      <td style="padding: 12px 0;">${d.toLocaleDateString('en-US', { weekday: 'long' })}</td>
+                      <td style="padding: 12px 0; text-align: center;">
+                        <span style="display: inline-block;">${plan.startTime}</span>
+                        <span style="display: inline-block; width: 40px; height: 1px; background-color: #277E16; margin: 0 10px; vertical-align: middle;"></span>
+                        <span style="display: inline-block;">${plan.endTime}</span>
+                      </td>
+                      <td style="padding: 12px 0; text-align: right;">${plan.shift}</td>
+                    </tr>
+                  `;
+                    })
+                    .join(''),
+                )
+                .join('')}
+            </tbody>
+          </table>
+
+          <div style="margin-top: 40px;">
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Remarks</h3>
+            <p style="color: #666; font-size: 14px; line-height: 1.6;">
+              ${
+                shiftPlan.plans
+                  .map(p => p.remarks)
+                  .filter(r => r)
+                  .join('<br>') || 'No specific remarks for this period.'
+              }
+            </p>
+          </div>
+
+        </div>
+      </body>
+    `,
+  };
+  return data;
+};
+
 export const emailTemplate = {
   createAccount,
   resetPassword,
   confirmAppointment,
   supportReply,
   paymentFailed,
-  hiringRequestToAdmin
+  hiringRequestToAdmin,
+  shiftPlanToWorker,
 };
