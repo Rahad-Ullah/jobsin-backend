@@ -15,15 +15,6 @@ const createShiftPlanToDB = async (
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Worker not found');
   }
 
-  // check if the days are already booked
-  const existingShift = await ShiftPlan.exists({
-    days: { $in: payload.days },
-    author: payload.author,
-  });
-  if (existingShift) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Days are already booked');
-  }
-
   const result = await ShiftPlan.create(payload);
   return result;
 };
@@ -44,16 +35,6 @@ const updateShiftPlan = async (
   const existingWorker = await Worker.exists({ _id: payload.worker });
   if (!existingWorker) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Worker not found');
-  }
-
-  // check if the days are already booked
-  const isAlreadyBooked = await ShiftPlan.exists({
-    days: { $in: payload.days },
-    author: author,
-    _id: { $ne: id },
-  });
-  if (isAlreadyBooked) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Days are already booked');
   }
 
   const result = await ShiftPlan.findByIdAndUpdate(id, payload, { new: true });
@@ -79,11 +60,11 @@ const getShiftPlanByAuthorId = async (
 ) => {
   const filter: Record<string, any> = { author: authorId };
   if (query.startDate) {
-    filter.days = { $elemMatch: { $gte: new Date(query.startDate as string) } };
+    filter.createdAt = { $gte: new Date(query.startDate as string) };
   }
 
   if (query.endDate) {
-    filter.days = { $elemMatch: { $lte: new Date(query.endDate as string) } };
+    filter.createdAt = { $lte: new Date(query.endDate as string) };
   }
 
   const planQuery = new QueryBuilder(

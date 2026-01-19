@@ -8,25 +8,29 @@ const createShiftPlanValidation = z.object({
       .string({ required_error: 'Worker id is required' })
       .length(24, 'Invalid worker id')
       .nonempty('Worker id cannot be empty'),
-    shift: z.nativeEnum(ShiftType),
-    startTime: z
-      .string({ required_error: 'Start time is required' })
-      .nonempty('Start time cannot be empty'),
-    endTime: z
-      .string({ required_error: 'End time is required' })
-      .nonempty('End time cannot be empty'),
-    days: z
-      .array(
-        z
-          .string()
-          .datetime()
-          .refine(date => new Date(date) > new Date(), {
-            message: 'Date must be in the future',
-          })
-      )
-      .min(1, 'At least 1 day is required'),
-    tasks: z.array(z.string()).min(1, 'At least 1 task is required'),
-    remarks: z.string().optional(),
+    plans: z.array(
+      z.object({
+        shift: z.nativeEnum(ShiftType),
+        startTime: z
+          .string({ required_error: 'Start time is required' })
+          .nonempty('Start time cannot be empty'),
+        endTime: z
+          .string({ required_error: 'End time is required' })
+          .nonempty('End time cannot be empty'),
+        days: z
+          .array(
+            z
+              .string()
+              .datetime()
+              .refine(date => new Date(date) > new Date(), {
+                message: 'Date must be in the future',
+              }),
+          )
+          .min(1, 'At least 1 day is required'),
+        tasks: z.array(z.string()).min(1, 'At least 1 task is required'),
+        remarks: z.string().optional(),
+      }),
+    ),
   }),
   // .refine(
   //   data => {
@@ -45,27 +49,26 @@ const createShiftPlanValidation = z.object({
 const updateShiftPlanValidation = z.object({
   body: z.object({
     worker: z.string().length(24, 'Invalid worker id').optional(),
-    shift: z.nativeEnum(ShiftType).optional(),
-    startTime: z
-      .string({ required_error: 'Start time is required' })
-      .nonempty('Start time cannot be empty')
-      .optional(),
-    endTime: z.string({ required_error: 'End time is required' })
-      .nonempty('End time cannot be empty')
-      .optional(),
-    days: z
-      .array(
-        z
-          .string()
-          .datetime()
-          .refine(date => new Date(date) > new Date(), {
-            message: 'Date must be in the future',
-          })
-      )
-      .min(1, 'At least 1 day is required')
-      .optional(),
-    tasks: z.array(z.string()).optional(),
-    remarks: z.string().optional(),
+    plans: z.array(
+      z.object({
+        shift: z.nativeEnum(ShiftType).optional(),
+        startTime: z.string().optional(),
+        endTime: z.string().optional(),
+        days: z
+          .array(
+            z
+              .string()
+              .datetime()
+              .refine(date => new Date(date) > new Date(), {
+                message: 'Date must be in the future',
+              }),
+          )
+          .min(1, 'At least 1 day is required')
+          .optional(),
+        tasks: z.array(z.string()).min(1, 'At least 1 task is required'),
+        remarks: z.string().optional(),
+      }),
+    ),
   }),
 });
 
