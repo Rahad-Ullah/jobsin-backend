@@ -25,6 +25,12 @@ export type IUser = {
   stripeCustomerId?: string;
   googleUserId?: string;
   appleUserId?: string;
+  totpSecret?: {
+    ascii: string;
+    hex: string;
+    base32: string;
+    otpauth_url: string;
+  };
   authentication?: {
     isResetPassword: boolean;
     is2FAEmailActive: boolean;

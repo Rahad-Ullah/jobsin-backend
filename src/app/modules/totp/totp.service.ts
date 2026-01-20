@@ -1,64 +1,71 @@
 import speakeasy, { GeneratedSecret } from 'speakeasy';
 import QRCode from 'qrcode';
+import { User } from '../user/user.model';
 
-
-interface TokenService {
-      generateSecret(userId: string): Promise<GeneratedSecret>;
-      verifyToken(userId: string, userOtp: string): Promise<boolean>;
-      generateQRCode(userId: string): Promise<{
-            qrcode: string;
-            data: GeneratedSecret;
-
-      }>;
+interface TOTPService {
+  verifyToken(userId: string, userOtp: string): Promise<boolean>;
+  generateQRCode(userId: string): Promise<{
+    qrcode: string;
+    data: GeneratedSecret;
+  }>;
 }
 
-const token: TokenService = {
-      // Generate & store secret in Redis
-      async generateSecret(userId: string): Promise<GeneratedSecret> {
-            const secretObj = speakeasy.generateSecret({
-                  name: 'CodeNest App',
-                  issuer: 'CodeNest',
-            });
-            return secretObj;
-      },
+// Generate & store secret in Redis
+async function generateSecret(): Promise<GeneratedSecret> {
+  const secretObj = speakeasy.generateSecret({
+    name: 'Jobsin App',
+    issuer: 'Jobsin',
+  });
+  return secretObj;
+}
 
+// Verify OTP entered by the user
+async function verifyToken(userId: string, userOtp: string): Promise<boolean> {
+  const user = await User.findById(userId).select('+totpSecret').lean();
+  const secret = user?.totpSecret as GeneratedSecret;
+  if (!secret?.base32) {
+    throw new Error('Secret not found');
+  }
 
+  const verified = speakeasy.totp.verify({
+    secret: secret.base32,
+    encoding: 'base32',
+    token: userOtp,
+    step: 30,
+    window: 1,
+  });
+  return verified;
+}
 
-      // Verify OTP entered by the user
-      async verifyToken(secret: string, userOtp: string): Promise<boolean> {
-            // const secretObj = await this.generateSecret(userId);
+// Generate QR Code for Google Authenticator
+async function generateQRCode(userId: string): Promise<{
+  qrcode: string;
+  data: GeneratedSecret;
+}> {
+  // check if user has already the secret
+  const user = await User.findById(userId).select('+totpSecret').lean();
+  let secretObj;
+  if (user?.totpSecret) {
+    secretObj = user?.totpSecret as GeneratedSecret;
+  } else {
+    // if not generate new secret
+    secretObj = await generateSecret();
+    // save to db
+    await User.findByIdAndUpdate(userId, {
+      totpSecret: secretObj,
+    });
+  }
+  
+  if (!secretObj?.otpauth_url) {
+    throw new Error('OTP Auth URL not found');
+  }
 
-            const verified = speakeasy.totp.verify({
-                  secret: secret,
-                  encoding: 'base32',
-                  token: userOtp,
-                  step: 30,
-                  window: 1,
-            });
+  const qrCodeData = await QRCode.toDataURL(secretObj.otpauth_url);
 
-            console.log('Is Valid:', verified);
-            return verified;
-      },
+  return { qrcode: qrCodeData, data: secretObj };
+}
 
-      // Generate QR Code for Google Authenticator
-      async generateQRCode(userId: string): Promise<{
-            qrcode: string;
-            data: GeneratedSecret;
-
-      }> {
-            const secretObj = await this.generateSecret(userId);
-
-            if (!secretObj.otpauth_url) {
-                  throw new Error('OTP Auth URL not found');
-            }
-
-            const qrCodeData = await QRCode.toDataURL(secretObj.otpauth_url);
-
-            console.log('QR Code URL:', qrCodeData);
-            console.log('Secret Base32:', secretObj.base32);
-
-            return { qrcode: qrCodeData, data: secretObj };
-      },
+export const TOTPService: TOTPService = {
+  verifyToken,
+  generateQRCode,
 };
-
-export default token;
