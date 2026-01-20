@@ -287,9 +287,6 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <div style="display: flex; align-items: center;">
-               <div style="background-color: #f0f0f0; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                  <span style="font-size: 18px;">←</span>
-               </div>
                <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Shift Plan View</h1>
             </div>
             <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="JobsinApp Logo" style="width: 80px;" />
