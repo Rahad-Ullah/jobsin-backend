@@ -102,6 +102,24 @@ const userSchema = new Schema<IUser, UserModal>(
       default: null,
       select: 0,
     },
+    totpSecret: {
+      type: {
+        ascii: {
+          type: String,
+        },
+        hex: {
+          type: String,
+        },
+        base32: {
+          type: String,
+        },
+        otpauth_url: {
+          type: String,
+        },
+      },
+      default: null,
+      select: 0,
+    },
     authentication: {
       type: {
         isResetPassword: {
@@ -128,7 +146,7 @@ const userSchema = new Schema<IUser, UserModal>(
       select: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 // location index
 userSchema.index({ location: '2dsphere' });

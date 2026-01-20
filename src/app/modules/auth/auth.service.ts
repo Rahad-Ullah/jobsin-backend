@@ -24,14 +24,14 @@ import { Employer } from '../employer/employer.model';
 const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
   const isExistUser = await User.findOne({ email }).select(
-    '+password +authentication'
+    '+password +authentication +totpSecret',
   );
   if (!isExistUser) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
       config.node_env === 'development'
         ? "User doesn't exist!"
-        : 'Invalid email or password'
+        : 'Invalid email or password',
     );
   }
 
@@ -39,7 +39,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   if (isExistUser.isDeleted) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been deleted or deactivated.'
+      'It looks like your account has been deleted or deactivated.',
     );
   }
 
@@ -47,7 +47,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   if (!isExistUser.isVerified) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Please verify your account, then try to login again'
+      'Please verify your account, then try to login again',
     );
   }
 
@@ -55,7 +55,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   if (isExistUser.status !== USER_STATUS.ACTIVE) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been suspended or deactivated.'
+      'It looks like your account has been suspended or deactivated.',
     );
   }
 
@@ -65,7 +65,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
       StatusCodes.BAD_REQUEST,
       config.node_env === 'development'
         ? 'Password is incorrect!'
-        : 'Invalid email or password'
+        : 'Invalid email or password',
     );
   }
 
@@ -80,7 +80,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
   let data, message;
 
   // if 2fa is active, send otp
-  if (isExistUser.authentication?.is2FAEmailActive && isExistUser.email) {
+  if (
+    (isExistUser.authentication?.is2FAEmailActive && isExistUser.email) ||
+    isExistUser?.totpSecret
+  ) {
     const otp = generateOTP(6);
     const values = {
       name: isExistUser.name,
@@ -100,6 +103,9 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
     data = {
       role: isExistUser.role,
+      userId: isExistUser._id,
+      is2FAEmail: isExistUser.authentication?.is2FAEmailActive,
+      is2FAAuthenticator: !!isExistUser?.totpSecret,
       isProfileFulfilled:
         isProfileFulfilled && (await User.isProfileFulfilled(isExistUser._id)),
     };
@@ -109,7 +115,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
     const accessToken = jwtHelper.createToken(
       { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
       config.jwt.jwt_secret as Secret,
-      config.jwt.jwt_expire_in as string
+      config.jwt.jwt_expire_in as string,
     );
 
     data = {
