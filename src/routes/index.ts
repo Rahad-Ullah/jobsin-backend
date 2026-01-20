@@ -26,6 +26,7 @@ import { invoiceRoutes } from '../app/modules/invoice/invoice.route';
 import { workerRoutes } from '../app/modules/worker/worker.route';
 import { shiftPlanRoutes } from '../app/modules/shiftPlan/shiftPlan.route';
 import { policyRoutes } from '../app/modules/policy/policy.route';
+import TOTPRoute from '../app/modules/totp/totp.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -136,6 +137,10 @@ const apiRoutes = [
   {
     path: '/contact',
     route: contactRoutes,
+  },
+  {
+    path: '/totp',
+    route: TOTPRoute,
   },
 ];
 
