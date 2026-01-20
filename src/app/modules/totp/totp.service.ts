@@ -1,9 +1,14 @@
 import speakeasy, { GeneratedSecret } from 'speakeasy';
 import QRCode from 'qrcode';
 import { User } from '../user/user.model';
+import ApiError from '../../../errors/ApiError';
+import { jwtHelper } from '../../../helpers/jwtHelper';
+import config from '../../../config';
+import { Secret } from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
 
 interface TOTPService {
-  verifyToken(userId: string, userOtp: string): Promise<boolean>;
+  verifyToken(userId: string, userOtp: string): Promise<{}>;
   generateQRCode(userId: string): Promise<{
     qrcode: string;
     data: GeneratedSecret;
@@ -20,12 +25,13 @@ async function generateSecret(): Promise<GeneratedSecret> {
 }
 
 // Verify OTP entered by the user
-async function verifyToken(userId: string, userOtp: string): Promise<boolean> {
+async function verifyToken(userId: string, userOtp: string) {
   const user = await User.findById(userId).select('+totpSecret').lean();
+  if (!user) throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+
   const secret = user?.totpSecret as GeneratedSecret;
-  if (!secret?.base32) {
-    throw new Error('Secret not found');
-  }
+  if (!secret?.base32)
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Secret not found!');
 
   const verified = speakeasy.totp.verify({
     secret: secret.base32,
@@ -34,7 +40,23 @@ async function verifyToken(userId: string, userOtp: string): Promise<boolean> {
     step: 30,
     window: 1,
   });
-  return verified;
+
+  if (!verified) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid OTP');
+  }
+
+  // generate access token
+  const accessToken = jwtHelper.createToken(
+    { id: user._id, role: user.role, email: user.email },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.jwt_expire_in as string,
+  );
+
+  return {
+    accessToken,
+    role: user.role,
+    isProfileFulfilled: await User.isProfileFulfilled(user._id),
+  };
 }
 
 // Generate QR Code for Google Authenticator

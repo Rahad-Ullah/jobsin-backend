@@ -70,12 +70,12 @@ const loginUserFromDB = async (payload: ILoginData) => {
   }
 
   // check if user profile is fulfilled
-  let isProfileFulfilled = true;
-  if (isExistUser.role === USER_ROLES.JOB_SEEKER) {
-    isProfileFulfilled = await JobSeeker.isProfileFulfilled(isExistUser._id);
-  } else if (isExistUser.role === USER_ROLES.EMPLOYER) {
-    isProfileFulfilled = await Employer.isProfileFulfilled(isExistUser._id);
-  }
+  // let isProfileFulfilled = true;
+  // if (isExistUser.role === USER_ROLES.JOB_SEEKER) {
+  //   isProfileFulfilled = await JobSeeker.isProfileFulfilled(isExistUser._id);
+  // } else if (isExistUser.role === USER_ROLES.EMPLOYER) {
+  //   isProfileFulfilled = await Employer.isProfileFulfilled(isExistUser._id);
+  // }
 
   let data, message;
 
@@ -106,8 +106,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
       userId: isExistUser._id,
       is2FAEmail: isExistUser.authentication?.is2FAEmailActive,
       is2FAAuthenticator: !!isExistUser?.totpSecret,
-      isProfileFulfilled:
-        isProfileFulfilled && (await User.isProfileFulfilled(isExistUser._id)),
+      isProfileFulfilled: await User.isProfileFulfilled(isExistUser._id),
     };
     message = 'Please check your email and enter otp to login';
   } else {
@@ -121,8 +120,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
     data = {
       accessToken,
       role: isExistUser.role,
-      isProfileFulfilled:
-        isProfileFulfilled && (await User.isProfileFulfilled(isExistUser._id)),
+      isProfileFulfilled: await User.isProfileFulfilled(isExistUser._id),
     };
     message = 'Login successfully!';
   }
@@ -138,7 +136,7 @@ const forgetPasswordToDB = async (email: string) => {
       StatusCodes.BAD_REQUEST,
       config.node_env === 'development'
         ? "User doesn't exist!"
-        : 'Invalid email'
+        : 'Invalid email',
     );
   }
 
@@ -146,7 +144,7 @@ const forgetPasswordToDB = async (email: string) => {
   if (isExistUser.isDeleted) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been deleted or deactivated.'
+      'It looks like your account has been deleted or deactivated.',
     );
   }
 
@@ -154,7 +152,7 @@ const forgetPasswordToDB = async (email: string) => {
   if (isExistUser.status !== USER_STATUS.ACTIVE) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been suspended or deactivated.'
+      'It looks like your account has been suspended or deactivated.',
     );
   }
 
@@ -186,7 +184,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   if (!oneTimeCode) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Please give the otp, check your email we send a code'
+      'Please give the otp, check your email we send a code',
     );
   }
 
@@ -198,7 +196,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   if (date > isExistUser.authentication?.expireAt) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Otp already expired, Please try again'
+      'Otp already expired, Please try again',
     );
   }
 
@@ -214,7 +212,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
           'authentication.oneTimeCode': null,
           'authentication.expireAt': null,
         },
-      }
+      },
     );
     message = 'Email verify successfully';
   } else if (isExistUser.authentication?.is2FAProcessing) {
@@ -225,13 +223,13 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
           'authentication.oneTimeCode': null,
           'authentication.expireAt': null,
         },
-      }
+      },
     );
 
     const accessToken = jwtHelper.createToken(
       { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
       config.jwt.jwt_secret as Secret,
-      config.jwt.jwt_expire_in as string
+      config.jwt.jwt_expire_in as string,
     );
     data = accessToken;
     message = 'Login Successful';
@@ -244,7 +242,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
           'authentication.oneTimeCode': null,
           'authentication.expireAt': null,
         },
-      }
+      },
     );
 
     const createToken = cryptoToken();
@@ -263,7 +261,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
 //forget password
 const resetPasswordToDB = async (
   token: string,
-  payload: IAuthResetPassword
+  payload: IAuthResetPassword,
 ) => {
   const { newPassword, confirmPassword } = payload;
   //isExist token
@@ -274,12 +272,12 @@ const resetPasswordToDB = async (
 
   //user permission check
   const isExistUser = await User.findById(isExistToken.user).select(
-    '+authentication'
+    '+authentication',
   );
   if (!isExistUser?.authentication?.isResetPassword) {
     throw new ApiError(
       StatusCodes.UNAUTHORIZED,
-      "You don't have permission to change the password. Please click again to 'Forgot Password'"
+      "You don't have permission to change the password. Please click again to 'Forgot Password'",
     );
   }
 
@@ -288,7 +286,7 @@ const resetPasswordToDB = async (
   if (!isValid) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Token expired, Please click again to the forget password'
+      'Token expired, Please click again to the forget password',
     );
   }
 
@@ -296,13 +294,13 @@ const resetPasswordToDB = async (
   if (newPassword !== confirmPassword) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "New password and Confirm password doesn't match!"
+      "New password and Confirm password doesn't match!",
     );
   }
 
   const hashPassword = await bcrypt.hash(
     newPassword,
-    Number(config.bcrypt_salt_rounds)
+    Number(config.bcrypt_salt_rounds),
   );
 
   const updateData = {
@@ -319,7 +317,7 @@ const resetPasswordToDB = async (
 
 const changePasswordToDB = async (
   user: JwtPayload,
-  payload: IChangePassword
+  payload: IChangePassword,
 ) => {
   const { currentPassword, newPassword, confirmPassword } = payload;
   const isExistUser = await User.findById(user.id).select('+password');
@@ -339,21 +337,21 @@ const changePasswordToDB = async (
   if (currentPassword === newPassword) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Please give different password from current password'
+      'Please give different password from current password',
     );
   }
   //new password and confirm password check
   if (newPassword !== confirmPassword) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "Password and Confirm password doesn't matched"
+      "Password and Confirm password doesn't matched",
     );
   }
 
   //hash password
   const hashPassword = await bcrypt.hash(
     newPassword,
-    Number(config.bcrypt_salt_rounds)
+    Number(config.bcrypt_salt_rounds),
   );
 
   const updateData = {
@@ -367,7 +365,7 @@ const changeAdminPasswordRequest = async (userId: string) => {
   if (!isExistUser) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "User doesn't exist, Please try again"
+      "User doesn't exist, Please try again",
     );
   }
 
@@ -375,7 +373,7 @@ const changeAdminPasswordRequest = async (userId: string) => {
   if (isExistUser.isDeleted) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been deleted or deactivated.'
+      'It looks like your account has been deleted or deactivated.',
     );
   }
 
@@ -383,7 +381,7 @@ const changeAdminPasswordRequest = async (userId: string) => {
   if (isExistUser.status !== USER_STATUS.ACTIVE) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'It looks like your account has been suspended or deactivated.'
+      'It looks like your account has been suspended or deactivated.',
     );
   }
 
@@ -407,11 +405,11 @@ const changeAdminPasswordRequest = async (userId: string) => {
 // admin password change
 const changeAdminPasswordToDB = async (
   user: JwtPayload,
-  payload: IChangePassword & { oneTimeCode: number }
+  payload: IChangePassword & { oneTimeCode: number },
 ) => {
   const { currentPassword, newPassword, confirmPassword } = payload;
   const existingUser = await User.findById(user.id).select(
-    '+password +authentication'
+    '+password +authentication',
   );
   if (!existingUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
@@ -429,14 +427,14 @@ const changeAdminPasswordToDB = async (
   if (currentPassword === newPassword) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'Please give different password from current password'
+      'Please give different password from current password',
     );
   }
   //new password and confirm password check
   if (newPassword !== confirmPassword) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      "Password and Confirm password doesn't matched"
+      "Password and Confirm password doesn't matched",
     );
   }
 
@@ -448,7 +446,7 @@ const changeAdminPasswordToDB = async (
   //hash password
   const hashPassword = await bcrypt.hash(
     newPassword,
-    Number(config.bcrypt_salt_rounds)
+    Number(config.bcrypt_salt_rounds),
   );
 
   const updateData = {
