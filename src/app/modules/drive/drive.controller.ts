@@ -48,7 +48,7 @@ const deleteDrive = catchAsync(async (req: Request, res: Response) => {
 
 // get my drive files
 const getMyDrives = catchAsync(async (req: Request, res: Response) => {
-  const result = await DriveServices.getDrivesByUserId(req.user.id, req.query);
+  const result = await DriveServices.getDrivesByUserId(req.query);
 
   sendResponse(res, {
     success: true,

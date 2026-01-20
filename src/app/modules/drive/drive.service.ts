@@ -49,10 +49,9 @@ const deleteDriveToDB = async (id: string) => {
 
 // ------------- get all drive files by user id --------------
 const getDrivesByUserId = async (
-  userId: string,
   query: Record<string, any>
 ) => {
-  const driveQuery = new QueryBuilder(Drive.find({ user: userId }), query)
+  const driveQuery = new QueryBuilder(Drive.find(), query)
     .search(['name'])
     .sort()
     .paginate()
