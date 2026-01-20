@@ -6,7 +6,7 @@ import { Application } from './application.model';
 
 // ------------- create application -------------
 const createApplicationToDB = async (
-  payload: Partial<IApplication> & { isResume: boolean | string }
+  payload: Partial<IApplication> & { isResume: boolean | string },
 ): Promise<IApplication> => {
   // check if the job exists
   const existingJob = await Job.exists({ _id: payload.job });
@@ -39,7 +39,7 @@ const createApplicationToDB = async (
 // ------------- update application ------------
 const updateApplicationToDB = async (
   id: string,
-  payload: Partial<IApplication>
+  payload: Partial<IApplication>,
 ) => {
   // check if the application exists
   const existingApplication = await Application.exists({ _id: id });
@@ -56,7 +56,7 @@ const updateApplicationToDB = async (
 // ------------- get applications by job id ------------
 const getApplicationsByJobId = async (
   id: string,
-  query: Record<string, any>
+  query: Record<string, any>,
 ) => {
   const applicationQuery = new QueryBuilder(
     Application.find({ job: id, isDeleted: false }).populate([
@@ -76,7 +76,7 @@ const getApplicationsByJobId = async (
         path: 'resume',
       },
     ]),
-    query
+    query,
   )
     .filter()
     .sort()

@@ -5,7 +5,7 @@ import { SubscriptionStatus } from '../subscription/subscription.constants';
 import { Job } from '../job/job.model';
 
 // get user subscription
-const getUserSubscription = async (userId: string) => {
+const getUserPlan = async (userId: string) => {
   const user = await User.findById(userId)
     .populate({
       path: 'subscription',
@@ -29,7 +29,7 @@ const getUserSubscription = async (userId: string) => {
 
 // on create job
 const onCreateJob = async (userId: string) => {
-  const plan = await getUserSubscription(userId);
+  const plan = await getUserPlan(userId);
 
   // check job limit for basic plan - 5 jobs per month
   if (plan === 'BASIC') {
@@ -53,6 +53,14 @@ const onCreateJob = async (userId: string) => {
   }
 };
 
+// on get candidate applications
+const onGetCandidateApplications = async (userId: string) => {
+  const plan = await getUserPlan(userId);
+  const hasLimitation = plan === 'BASIC';
+  return hasLimitation;
+};
+
 export const LimitationServices = {
   onCreateJob,
+  onGetCandidateApplications,
 };

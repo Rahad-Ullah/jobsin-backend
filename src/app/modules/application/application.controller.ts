@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import { getSingleFilePath } from '../../../shared/getFilePath';
+import { LimitationServices } from '../limitation/limitation.service';
 
 // create application
 const createApplication = catchAsync(async (req: Request, res: Response) => {
@@ -27,7 +28,7 @@ const createApplication = catchAsync(async (req: Request, res: Response) => {
 const updateApplication = catchAsync(async (req: Request, res: Response) => {
   const result = await ApplicationServices.updateApplicationToDB(
     req.params.id,
-    req.body
+    req.body,
   );
 
   sendResponse(res, {
@@ -39,21 +40,33 @@ const updateApplication = catchAsync(async (req: Request, res: Response) => {
 });
 
 // get applications by job id
-const getApplicationsByJobId = catchAsync(async (req: Request, res: Response) => {
-  const result = await ApplicationServices.getApplicationsByJobId(req.params.id, req.query);
+const getApplicationsByJobId = catchAsync(
+  async (req: Request, res: Response) => {
+    const hasLimitation = await LimitationServices.onGetCandidateApplications(
+      req.user.id,
+    );
 
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Applications retrieved successfully',
-    data: result?.data,
-    pagination: result?.pagination,
-  });
-});
+    const result = await ApplicationServices.getApplicationsByJobId(
+      req.params.id,
+      req.query,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Applications retrieved successfully',
+      data: { hasLimitation, data: result?.data },
+      pagination: result?.pagination,
+    });
+  },
+);
 
 // get my applications
 const getMyApplications = catchAsync(async (req: Request, res: Response) => {
-  const result = await ApplicationServices.getApplicationsByUserId(req.user.id, req.query);
+  const result = await ApplicationServices.getApplicationsByUserId(
+    req.user.id,
+    req.query,
+  );
 
   sendResponse(res, {
     success: true,
@@ -65,16 +78,20 @@ const getMyApplications = catchAsync(async (req: Request, res: Response) => {
 });
 
 // get single application by id
-const getSingleApplicationById = catchAsync(async (req: Request, res: Response) => {
-  const result = await ApplicationServices.getSingleApplicationById(req.params.id);
+const getSingleApplicationById = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await ApplicationServices.getSingleApplicationById(
+      req.params.id,
+    );
 
-  sendResponse(res, {
-    success: true,
-    statusCode: StatusCodes.OK,
-    message: 'Application retrieved successfully',
-    data: result,
-  });
-});
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Application retrieved successfully',
+      data: result,
+    });
+  },
+);
 
 export const ApplicationController = {
   createApplication,
