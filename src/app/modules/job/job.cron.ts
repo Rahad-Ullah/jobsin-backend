@@ -7,7 +7,9 @@ import { Employer } from '../employer/employer.model';
 import { RepeatType } from '../employer/employer.constant';
 import { sleep } from '../../../util/sleep';
 import { LimitationServices } from '../limitation/limitation.service';
+import { Job } from './job.model';
 
+// ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
 const EMPLOYER_DELAY_MS = 3000; // delay between employers
 const PER_NOTIFICATION_DELAY_MS = 400; // delay between notifications
@@ -32,11 +34,10 @@ export function startJobSeekerAlertCron() {
         const { repeat, lastSentAt } = employer.notificationSettings;
 
         // 2️⃣ MONTHLY LIMIT CHECK (BASIC users only)
-        const isLimited =
-          await LimitationServices.onJobSeekerMatchNotification(
-            employerUserId,
-            lastSentAt,
-          );
+        const isLimited = await LimitationServices.onJobSeekerMatchNotification(
+          employerUserId,
+          lastSentAt,
+        );
 
         if (isLimited) {
           continue; // ⛔ already received notification in this month
@@ -78,7 +79,6 @@ export function startJobSeekerAlertCron() {
     }
   });
 }
-
 
 // ------------- FREQUENCY CHECK -------------
 function shouldSendNotification(
@@ -142,4 +142,144 @@ async function cleanupEmployer(employerId: string) {
   await redisClient.del(`job_search:${employerId}`);
   await redisClient.del(`job_search:dedup:${employerId}`);
   await redisClient.srem('job_search:employers', employerId);
+}
+
+// ############ JOB ALERT CRON FOR JOB SEEKER ############
+// ----------- CONFIG -----------
+const PER_USER_DELAY_MS = 300; // throttle between users
+
+// ----------- CRON STARTER -------------
+export function startJobSeekerJobAlertCron() {
+  nodeCron.schedule('0 0 * * *', async () => {
+    console.log('[CRON] Job seeker job alert started');
+
+    try {
+      const now = new Date();
+
+      // 1️⃣ Load all job seekers with notification settings
+      const jobSeekers = await User.find({
+        role: 'JOB_SEEKER',
+      })
+        .select('jobSeeker name location')
+        .populate('jobSeeker', 'experiences notificationSettings');
+
+      for (const user of jobSeekers) {
+        const settings = (user as any).jobSeeker?.notificationSettings;
+        if (!settings) continue;
+
+        const { pushNotification, emailNotification, repeat, lastSentAt } = settings;
+
+        // if both settings are off, skip
+        if (!pushNotification && !emailNotification) {
+          continue;
+        }
+
+        // 2️⃣ Check DAILY / WEEKLY timing
+        if (!shouldSendJobAlert(repeat, lastSentAt, now)) {
+          continue;
+        }
+
+        // 3️⃣ Find new matching jobs
+        const jobs = await findMatchingJobs(user, lastSentAt);
+
+        if (jobs.length === 0) {
+          continue; // ⛔ no jobs → no notification, don't update lastSentAt
+        }
+
+        // 4️⃣ Send push notification
+        if(pushNotification){
+          for (const job of jobs) {
+            await sendNotifications({
+              type: 'JOB_ALERT',
+              receiver: new Types.ObjectId(user._id),
+              title: `New job available: ${job.subCategory}`,
+              message: `New job available for you: ${job.subCategory}`,
+              referenceId: job._id.toString(),
+            });
+          }
+        }
+
+        // 4️⃣ Send email notification
+        if(emailNotification){
+          //! await sendJobAlertEmail(user, jobs);
+        }
+
+        // 5️⃣ Update lastSentAt after success
+        await User.updateOne(
+          { _id: user._id },
+          { 'notificationSettings.lastSentAt': now },
+        );
+
+        // 💤 throttle between users
+        await sleep(PER_USER_DELAY_MS);
+      }
+
+      console.log('[CRON] Job seeker job alert completed');
+    } catch (err) {
+      console.error('[CRON] Job seeker job alert failed', err);
+    }
+  });
+}
+
+function shouldSendJobAlert(
+  repeat: RepeatType,
+  lastSentAt: Date | null,
+  now: Date,
+): boolean {
+  if (!lastSentAt) return true;
+
+  const diffMs = now.getTime() - new Date(lastSentAt).getTime();
+
+  if (repeat === RepeatType.DAILY) {
+    return diffMs >= 24 * 60 * 60 * 1000;
+  }
+
+  if (repeat === RepeatType.WEEKLY) {
+    return diffMs >= 7 * 24 * 60 * 60 * 1000;
+  }
+
+  return false;
+}
+
+async function findMatchingJobs(user: any, lastSentAt: Date | null) {
+  const experiences = user.jobSeeker?.experiences ?? [];
+
+  const query: any = {
+    status: 'ACTIVE',
+  };
+
+    // Preference matching on nearby location
+  if (user?.location?.coordinates?.length === 2) {
+    const lat = parseFloat(user.location.coordinates[1] as string);
+    const long = parseFloat(user.location.coordinates[0] as string);
+    const radiusKm = 200 ; // radius in kilometers
+
+    if (
+      !isNaN(radiusKm) &&
+      radiusKm > 0 &&
+      lat !== undefined &&
+      long !== undefined
+    ) {
+      const EARTH_RADIUS = 6378.1; // km
+      const radiusInRadians = radiusKm / EARTH_RADIUS;
+
+      query.location = {
+        $geoWithin: {
+          $centerSphere: [[long, lat], radiusInRadians],
+        },
+      };
+    }
+  }
+
+  // Preference matching on recent jobs
+  if (lastSentAt) {
+    query.createdAt = { $gt: lastSentAt };
+  }
+
+  //  preference matching on category
+  if (experiences.length > 0) {
+    query.category = { $in: experiences.map((exp: any) => exp.category) };
+  }
+
+  return Job.find(query).select('_id title category location').limit(20);
 }
