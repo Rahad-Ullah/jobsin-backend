@@ -205,16 +205,16 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
     const TTL_8_DAYS = 60 * 60 * 24 * 8;
 
     for (const job of data) {
-      const jobSeekerId = user._id.toString();
-      const employerId = job.author?._id?.toString();
-      if (!employerId) continue;
+      const jobSeekerUserId = user.id;
+      const employerUserId = job.author?._id?.toString();
+      if (!employerUserId) continue;
 
       const jobId = job._id.toString();
-      const dedupKey = `${jobSeekerId}:${jobId}`;
+      const dedupKey = `${jobSeekerUserId}:${jobId}`;
 
       // 1️. Check dedup
       const isNew = await redisClient.sadd(
-        `job_search:dedup:${employerId}`,
+        `job_search:dedup:${employerUserId}`,
         dedupKey,
       );
 
@@ -223,21 +223,21 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
 
       // 2️. Save event
       await redisClient.sadd(
-        `job_search:${employerId}`,
+        `job_search:${employerUserId}`,
         JSON.stringify({
           jobId,
-          jobSeekerId,
-          employerId,
+          jobSeekerId: jobSeekerUserId,
+          employerId: employerUserId,
           searchedAt: Date.now(),
         }),
       );
 
       // 3️. TTL
-      await redisClient.expire(`job_search:${employerId}`, TTL_8_DAYS);
-      await redisClient.expire(`job_search:dedup:${employerId}`, TTL_8_DAYS);
+      await redisClient.expire(`job_search:${employerUserId}`, TTL_8_DAYS);
+      await redisClient.expire(`job_search:dedup:${employerUserId}`, TTL_8_DAYS);
 
       // 4️. Track employer
-      await redisClient.sadd('job_search:employers', employerId);
+      await redisClient.sadd('job_search:employers', employerUserId);
     }
   }
 
