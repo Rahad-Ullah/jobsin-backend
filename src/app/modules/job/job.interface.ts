@@ -5,16 +5,8 @@ import {
   ExperienceLevel,
   JobStatus,
   JobType,
-  RepeatType,
   SalaryType,
 } from './job.constants';
-
-export interface INotificationSettings {
-  pushNotification: boolean;
-  emailNotification: boolean;
-  repeat: RepeatType;
-  email: string;
-}
 
 export interface IJob {
   _id: Types.ObjectId;
@@ -37,7 +29,6 @@ export interface IJob {
   status: JobStatus;
   isHiringRequest: boolean;
   isDeleted: boolean;
-  notificationSettings: INotificationSettings;
 }
 
 export type JobModel = Model<IJob>;

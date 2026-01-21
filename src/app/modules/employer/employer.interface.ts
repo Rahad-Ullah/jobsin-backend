@@ -1,4 +1,12 @@
 import { Model, Types } from 'mongoose';
+import { RepeatType } from './employer.constant';
+
+export interface INotificationSettings {
+  pushNotification: boolean;
+  emailNotification: boolean;
+  repeat: RepeatType;
+  email: string;
+}
 
 export type IEmployer = {
   _id: Types.ObjectId;
@@ -9,6 +17,7 @@ export type IEmployer = {
   deNo: string;
   whatsApp: string;
   about: string;
+  notificationSettings: INotificationSettings;
 };
 
 export type EmployerModel = {

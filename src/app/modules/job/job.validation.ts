@@ -3,19 +3,8 @@ import {
   ExperienceLevel,
   JobStatus,
   JobType,
-  RepeatType,
   SalaryType,
 } from './job.constants';
-
-// Notification Settings schema
-const notificationSettingsSchema = z
-  .object({
-    pushNotification: z.boolean().default(false),
-    emailNotification: z.boolean().default(false),
-    repeat: z.nativeEnum(RepeatType).default(RepeatType.WEEKLY),
-    email: z.string().email('Email must be valid').default(''),
-  })
-  .strict();
 
 // Job schema for creation
 export const createJobValidation = z.object({
@@ -29,7 +18,7 @@ export const createJobValidation = z.object({
         val => (typeof val === 'string' ? new Date(val) : val),
         z.date().refine(d => d > new Date(), {
           message: 'Deadline must be in the future',
-        })
+        }),
       ),
       salaryType: z.nativeEnum(SalaryType),
       salaryAmount: z
@@ -45,7 +34,6 @@ export const createJobValidation = z.object({
         .min(1, 'At least one qualification is required'),
       aboutCompany: z.string().nonempty('About company is required'),
       isHiringRequest: z.boolean().default(false).optional(),
-      notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
 });
@@ -70,7 +58,6 @@ export const updateJobValidation = z.object({
       qualifications: z.array(z.string()).optional(),
       aboutCompany: z.string().optional(),
       status: z.nativeEnum(JobStatus).optional(),
-      notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
 });

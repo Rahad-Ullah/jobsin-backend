@@ -3,6 +3,7 @@ import { redisClient } from '../../../config/redis';
 import { sendNotifications } from '../../../helpers/notificationHelper';
 import { Types } from 'mongoose';
 import { User } from '../user/user.model';
+import { sleep } from '../../../util/sleep';
 
 // ----------- CONFIG -----------
 const EMPLOYER_DELAY_MS = 3000; // delay between employers

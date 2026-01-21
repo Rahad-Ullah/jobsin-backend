@@ -1,5 +1,21 @@
 import { Schema, Types, model } from 'mongoose';
 import { IEmployer, EmployerModel } from './employer.interface';
+import { RepeatType } from './employer.constant';
+
+// Notification Settings sub-schema
+const notificationSettingsSchema = new Schema(
+  {
+    pushNotification: { type: Boolean, default: false },
+    emailNotification: { type: Boolean, default: false },
+    repeat: {
+      type: String,
+      enum: Object.values(RepeatType),
+      default: RepeatType.DAILY,
+    },
+    email: { type: String, default: '' },
+  },
+  { _id: false },
+);
 
 const employerSchema = new Schema<IEmployer, EmployerModel>(
   {
@@ -10,8 +26,9 @@ const employerSchema = new Schema<IEmployer, EmployerModel>(
     deNo: { type: String, default: '' },
     whatsApp: { type: String, default: '' },
     about: { type: String, default: '' },
+    notificationSettings: notificationSettingsSchema,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // check if employer profile is fulfilled
@@ -35,5 +52,5 @@ employerSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
 
 export const Employer = model<IEmployer, EmployerModel>(
   'Employer',
-  employerSchema
+  employerSchema,
 );

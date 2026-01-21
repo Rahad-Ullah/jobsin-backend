@@ -4,24 +4,8 @@ import {
   ExperienceLevel,
   JobStatus,
   JobType,
-  RepeatType,
   SalaryType,
 } from './job.constants';
-
-// Notification Settings sub-schema
-const notificationSettingsSchema = new Schema(
-  {
-    pushNotification: { type: Boolean, default: false },
-    emailNotification: { type: Boolean, default: false },
-    repeat: {
-      type: String,
-      enum: Object.values(RepeatType),
-      default: RepeatType.DAILY,
-    },
-    email: { type: String, default: '' },
-  },
-  { _id: false }
-);
 
 // Job schema
 const jobSchema = new Schema<IJob, JobModel>(
@@ -68,8 +52,7 @@ const jobSchema = new Schema<IJob, JobModel>(
       default: JobStatus.OPEN,
     },
     isHiringRequest: { type: Boolean, default: false },
-    isDeleted: { type: Boolean, default: false },
-    notificationSettings: notificationSettingsSchema,
+    isDeleted: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

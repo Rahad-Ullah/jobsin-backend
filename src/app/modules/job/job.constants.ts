@@ -22,8 +22,3 @@ export enum JobStatus {
   OPEN = 'Open',
   CLOSED = 'Closed',
 }
-
-export enum RepeatType {
-  DAILY = 'Daily',
-  WEEKLY = 'Weekly',
-}
