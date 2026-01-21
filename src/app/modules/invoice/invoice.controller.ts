@@ -4,6 +4,18 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 
+// refund invoice
+const refundInvoice = catchAsync(async (req: Request, res: Response) => {
+  const result = await InvoiceServices.refundInvoiceFromDB(req.body.invoiceId, req.body.reason);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Invoice refunded successfully',
+    data: result,
+  });
+});
+
 // get invoices by user id
 const getMyInvoices = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -36,6 +48,7 @@ const getAllInvoices = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const InvoiceController = {
+  refundInvoice,
   getMyInvoices,
   getAllInvoices,
 };

@@ -29,7 +29,7 @@ export interface IJobSeeker {
   resume?: Types.ObjectId;
   attachments: string[];
   isProfileVisible: boolean;
-  
+  notificationSettings: INotificationSettings;
 }
 
 export type JobSeekerModel = {

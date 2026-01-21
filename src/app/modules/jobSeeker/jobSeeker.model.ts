@@ -44,7 +44,7 @@ const jobSeekerSchema = new Schema<IJobSeeker, JobSeekerModel>(
     resume: { type: Schema.Types.ObjectId, ref: 'Resume', default: null },
     attachments: [{ type: String }, { default: [] }],
     isProfileVisible: { type: Boolean, default: true },
-    
+    notificationSettings: notificationSettingsSchema,
   },
   { timestamps: true }
 );

@@ -23,7 +23,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       stripeSubscription.id as string,
       {
         expand: ['items.data.price', 'latest_invoice.lines.data.price'],
-      }
+      },
     );
 
     const stripePrice = stripeSub.items.data[0].price;
@@ -57,7 +57,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     if (!result) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Subscription creation failed'
+        'Subscription creation failed',
       );
     }
 
@@ -110,7 +110,7 @@ const onInvoicePaid = async (event: Stripe.Event) => {
     if (!stripeSubscriptionId) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Subscription ID not found in invoice'
+        'Subscription ID not found in invoice',
       );
     }
 
@@ -131,7 +131,7 @@ const onInvoicePaid = async (event: Stripe.Event) => {
         currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
         currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
       },
-      { new: true }
+      { new: true },
     );
 
     // DB write: create invoice
@@ -155,7 +155,7 @@ const onInvoicePaid = async (event: Stripe.Event) => {
     if (!result) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Invoice creation failed'
+        'Invoice creation failed',
       );
     }
   } catch (error) {
@@ -174,7 +174,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
     if (!stripeSubscriptionId) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Subscription ID not found in invoice'
+        'Subscription ID not found in invoice',
       );
     }
 
@@ -195,7 +195,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
         currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
         currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
       },
-      { new: true }
+      { new: true },
     ).populate('user package');
 
     // DB write: create invoice
@@ -217,7 +217,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
     if (!result) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Invoice creation failed'
+        'Invoice creation failed',
       );
     }
 
@@ -253,7 +253,7 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
     if (!stripeSubscriptionId) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Subscription ID not found in invoice'
+        'Subscription ID not found in invoice',
       );
     }
 
@@ -278,7 +278,7 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
           currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
           currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
         },
-        { new: true }
+        { new: true },
       );
 
       // DB write: update invoice
@@ -286,7 +286,7 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
         { stripeInvoiceId: stripeInvoice.id, status: InvoiceStatus.RETRYING },
         {
           status: InvoiceStatus.FAILED,
-        }
+        },
       );
     }
   } catch (error) {
@@ -294,9 +294,35 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
   }
 };
 
+// on refund created
+const onRefundCreated = async (event: Stripe.Event) => {
+  const refund = event.data.object as Stripe.Refund;
+  const invoiceId = refund.metadata?.internalInvoiceId;
+  const subscriptionId = refund.metadata?.subscriptionId;
+
+  if (!invoiceId) {
+    console.warn(
+      `Refund ${refund.id} processed without internalInvoiceId metadata.`,
+    );
+    return;
+  }
+
+  // DB write: update invoice and subscription
+  await Invoice.findOneAndUpdate(
+    { _id: invoiceId, status: { $ne: InvoiceStatus.REFUNDED } },
+    { status: InvoiceStatus.REFUNDED },
+  );
+  await Subscription.findByIdAndUpdate(
+    subscriptionId,
+    { status: SubscriptionStatus.CANCELED },
+    { new: true },
+  );
+};
+
 export const StripeWebhookServices = {
   onCustomerSubscriptionCreated,
   onInvoicePaid,
   onInvoicePaymentFailed,
   onInvoiceUpdate,
+  onRefundCreated,
 };

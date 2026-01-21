@@ -131,5 +131,5 @@ export const LimitationServices = {
   onCreateJob,
   onGetCandidateApplications,
   onJobSeekerMatchNotification,
-  
+  onCreateAppointment,
 };

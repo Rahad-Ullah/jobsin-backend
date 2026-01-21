@@ -35,6 +35,10 @@ export async function stripeEventHandler(event: Stripe.Event) {
       await StripeWebhookServices.onInvoiceUpdate(event);
       break;
 
+    case 'refund.created':
+      await StripeWebhookServices.onRefundCreated(event);
+      break;
+
     default:
   }
 
