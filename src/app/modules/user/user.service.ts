@@ -201,7 +201,9 @@ const getUserByIdFromDB = async (id: string): Promise<Partial<IUser>> => {
 
 // ------------- get user profile -------------
 const getUserProfileFromDB = async (id: string) => {
-  const result = await User.findById(id).select('+authentication').lean();
+  const result = await User.findById(id)
+    .select('+authentication +totpSecret')
+    .lean();
   if (!result) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
@@ -210,8 +212,9 @@ const getUserProfileFromDB = async (id: string) => {
     ...result,
     authentication: {
       is2FAEmailActive: result.authentication?.is2FAEmailActive,
-      is2FAAuthenticatorActive: result.totpSecret !== null,
+      is2FAAuthenticatorActive: !!result.totpSecret,
     },
+    totpSecret: null,
   };
 };
 
