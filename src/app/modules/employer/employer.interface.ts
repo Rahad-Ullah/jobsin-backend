@@ -5,6 +5,7 @@ export interface INotificationSettings {
   pushNotification: boolean;
   emailNotification: boolean;
   repeat: RepeatType;
+  lastSentAt: Date;
   email: string;
 }
 

@@ -3,6 +3,7 @@ import ApiError from '../../../errors/ApiError';
 import { User } from '../user/user.model';
 import { SubscriptionStatus } from '../subscription/subscription.constants';
 import { Job } from '../job/job.model';
+import { isSameCalendarMonth } from '../../../util/isSameCalendarMonth';
 
 // get user subscription
 const getUserPlan = async (userId: string) => {
@@ -61,14 +62,29 @@ const onGetCandidateApplications = async (userId: string) => {
 };
 
 // on candidate match alert
-const onCandidateMatchAlert = async (userId: string) => {
+
+export const onJobSeekerMatchNotification = async (
+  userId: string,
+  lastSentAt: Date | null,
+): Promise<boolean> => {
   const plan = await getUserPlan(userId);
-  const hasLimitation = plan === 'BASIC';
-  return hasLimitation;
+
+  // Premium users → no limitation
+  if (plan !== 'BASIC') {
+    return false;
+  }
+
+  // BASIC users → 1 per calendar month
+  if (!lastSentAt) {
+    return false; // never sent before → allow
+  }
+
+  const now = new Date();
+  return isSameCalendarMonth(lastSentAt, now);
 };
 
 export const LimitationServices = {
   onCreateJob,
   onGetCandidateApplications,
-  onCandidateMatchAlert,
+  onJobSeekerMatchNotification,
 };

@@ -12,6 +12,7 @@ const notificationSettingsSchema = new Schema(
       enum: Object.values(RepeatType),
       default: RepeatType.DAILY,
     },
+    lastSentAt: { type: Date, default: null },
     email: { type: String, default: '' },
   },
   { _id: false },
