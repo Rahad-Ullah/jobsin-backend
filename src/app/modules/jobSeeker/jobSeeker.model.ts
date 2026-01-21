@@ -1,6 +1,22 @@
 import { Schema, Types, model } from 'mongoose';
 import { IJobSeeker, JobSeekerModel } from './jobSeeker.interface';
-import { SalaryType } from './jobSeeker.constants';
+import { RepeatType, SalaryType } from './jobSeeker.constants';
+
+// Notification Settings sub-schema
+const notificationSettingsSchema = new Schema(
+  {
+    pushNotification: { type: Boolean, default: false },
+    emailNotification: { type: Boolean, default: false },
+    repeat: {
+      type: String,
+      enum: Object.values(RepeatType),
+      default: RepeatType.DAILY,
+    },
+    lastSentAt: { type: Date, default: null },
+    email: { type: String, default: '' },
+  },
+  { _id: false },
+);
 
 // experience sub-schema
 const experienceSchema = new Schema(
@@ -28,6 +44,7 @@ const jobSeekerSchema = new Schema<IJobSeeker, JobSeekerModel>(
     resume: { type: Schema.Types.ObjectId, ref: 'Resume', default: null },
     attachments: [{ type: String }, { default: [] }],
     isProfileVisible: { type: Boolean, default: true },
+    
   },
   { timestamps: true }
 );

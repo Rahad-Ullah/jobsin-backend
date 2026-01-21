@@ -3,3 +3,8 @@ export enum SalaryType {
   MONTH = 'Month',
   YEAR = 'Year',
 }
+
+export enum RepeatType {
+  DAILY = 'Daily',
+  WEEKLY = 'Weekly',
+}

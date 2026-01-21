@@ -1,5 +1,13 @@
 import { Model, Types } from 'mongoose';
-import { SalaryType } from './jobSeeker.constants';
+import { RepeatType, SalaryType } from './jobSeeker.constants';
+
+export interface INotificationSettings {
+  pushNotification: boolean;
+  emailNotification: boolean;
+  repeat: RepeatType;
+  lastSentAt: Date;
+  email: string;
+}
 
 // Work Experience sub-document
 export interface IExperience {
@@ -21,6 +29,7 @@ export interface IJobSeeker {
   resume?: Types.ObjectId;
   attachments: string[];
   isProfileVisible: boolean;
+  
 }
 
 export type JobSeekerModel = {
