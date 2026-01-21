@@ -127,7 +127,7 @@ async function sendEmployerNotification(employerId: string, events: any[]) {
     await sendNotifications({
       type: 'JOB_SEEKER_ALERT',
       receiver: new Types.ObjectId(employerId),
-      title: `${user.name} ${category}`,
+      title: `${user.name} - ${category}`,
       message: `${user.name} is looking for ${category}`,
       referenceId: event.jobSeekerId,
     });

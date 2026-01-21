@@ -24,6 +24,7 @@ const updateEmployerSchema = z.object({
       deNo: z.string().nonempty('DE No cannot be empty').optional(),
       whatsApp: z.string().nonempty('WhatsApp cannot be empty').optional(),
       about: z.string().nonempty('About cannot be empty').optional(),
+      notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
 });
@@ -45,6 +46,7 @@ const updateEmployerProfileSchema = z.object({
       whatsApp: z.string().nonempty('WhatsApp cannot be empty').optional(),
       about: z.string().nonempty('About cannot be empty').optional(),
       image: z.string().optional(),
+      notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
 });

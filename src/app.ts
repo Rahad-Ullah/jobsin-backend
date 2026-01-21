@@ -41,7 +41,7 @@ app.get('/', (req: Request, res: Response) => {
   );
 });
 
-// cron 
+// cron job
 startCrons();
 
 //global error handle

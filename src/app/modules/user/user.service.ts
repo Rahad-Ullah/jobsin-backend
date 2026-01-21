@@ -14,7 +14,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 
 // ------------- create user -------------
 export const createUserIntoDB = async (
-  payload: Partial<IUser>
+  payload: Partial<IUser>,
 ): Promise<string> => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -35,13 +35,13 @@ export const createUserIntoDB = async (
             user: user._id,
           },
         ],
-        { session }
+        { session },
       );
       // update user with jobSeeker id
       await User.findByIdAndUpdate(
         user._id,
         { $set: { jobSeeker: jobSeeker[0]._id } },
-        { session }
+        { session },
       );
     } else if (payload.role === USER_ROLES.EMPLOYER) {
       const employer = await Employer.create(
@@ -50,13 +50,13 @@ export const createUserIntoDB = async (
             user: user._id,
           },
         ],
-        { session }
+        { session },
       );
       // update user with employer id
       await User.findByIdAndUpdate(
         user._id,
         { $set: { employer: employer[0]._id } },
-        { session }
+        { session },
       );
     }
 
@@ -78,7 +78,7 @@ export const createUserIntoDB = async (
     await User.findOneAndUpdate(
       { _id: user._id },
       { $set: { authentication } },
-      { session }
+      { session },
     );
 
     // Commit transaction
@@ -111,7 +111,7 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
 // ------------- update user by id -------------
 const updateUserByIdIntoDB = async (
   id: string,
-  payload: Partial<IUser> & any
+  payload: Partial<IUser> & any,
 ) => {
   const isExistUser = await User.findById(id);
   if (!isExistUser) {
@@ -119,32 +119,36 @@ const updateUserByIdIntoDB = async (
   }
 
   if (payload.is2FAEmailActive !== undefined) {
+    if (!isExistUser.email) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Please add an email first to enable 2FA!',
+      );
+    }
     payload['authentication.is2FAEmailActive'] = payload.is2FAEmailActive;
     delete payload.is2FAEmailActive;
   }
 
+  if (payload.is2FAAuthenticatorActive === false) {
+    payload['totpSecret'] = null;
+    delete payload.is2FAAuthenticatorActive;
+  }
+
   const updateDoc = await User.findByIdAndUpdate(id, payload, {
     new: true,
-  })
-    .select('+authentication')
-    .lean();
+  }).lean();
 
   //unlink file here
   if (payload.image && isExistUser.image) {
     unlinkFile(isExistUser.image);
   }
 
-  return {
-    ...updateDoc,
-    authentication: {
-      is2FAEmailActive: updateDoc!.authentication?.is2FAEmailActive,
-    },
-  };
+  return updateDoc;
 };
 
 // ------------- update user status by id -------------
 const toggleUserStatusById = async (
-  id: string
+  id: string,
 ): Promise<Partial<IUser | null>> => {
   const isExistUser = await User.findById(id);
   if (!isExistUser) {
@@ -161,7 +165,7 @@ const toggleUserStatusById = async (
     },
     {
       new: true,
-    }
+    },
   );
 
   return updateDoc;
@@ -177,7 +181,7 @@ const deleteUserByIdFromDB = async (id: string) => {
   const result = await User.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
 
   return result;
@@ -206,6 +210,7 @@ const getUserProfileFromDB = async (id: string) => {
     ...result,
     authentication: {
       is2FAEmailActive: result.authentication?.is2FAEmailActive,
+      is2FAAuthenticatorActive: result.totpSecret !== null,
     },
   };
 };

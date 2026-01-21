@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { USER_ROLES, USER_STATUS } from './user.constant';
+import { USER_ROLES } from './user.constant';
 
 const createUserZodSchema = z.object({
   body: z
@@ -29,14 +29,23 @@ const createAdminZodSchema = z.object({
 });
 
 const updateUserZodSchema = z.object({
-  name: z.string().nonempty('Name cannot be empty').optional(),
-  phone: z.string().nonempty('Phone cannot be empty').optional(),
-  address: z.string().nonempty('Address cannot be empty').optional(),
-  location: z
-    .array(z.number())
-    .length(2, 'Location must be an array of 2 numbers [longitude, latitude]')
-    .optional(),
-  image: z.string().optional(),
+  body: z
+    .object({
+      name: z.string().nonempty('Name cannot be empty').optional(),
+      phone: z.string().nonempty('Phone cannot be empty').optional(),
+      address: z.string().nonempty('Address cannot be empty').optional(),
+      location: z
+        .array(z.number())
+        .length(
+          2,
+          'Location must be an array of 2 numbers [longitude, latitude]',
+        )
+        .optional(),
+      image: z.string().optional(),
+      is2FAEmailActive: z.boolean().optional(),
+      is2FAAuthenticatorActive: z.boolean().optional(),
+    })
+    .strict(),
 });
 
 export const UserValidation = {
