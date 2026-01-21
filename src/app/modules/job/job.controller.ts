@@ -104,7 +104,7 @@ const getMyJobs = catchAsync(async (req: Request, res: Response) => {
 
 // get all jobs
 const getAllJobs = catchAsync(async (req: Request, res: Response) => {
-  const result = await JobServices.getAllJobs(req.query);
+  const result = await JobServices.getAllJobs(req.query, req.user);
 
   sendResponse(res, {
     success: true,

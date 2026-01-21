@@ -60,7 +60,15 @@ const onGetCandidateApplications = async (userId: string) => {
   return hasLimitation;
 };
 
+// on candidate match alert
+const onCandidateMatchAlert = async (userId: string) => {
+  const plan = await getUserPlan(userId);
+  const hasLimitation = plan === 'BASIC';
+  return hasLimitation;
+};
+
 export const LimitationServices = {
   onCreateJob,
   onGetCandidateApplications,
+  onCandidateMatchAlert,
 };

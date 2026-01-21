@@ -10,6 +10,8 @@ import { USER_ROLES } from '../user/user.constant';
 import { User } from '../user/user.model';
 import { IJob } from './job.interface';
 import { Job } from './job.model';
+import { redisClient } from '../../../config/redis';
+import { JwtPayload } from 'jsonwebtoken';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
@@ -156,7 +158,7 @@ const getJobsByEmployerId = async (
 };
 
 // -------------- get all jobs with pagination --------------
-const getAllJobs = async (query: Record<string, unknown>) => {
+const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
   const filter: Record<string, any> = { isDeleted: false };
   // Nearby search (lat, lng, radius)
   if (query.radius && query.lat && query.lng) {
@@ -194,9 +196,31 @@ const getAllJobs = async (query: Record<string, unknown>) => {
     .populate(['author'], { author: 'name email phone address image' });
 
   const [data, pagination] = await Promise.all([
-    jobQuery.modelQuery.lean(),
+    jobQuery.modelQuery,
     jobQuery.getPaginationInfo(),
   ]);
+
+  // save this jobs to redis for job seeker alerts
+  if (user.role === USER_ROLES.JOB_SEEKER) {
+    const TTL_8_DAYS = 60 * 60 * 24 * 8;
+    for (const job of data) {
+      const employerId = job.author?._id?.toString();
+      if (!employerId) continue;
+
+      const event = {
+        jobId: job._id.toString(),
+        employerId,
+        jobSeekerId: user.id,
+        searchedAt: Date.now(),
+      };
+
+      await redisClient.sadd(`job_search:${employerId}`, JSON.stringify(event));
+
+      await redisClient.expire(`job_search:${employerId}`, TTL_8_DAYS);
+
+      await redisClient.sadd('job_search:employers', employerId);
+    }
+  }
 
   return { data, pagination };
 };
