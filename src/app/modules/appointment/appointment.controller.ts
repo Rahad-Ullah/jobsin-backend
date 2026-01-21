@@ -3,9 +3,15 @@ import { AppointmentServices } from './appointment.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
+import { USER_ROLES } from '../user/user.constant';
+import { LimitationServices } from '../limitation/limitation.service';
 
 // create appointment
 const createAppointment = catchAsync(async (req: Request, res: Response) => {
+  if (req.user.role === USER_ROLES.EMPLOYER){
+    await LimitationServices.onCreateAppointment(req.user.id, req.body.receiver);
+  }
+  
   const result = await AppointmentServices.createAppointmentToDB({
     ...req.body,
     sender: req.user.id,

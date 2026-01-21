@@ -4,6 +4,7 @@ import { User } from '../user/user.model';
 import { SubscriptionStatus } from '../subscription/subscription.constants';
 import { Job } from '../job/job.model';
 import { isSameCalendarMonth } from '../../../util/isSameCalendarMonth';
+import { Appointment } from '../appointment/appointment.model';
 
 // get user subscription
 const getUserPlan = async (userId: string) => {
@@ -62,7 +63,6 @@ const onGetCandidateApplications = async (userId: string) => {
 };
 
 // on candidate match alert
-
 export const onJobSeekerMatchNotification = async (
   userId: string,
   lastSentAt: Date | null,
@@ -83,8 +83,53 @@ export const onJobSeekerMatchNotification = async (
   return isSameCalendarMonth(lastSentAt, now);
 };
 
+// on create appointment
+export const onCreateAppointment = async (
+  userId: string,
+  candidateId: string,
+) => {
+  const plan = await getUserPlan(userId);
+
+  if (plan !== 'BASIC') {
+    return;
+  }
+
+  const startOfMonth = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    1,
+  );
+  // check if max appointment limit is 5 on the month
+  const appointmentCount = await Appointment.countDocuments({
+    sender: userId,
+    createdAt: { $gte: startOfMonth },
+  });
+
+  if (appointmentCount >= 5) {
+    throw new ApiError(
+      StatusCodes.PAYMENT_REQUIRED,
+      'Monthly limit reached. Please upgrade your plan.',
+    );
+  }
+
+  // check if already 1 appointment is created for this candidate on the month
+  const candidateAppointmentCount = await Appointment.countDocuments({
+    sender: userId,
+    receiver: candidateId,
+    createdAt: { $gte: startOfMonth },
+  });
+
+  if (candidateAppointmentCount >= 1) {
+    throw new ApiError(
+      StatusCodes.PAYMENT_REQUIRED,
+      'Monthly limit reached. Please upgrade your plan.',
+    );
+  }
+};
+
 export const LimitationServices = {
   onCreateJob,
   onGetCandidateApplications,
   onJobSeekerMatchNotification,
+  
 };
