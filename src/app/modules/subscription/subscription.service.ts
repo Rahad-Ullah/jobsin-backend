@@ -81,6 +81,8 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
         packageId: pkg._id.toString(),
       },
     },
+    // automatic tax
+    automatic_tax: { enabled: true },
   });
 
   return checkoutSession.url;
