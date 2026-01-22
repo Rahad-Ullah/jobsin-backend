@@ -17,6 +17,7 @@ export default {
   },
   email: {
     from: process.env.EMAIL_FROM,
+    reply_to: process.env.EMAIL_REPLY_TO,
     user: process.env.EMAIL_USER,
     port: process.env.EMAIL_PORT,
     host: process.env.EMAIL_HOST,
