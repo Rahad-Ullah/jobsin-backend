@@ -16,7 +16,7 @@ const PER_NOTIFICATION_DELAY_MS = 400; // delay between notifications
 
 // ----------- CRON STARTER -------------
 export function startJobSeekerAlertCron() {
-  nodeCron.schedule('0 0 * * *', async () => {
+  nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Job seeker alert started');
 
     try {
