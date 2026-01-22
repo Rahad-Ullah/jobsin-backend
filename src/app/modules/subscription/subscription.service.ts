@@ -35,7 +35,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     if (!existingUser?.stripeCustomerId) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to create Stripe customer'
+        'Failed to create Stripe customer',
       );
     }
   }
@@ -59,7 +59,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   if (hasActiveSubscription) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'User already has an active subscription for this package'
+      'User already has an active subscription for this package',
     );
   }
 
@@ -82,7 +82,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
       },
     },
     // automatic tax
-    automatic_tax: { enabled: true },
+    // automatic_tax: { enabled: true },
   });
 
   return checkoutSession.url;
