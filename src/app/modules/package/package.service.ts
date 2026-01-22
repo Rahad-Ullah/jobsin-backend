@@ -5,10 +5,11 @@ import { Package } from './package.model';
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { stripe } from '../../../config/stripe';
+import { PackageName } from './package.constants';
 
 // --------------- create package service ---------------
 const createPackageToDB = async (
-  payload: Partial<IPackage>
+  payload: Partial<IPackage>,
 ): Promise<IPackage> => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -33,12 +34,13 @@ const createPackageToDB = async (
 
       price = await stripe.prices.create({
         unit_amount: Math.round(
-          (payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100
+          (payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100,
         ),
         currency: 'usd',
         recurring: {
           interval: payload.interval!,
           interval_count: payload.intervalCount ?? 1,
+          trial_period_days: payload.name === PackageName.BASIC ? 0 : 15,
         },
         product: product.id,
       });
@@ -48,7 +50,7 @@ const createPackageToDB = async (
       session.endSession();
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        `Stripe error: ${stripeErr.message}`
+        `Stripe error: ${stripeErr.message}`,
       );
     }
 
@@ -72,7 +74,7 @@ const createPackageToDB = async (
       session.endSession();
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to create package'
+        'Failed to create package',
       );
     }
 
@@ -90,7 +92,7 @@ const createPackageToDB = async (
 // --------------- update package service ---------------
 const updatePackageInDB = async (
   id: string,
-  payload: Partial<IPackage>
+  payload: Partial<IPackage>,
 ): Promise<IPackage | null> => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -112,7 +114,7 @@ const updatePackageInDB = async (
       if (isNameTaken) {
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
-          'Package name already taken'
+          'Package name already taken',
         );
       }
     }
@@ -129,7 +131,7 @@ const updatePackageInDB = async (
     if (payload.interval || payload.intervalCount || payload.intervalPrice) {
       const newPrice = await stripe.prices.create({
         unit_amount: Math.round(
-          (payload.intervalPrice ?? existingPackage.intervalPrice) * 100
+          (payload.intervalPrice ?? existingPackage.intervalPrice) * 100,
         ),
         currency: 'usd',
         recurring: {
@@ -150,7 +152,7 @@ const updatePackageInDB = async (
     const updatedPackage = await Package.findByIdAndUpdate(
       id,
       { $set: payload },
-      { new: true, session }
+      { new: true, session },
     );
 
     // Compensation: rollback Stripe changes if DB fails
@@ -164,7 +166,7 @@ const updatePackageInDB = async (
       session.endSession();
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to update package'
+        'Failed to update package',
       );
     }
 
@@ -183,7 +185,7 @@ const updatePackageInDB = async (
 // --------------- delete package service ---------------
 export const deletePackageFromDB = async (
   id: string,
-  archiveProduct = false
+  archiveProduct = false,
 ): Promise<IPackage> => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -202,12 +204,12 @@ export const deletePackageFromDB = async (
     const softDeleted = await Package.findByIdAndUpdate(
       id,
       { isDeleted: true },
-      { new: true, session }
+      { new: true, session },
     );
     if (!softDeleted) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to update package'
+        'Failed to update package',
       );
     }
 
@@ -226,7 +228,7 @@ export const deletePackageFromDB = async (
       session.endSession();
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        `Stripe cleanup failed: ${stripeErr.message}`
+        `Stripe cleanup failed: ${stripeErr.message}`,
       );
     }
 
@@ -252,7 +254,7 @@ export const getSinglePackageFromDB = async (id: string) => {
 export const getAllPackagesFromDB = async (query: Record<string, any>) => {
   const packageQuery = new QueryBuilder(
     Package.find({ isDeleted: false }),
-    query
+    query,
   )
     .search(['name'])
     .filter()

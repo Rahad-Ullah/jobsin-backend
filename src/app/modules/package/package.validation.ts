@@ -1,13 +1,11 @@
 import { z } from 'zod';
-import { PackageInterval } from './package.constants';
+import { PackageInterval, PackageName } from './package.constants';
 
 // Package creation schema
 export const createPackageValidation = z.object({
   body: z
     .object({
-      name: z
-        .string({ required_error: 'Name is required' })
-        .nonempty('Name is required'),
+      name: z.nativeEnum(PackageName),
       interval: z.nativeEnum(PackageInterval),
       intervalCount: z
         .number()
@@ -24,10 +22,7 @@ export const createPackageValidation = z.object({
 export const updatePackageValidation = z.object({
   body: z
     .object({
-      name: z
-        .string({ required_error: 'Name is required' })
-        .nonempty('Name is required')
-        .optional(),
+      name: z.nativeEnum(PackageName).optional(),
       // interval: z.nativeEnum(PackageInterval).optional(),
       // intervalCount: z
       //   .number()

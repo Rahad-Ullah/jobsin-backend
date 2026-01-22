@@ -3,3 +3,9 @@ export enum PackageInterval {
   WEEK = 'week',
   MONTH = 'month',
 }
+
+export enum PackageName {
+  BASIC = 'Basic',
+  STANDARD = 'Standard',
+  BOOSTER = 'Booster',
+}
