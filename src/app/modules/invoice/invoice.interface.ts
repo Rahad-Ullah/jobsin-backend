@@ -8,6 +8,9 @@ export interface IInvoice {
   subscription: Types.ObjectId;
   stripeSubscriptionId: string;
   stripeInvoiceId: string;
+  stripeCustomerId: string;
+  stripePaymentIntentId: string;
+  stripeChargeId: string;
   invoiceNumber: string;
   periodStart: Date;
   periodEnd: Date;

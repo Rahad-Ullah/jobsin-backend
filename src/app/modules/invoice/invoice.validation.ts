@@ -1,4 +1,5 @@
 import z from 'zod';
+import { RefundReason } from './invoice.constants';
 
 // create refund invoice validation
 const createRefundInvoiceValidation = z.object({
@@ -7,7 +8,7 @@ const createRefundInvoiceValidation = z.object({
       .string()
       .nonempty('Invoice id is required')
       .length(24, 'Invalid invoice id'),
-    reason: z.string().nonempty('Reason is required'),
+    reason: z.nativeEnum(RefundReason),
   }),
 });
 

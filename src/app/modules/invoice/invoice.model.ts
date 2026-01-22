@@ -7,23 +7,33 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
       index: true,
     },
     subscription: {
       type: Schema.Types.ObjectId,
       ref: 'Subscription',
-      required: true,
       index: true,
     },
     stripeSubscriptionId: {
       type: String,
-      required: true,
       index: true,
     },
     stripeInvoiceId: {
       type: String,
       required: true,
+      index: true,
+    },
+    stripeCustomerId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    stripePaymentIntentId: {
+      type: String,
+      index: true,
+    },
+    stripeChargeId: {
+      type: String,
       index: true,
     },
     invoiceNumber: {
@@ -69,7 +79,7 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const Invoice = model<IInvoice, InvoiceModel>('Invoice', invoiceSchema);

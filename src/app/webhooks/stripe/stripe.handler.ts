@@ -11,6 +11,10 @@ export async function stripeEventHandler(event: Stripe.Event) {
 
   // event routing
   switch (event.type) {
+    case 'payment_intent.succeeded':
+      await StripeWebhookServices.onPaymentIntentSucceeded(event);
+      break;
+
     case 'customer.subscription.created':
       await StripeWebhookServices.onCustomerSubscriptionCreated(event);
       break;

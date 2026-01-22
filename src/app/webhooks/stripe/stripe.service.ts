@@ -14,6 +14,61 @@ import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 
+// on payment intent succeeded
+const onPaymentIntentSucceeded = async (event: Stripe.Event) => {
+  const paymentIntent = event.data.object as Stripe.PaymentIntent;
+  // fetch the latest invoice for this payment intent
+  const invoicesList = await stripe.invoices.list({
+    customer: paymentIntent.customer as string,
+    limit: 5,
+  });
+
+  // find the latest one matching the payment intent
+  const stripeInvoice =
+    invoicesList.data.find(
+      inv =>
+        inv.amount_paid === paymentIntent.amount_received &&
+        inv.status === 'paid',
+    ) ?? invoicesList.data[0];
+
+  const invoicePayload: Partial<IInvoice> = {
+    // Stripe references
+    stripeInvoiceId: stripeInvoice.id,
+    stripeSubscriptionId:
+      (stripeInvoice.parent?.subscription_details?.subscription as string) ||
+      '',
+    stripeCustomerId: stripeInvoice.customer as string,
+    stripePaymentIntentId: paymentIntent.id,
+    stripeChargeId: paymentIntent.latest_charge as string,
+
+    // Invoice details
+    invoiceNumber: stripeInvoice.number ?? undefined,
+    periodStart: new Date(stripeInvoice.period_start * 1000),
+    periodEnd: new Date(stripeInvoice.period_end * 1000),
+
+    // Money
+    amount: stripeInvoice.total / 100, // cents → dollars
+    currency: stripeInvoice.currency,
+
+    // Status
+    status: InvoiceStatus.PAID,
+    paidAt: stripeInvoice.status_transitions?.paid_at
+      ? new Date(stripeInvoice.status_transitions.paid_at * 1000)
+      : null,
+
+    // URLs
+    invoicePdfUrl: stripeInvoice.invoice_pdf ?? null,
+    hostedInvoiceUrl: stripeInvoice.hosted_invoice_url ?? null,
+  };
+
+  // create or update invoice in DB
+  await Invoice.findOneAndUpdate(
+    { stripeInvoiceId: stripeInvoice.id },
+    invoicePayload,
+    { upsert: true, new: true },
+  );
+};
+
 // on checkout session completed
 const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
   try {
@@ -67,11 +122,12 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     });
 
     // DB write: create invoice
-    const invoicePayload: IInvoice = {
+    const invoicePayload: Partial<IInvoice> = {
       user: result.user,
       subscription: result._id,
       stripeSubscriptionId: stripeSub.id,
       stripeInvoiceId: stripeInvoice.id,
+      stripeCustomerId: stripeSub.customer as string,
       invoiceNumber: stripeInvoice.number!,
       periodStart: new Date(period.start * 1000),
       periodEnd: new Date(period.end * 1000),
@@ -82,7 +138,11 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
-    const invoiceResult = await Invoice.create(invoicePayload);
+    const invoiceResult = await Invoice.findOneAndUpdate(
+      { stripeInvoiceId: stripeInvoice.id },
+      invoicePayload,
+      { upsert: true, new: true },
+    );
     if (!invoiceResult) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Invoice creation failed');
     }
@@ -151,7 +211,11 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
 
-    const result = await Invoice.create(invoicePayload);
+    const result = await Invoice.findOneAndUpdate(
+      { stripeInvoiceId: stripeInvoice.id },
+      invoicePayload,
+      { upsert: true, new: true },
+    );
     if (!result) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
@@ -213,7 +277,11 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       paidAt: null,
     };
 
-    const result = await Invoice.create(invoicePayload);
+    const result = await Invoice.findOneAndUpdate(
+      { stripeInvoiceId: stripeInvoice.id },
+      invoicePayload,
+      { upsert: true, new: true },
+    );
     if (!result) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
@@ -321,6 +389,7 @@ const onRefundCreated = async (event: Stripe.Event) => {
 
 export const StripeWebhookServices = {
   onCustomerSubscriptionCreated,
+  onPaymentIntentSucceeded,
   onInvoicePaid,
   onInvoicePaymentFailed,
   onInvoiceUpdate,

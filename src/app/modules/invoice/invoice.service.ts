@@ -2,42 +2,43 @@ import Stripe from 'stripe';
 import { stripe } from '../../../config/stripe';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { Invoice } from './invoice.model';
-import { InvoiceStatus } from './invoice.constants';
+import { InvoiceStatus, RefundReason } from './invoice.constants';
 import { Subscription } from '../subscription/subscription.model';
 import { SubscriptionStatus } from '../subscription/subscription.constants';
+import ApiError from '../../../errors/ApiError';
+import { StatusCodes } from 'http-status-codes';
 
 // ------------- refund invoice -------------
-const refundInvoiceFromDB = async (invoiceId: string, reason: string) => {
-  const invoice = await Invoice.findById(invoiceId).lean();
-  if (!invoice) throw new Error('Invoice not found');
+const refundInvoiceFromDB = async (invoiceId: string, reason: RefundReason) => {
+  const invoice = await Invoice.findById(invoiceId);
+  if (!invoice) throw new ApiError(StatusCodes.NOT_FOUND, 'Invoice not found');
 
-  const stripeInvoice = (await stripe.invoices.retrieve(
-    invoice.stripeInvoiceId,
-    {
-      expand: ['payment_intent'],
-    },
-  )) as Stripe.Invoice;
+  if (invoice.status !== InvoiceStatus.PAID)
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Only paid invoices can be refunded',
+    );
 
-  // Ensure the invoice is actually paid before refunding
-  if (stripeInvoice.status !== 'paid') {
-    throw new Error(`Invoice is not paid: ${stripeInvoice.status}`);
+  // create refund in Stripe
+  if (invoice.stripeChargeId) {
+    await stripe.refunds.create({
+      charge: invoice.stripeChargeId!,
+      reason: reason as Stripe.RefundCreateParams.Reason,
+    });
+  } else if (invoice.stripePaymentIntentId) {
+    await stripe.refunds.create({
+      payment_intent: invoice.stripePaymentIntentId!,
+      reason: reason as Stripe.RefundCreateParams.Reason,
+    });
+  } else {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'Invoice has no Stripe Charge ID',
+    );
   }
-  // @ts-ignore (Optional: if you want to hide the warning entirely)
-  const paymentIntentId = stripeInvoice['payment_intent'] as string;
-  if (!paymentIntentId) throw new Error('No payment intent found.');
-
-  const refund = await stripe.refunds.create({
-    payment_intent: paymentIntentId,
-    amount: Math.round(invoice.amount * 100),
-    metadata: {
-      reason,
-      internalInvoiceId: invoiceId,
-      subscriptionId: invoice.subscription.toString(),
-    },
-  });
 
   // update invoice and it's subscription
-  await Invoice.findByIdAndUpdate(invoiceId, {
+  const result = await Invoice.findByIdAndUpdate(invoiceId, {
     status: InvoiceStatus.REFUNDED,
   });
   await Subscription.findByIdAndUpdate(
@@ -46,7 +47,7 @@ const refundInvoiceFromDB = async (invoiceId: string, reason: string) => {
     { new: true },
   );
 
-  return refund;
+  return result;
 };
 
 // ------------- get invoices by user id -------------
