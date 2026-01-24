@@ -27,6 +27,7 @@ import { workerRoutes } from '../app/modules/worker/worker.route';
 import { shiftPlanRoutes } from '../app/modules/shiftPlan/shiftPlan.route';
 import { policyRoutes } from '../app/modules/policy/policy.route';
 import TOTPRoute from '../app/modules/totp/totp.route';
+import { salaryRoutes } from '../app/modules/salary/salary.route';
 const router_v1 = express.Router();
 
 const apiRoutes = [
@@ -37,6 +38,10 @@ const apiRoutes = [
   {
     path: '/auth',
     route: AuthRoutes,
+  },
+  {
+    path: '/totp',
+    route: TOTPRoute,
   },
   {
     path: '/job-seekers',
@@ -81,6 +86,10 @@ const apiRoutes = [
   {
     path: '/drives',
     route: driveRoutes,
+  },
+  {
+    path: '/salary',
+    route: salaryRoutes,
   },
   {
     path: '/workers',
@@ -137,10 +146,6 @@ const apiRoutes = [
   {
     path: '/contact',
     route: contactRoutes,
-  },
-  {
-    path: '/totp',
-    route: TOTPRoute,
   },
 ];
 

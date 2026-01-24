@@ -32,4 +32,7 @@ export default {
     secret_key: process.env.STRIPE_SECRET_KEY,
     webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
   },
+  deepseek: {
+    api_key: process.env.DEEPSEEK_API_KEY,
+  },
 };

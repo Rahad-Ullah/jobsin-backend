@@ -2,14 +2,14 @@ import Stripe from 'stripe';
 import { stripe } from '../../../config/stripe';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { Invoice } from './invoice.model';
-import { InvoiceStatus, RefundReason } from './invoice.constants';
+import { InvoiceStatus } from './invoice.constants';
 import { Subscription } from '../subscription/subscription.model';
 import { SubscriptionStatus } from '../subscription/subscription.constants';
 import ApiError from '../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
 
 // ------------- refund invoice -------------
-const refundInvoiceFromDB = async (invoiceId: string, reason: RefundReason) => {
+const refundInvoiceFromDB = async (invoiceId: string, reason: string) => {
   const invoice = await Invoice.findById(invoiceId);
   if (!invoice) throw new ApiError(StatusCodes.NOT_FOUND, 'Invoice not found');
 
