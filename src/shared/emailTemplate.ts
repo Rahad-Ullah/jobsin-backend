@@ -1,5 +1,6 @@
 import { IAppointment } from '../app/modules/appointment/appointment.interface';
 import { IJob } from '../app/modules/job/job.interface';
+import { IJobSeeker } from '../app/modules/jobSeeker/jobSeeker.interface';
 import { IShiftPlan } from '../app/modules/shiftPlan/shiftPlan.interface';
 import { ISupport } from '../app/modules/support/support.interface';
 import { IUser } from '../app/modules/user/user.interface';
@@ -361,6 +362,88 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
   return data;
 };
 
+// job seeker alert email template (to employers)
+const jobSeekerAlert = (
+  employerUser: Partial<IUser>,
+  jobSeekerUsers: (IUser & { jobSeeker: IJobSeeker })[],
+) => {
+  const data = {
+    to: employerUser.email,
+    subject: `🚀 ${jobSeekerUsers.length} Qualified Candidates Found - Jobsin App`,
+    html: `
+      <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
+          
+          <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+            <h1 style="margin: 0; color: #1a73e8; font-size: 22px;">New Talent Matches</h1>
+            <p style="margin: 5px 0 0 0; color: #666;">Hi ${employerUser.name || 'there'}, we found candidates matching your requirements.</p>
+          </div>
+
+          <div style="margin-top: 10px;">
+            ${jobSeekerUsers
+              .map((candidate, index) => {
+                // Extract unique categories to show at a glance
+                const mainCategories = candidate.jobSeeker.experiences
+                  .map(exp => exp.category)
+                  .filter((v, i, a) => a.indexOf(v) === i)
+                  .join(', ');
+
+                return `
+                <div style="padding: 20px 0; border-bottom: ${index === jobSeekerUsers.length - 1 ? 'none' : '1px solid #eee'};">
+                  <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <div style="height: 40px; width: 40px; background: #e8f0fe; color: #1a73e8; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 12px;">
+                      ${candidate.name?.charAt(0) || 'JS'}
+                    </div>
+                    <div>
+                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name}</h3>
+                      <p style="margin: 0; font-size: 13px; color: #1a73e8; font-weight: bold;">${mainCategories}</p>
+                    </div>
+                  </div>
+
+                  <div style="background: #fafafa; border-radius: 6px; padding: 12px; margin-top: 10px;">
+                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #444;">
+                      <strong>Experience Details:</strong>
+                    </p>
+                    ${candidate.jobSeeker.experiences
+                      .map(
+                        exp => `
+                      <div style="font-size: 13px; color: #555; margin-bottom: 4px;">
+                        • ${exp.subCategory} (${exp.experience} Years) 
+                        <span style="color: #2e7d32; font-weight: 500;"> - Expected: ${exp.salaryAmount.toLocaleString()} ${exp.salaryType}</span>
+                      </div>
+                    `,
+                      )
+                      .join('')}
+                  </div>
+
+                  <p style="margin: 12px 0 0 0; font-size: 13px; color: #777; line-height: 1.4;">
+                    "${candidate.jobSeeker.overview.substring(0, 120)}${candidate.jobSeeker.overview.length > 120 ? '...' : ''}"
+                  </p>
+                </div>
+              `;
+              })
+              .join('')}
+          </div>
+
+          <div style="background: #202124; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">Want to review their profiles?</p>
+            <p style="margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.5;">
+              Open the <strong>Jobsin App</strong> to view full resumes, contact details, and start the hiring process.
+            </p>
+          </div>
+
+        </div>
+
+        <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
+          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  };
+
+  return data;
+};
+
 // job alert email template (to job seekers)
 const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
   const data = {
@@ -371,7 +454,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h1 style="margin: 0; color: #1a73e8; font-size: 24px;">New Job Alerts</h1>
+            <h1 style="margin: 0; color: #2e7d32; font-size: 24px;">New Job Alerts</h1>
             <p style="margin: 5px 0 0 0; color: #666;">Hi ${user.name || 'there'}, we found matches for your profile.</p>
           </div>
 
@@ -380,7 +463,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .map(
                 (job, index) => `
               <div style="padding: 20px 0; border-bottom: ${index === jobs.length - 1 ? 'none' : '1px solid #eee'};">
-                <h3 style="color: #1a73e8; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
+                <h3 style="color: #2e7d32; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
                 
                 <p style="margin: 0; font-size: 14px; color: #444;">
                   <strong style="color: #202124;">Type:</strong> ${job.jobType} • 
@@ -405,7 +488,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .join('')}
           </div>
 
-          <div style="background: #1a73e8; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+          <div style="background: #2e7d32; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
             <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
             <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
               These jobs are waiting for you! Open the <strong>Jobsin App</strong> to view responsibilities and apply instantly.
@@ -432,4 +515,5 @@ export const emailTemplate = {
   hiringRequestToAdmin,
   shiftPlanToWorker,
   jobAlert,
+  jobSeekerAlert,
 };

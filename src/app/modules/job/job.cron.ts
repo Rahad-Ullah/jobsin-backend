@@ -10,6 +10,9 @@ import { LimitationServices } from '../limitation/limitation.service';
 import { Job } from './job.model';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { USER_ROLES } from '../user/user.constant';
+import { IUser } from '../user/user.interface';
+import { IEmployer } from '../employer/employer.interface';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -22,22 +25,29 @@ export function startJobSeekerAlertCron() {
     console.log('[CRON] Job seeker alert started');
 
     try {
-      const employers = await redisClient.smembers('job_search:employers');
+      const employerIds = await redisClient.smembers('job_search:employers');
+      if (employerIds.length === 0) return;
+      const employers = await User.find({
+        _id: { $in: employerIds },
+        role: USER_ROLES.EMPLOYER,
+      })
+        .select('_id name email employer')
+        .populate('employer', 'notificationSettings');
+
       const now = new Date();
 
-      for (const employerUserId of employers) {
+      for (const employerUser of employers) {
         // 1️⃣ Load employer + notification settings
-        const employer = await Employer.findOne({
-          user: employerUserId,
-        }).select('notificationSettings');
+        const employer = employerUser.employer as any as IEmployer;
 
         if (!employer || !employer.notificationSettings) continue;
 
-        const { repeat, lastSentAt } = employer.notificationSettings;
+        const { repeat, lastSentAt, pushNotification, emailNotification } =
+          employer.notificationSettings;
 
         // 2️⃣ MONTHLY LIMIT CHECK (BASIC users only)
         const isLimited = await LimitationServices.onJobSeekerMatchNotification(
-          employerUserId,
+          employerUser._id.toString(),
           lastSentAt,
         );
 
@@ -52,7 +62,7 @@ export function startJobSeekerAlertCron() {
 
         // 4️⃣ Load Redis search events
         const rawEvents = await redisClient.smembers(
-          `job_search:${employerUserId}`,
+          `job_search:${employerUser._id.toString()}`,
         );
 
         if (rawEvents.length === 0) continue;
@@ -60,16 +70,21 @@ export function startJobSeekerAlertCron() {
         const events = rawEvents.map(e => JSON.parse(e));
 
         // 5️⃣ Send notifications
-        await sendEmployerNotification(employerUserId, events);
+        await sendEmployerNotification(
+          employerUser,
+          events,
+          pushNotification,
+          emailNotification,
+        );
 
         // 6️⃣ Update lastSentAt after success
         await Employer.updateOne(
-          { user: employerUserId },
+          { user: employerUser._id },
           { 'notificationSettings.lastSentAt': now },
         );
 
         // 7️⃣ Cleanup Redis
-        await cleanupEmployer(employerUserId);
+        await cleanupEmployer(employerUser._id.toString());
 
         // 💤 throttle between employers
         await sleep(EMPLOYER_DELAY_MS);
@@ -103,39 +118,59 @@ function shouldSendNotification(
   return false;
 }
 
-// ------------- NOTIFICATION LOGIC -------------
-async function sendEmployerNotification(employerId: string, events: any[]) {
+// ------------- NOTIFICATION LOGIC FOR EMPLOYER -------------
+async function sendEmployerNotification(
+  employerUser: Partial<IUser>,
+  events: any[],
+  pushNotification: boolean,
+  emailNotification: boolean,
+) {
   // 1️⃣ collect unique jobSeekerIds
-  const jobSeekerIds = [...new Set(events.map(e => e.jobSeekerId))];
+  const jobSeekerUserIds = [...new Set(events.map(e => e.jobSeekerId))];
 
-  // 2️⃣ batch fetch users
-  const users = await User.find({
-    _id: { $in: jobSeekerIds },
+  // 2️⃣ batch fetch jobSeeker users
+  const jobSeekerUsers = await User.find({
+    _id: { $in: jobSeekerUserIds },
   })
     .select('name jobSeeker')
     .populate('jobSeeker', 'experiences');
 
   // 3️⃣ map for O(1) access
-  const userMap = new Map(users.map(u => [u._id.toString(), u]));
+  const userMap = new Map(jobSeekerUsers.map(u => [u._id.toString(), u]));
 
   // 4️⃣ send notifications
-  for (const event of events) {
-    const user: any = userMap.get(event.jobSeekerId);
-    if (!user) continue;
+  if (pushNotification) {
+    for (const event of events) {
+      const user: any = userMap.get(event.jobSeekerId);
+      if (!user) continue;
 
-    const jobSeeker = user.jobSeeker;
-    const category = jobSeeker?.experiences?.[0]?.subCategory ?? '';
+      const jobSeeker = user.jobSeeker;
+      const category = jobSeeker?.experiences?.[0]?.subCategory ?? '';
 
-    await sendNotifications({
-      type: 'JOB_SEEKER_ALERT',
-      receiver: new Types.ObjectId(employerId),
-      title: `${user.name} - ${category}`,
-      message: `${user.name} is looking for ${category}`,
-      referenceId: event.jobSeekerId,
+      await sendNotifications({
+        type: 'JOB_SEEKER_ALERT',
+        receiver: employerUser._id,
+        title: `${user.name} - ${category}`,
+        message: `${user.name} is looking for ${category}`,
+        referenceId: event.jobSeekerId,
+      });
+
+      // 💤 throttle per notification
+      await sleep(PER_NOTIFICATION_DELAY_MS);
+    }
+  }
+
+  // 5️⃣ send email notification
+  if (emailNotification && employerUser.email) {
+    const template = emailTemplate.jobSeekerAlert(
+      employerUser,
+      jobSeekerUsers as any[],
+    );
+    await emailHelper.sendEmail({
+      to: employerUser.email,
+      subject: template.subject,
+      html: template.html,
     });
-
-    // 💤 throttle per notification
-    await sleep(PER_NOTIFICATION_DELAY_MS);
   }
 }
 
