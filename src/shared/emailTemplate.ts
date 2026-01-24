@@ -184,7 +184,7 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
     to: email,
     subject: `Hiring Request: ${employer.name} - ${job.category}`,
     html: `
-      <body style="font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
+      <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
         <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
             
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
@@ -282,7 +282,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
     to: worker.email,
     subject: `Your Shift Plan for ${planMonthYear}`,
     html: `
-      <body style="font-family: Arial, sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
+      <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
         <div style="max-width: 800px; margin: 0 auto;">
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -361,6 +361,68 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
   return data;
 };
 
+// job alert email template (to job seekers)
+const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
+  const data = {
+    to: user.email,
+    subject: `🚀 ${jobs.length} New Job Alerts - Jobsin App`,
+    html: `
+      <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
+          
+          <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+            <h1 style="margin: 0; color: #1a73e8; font-size: 24px;">New Job Alerts</h1>
+            <p style="margin: 5px 0 0 0; color: #666;">Hi ${user.name || 'there'}, we found matches for your profile.</p>
+          </div>
+
+          <div style="margin-top: 10px;">
+            ${jobs
+              .map(
+                (job, index) => `
+              <div style="padding: 20px 0; border-bottom: ${index === jobs.length - 1 ? 'none' : '1px solid #eee'};">
+                <h3 style="color: #1a73e8; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
+                
+                <p style="margin: 0; font-size: 14px; color: #444;">
+                  <strong style="color: #202124;">Type:</strong> ${job.jobType} • 
+                  <strong style="color: #202124;">Exp:</strong> ${job.experience}
+                </p>
+
+                ${
+                  job.salaryAmount
+                    ? `
+                  <p style="margin: 5px 0 0 0; color: #2e7d32; font-size: 14px; font-weight: bold;">
+                    Salary: ${job.salaryAmount.toLocaleString()} (${job.salaryType})
+                  </p>`
+                    : ''
+                }
+
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #777; font-style: italic;">
+                  Deadline: ${new Date(job.deadline).toLocaleDateString()}
+                </p>
+              </div>
+            `,
+              )
+              .join('')}
+          </div>
+
+          <div style="background: #1a73e8; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
+            <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
+              These jobs are waiting for you! Open the <strong>Jobsin App</strong> to view responsibilities and apply instantly.
+            </p>
+          </div>
+
+        </div>
+
+        <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
+          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. All rights reserved.</p>
+        </div>
+      </div>
+    `,
+  };
+  return data;
+};
+
 export const emailTemplate = {
   createAccount,
   resetPassword,
@@ -369,4 +431,5 @@ export const emailTemplate = {
   paymentFailed,
   hiringRequestToAdmin,
   shiftPlanToWorker,
+  jobAlert,
 };

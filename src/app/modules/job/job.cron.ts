@@ -8,6 +8,8 @@ import { RepeatType } from '../employer/employer.constant';
 import { sleep } from '../../../util/sleep';
 import { LimitationServices } from '../limitation/limitation.service';
 import { Job } from './job.model';
+import { emailHelper } from '../../../helpers/emailHelper';
+import { emailTemplate } from '../../../shared/emailTemplate';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -160,14 +162,15 @@ export function startJobSeekerJobAlertCron() {
       const jobSeekers = await User.find({
         role: 'JOB_SEEKER',
       })
-        .select('jobSeeker name location')
+        .select('jobSeeker name email location')
         .populate('jobSeeker', 'experiences notificationSettings');
 
       for (const user of jobSeekers) {
         const settings = (user as any).jobSeeker?.notificationSettings;
         if (!settings) continue;
 
-        const { pushNotification, emailNotification, repeat, lastSentAt } = settings;
+        const { pushNotification, emailNotification, repeat, lastSentAt } =
+          settings;
 
         // if both settings are off, skip
         if (!pushNotification && !emailNotification) {
@@ -187,7 +190,7 @@ export function startJobSeekerJobAlertCron() {
         }
 
         // 4️⃣ Send push notification
-        if(pushNotification){
+        if (pushNotification) {
           for (const job of jobs) {
             await sendNotifications({
               type: 'JOB_ALERT',
@@ -200,8 +203,13 @@ export function startJobSeekerJobAlertCron() {
         }
 
         // 4️⃣ Send email notification
-        if(emailNotification){
-          //! await sendJobAlertEmail(user, jobs);
+        if (emailNotification && user.email) {
+          const template = emailTemplate.jobAlert(user, jobs);
+          await emailHelper.sendEmail({
+            to: user.email,
+            subject: template.subject,
+            html: template.html,
+          });
         }
 
         // 5️⃣ Update lastSentAt after success
@@ -248,11 +256,11 @@ async function findMatchingJobs(user: any, lastSentAt: Date | null) {
     status: 'ACTIVE',
   };
 
-    // Preference matching on nearby location
+  // Preference matching on nearby location
   if (user?.location?.coordinates?.length === 2) {
     const lat = parseFloat(user.location.coordinates[1] as string);
     const long = parseFloat(user.location.coordinates[0] as string);
-    const radiusKm = 200 ; // radius in kilometers
+    const radiusKm = 200; // radius in kilometers
 
     if (
       !isNaN(radiusKm) &&
@@ -281,5 +289,7 @@ async function findMatchingJobs(user: any, lastSentAt: Date | null) {
     query.category = { $in: experiences.map((exp: any) => exp.category) };
   }
 
-  return Job.find(query).select('_id title category location').limit(20);
+  return Job.find(query)
+    .select('_id category subCategory jobType location')
+    .limit(20);
 }
