@@ -16,10 +16,7 @@ export const seedSuperAdmin = async () => {
   const existingSuperAdmin = await User.exists({
     role: USER_ROLES.SUPER_ADMIN,
   });
-  if (existingSuperAdmin) {
-    await User.findByIdAndUpdate(existingSuperAdmin._id, payload);
-    logger.info('✨ Super Admin account has been successfully updated!');
-  } else {
+  if (!existingSuperAdmin) {
     await User.create(payload);
     logger.info('✨ Super Admin account has been successfully created!');
   }
