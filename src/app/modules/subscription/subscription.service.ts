@@ -68,8 +68,8 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     customer: existingUser.stripeCustomerId,
     mode: 'subscription',
     line_items: [{ price: pkg.stripePriceId, quantity: 1 }],
-    success_url: `${config.frontend_url}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${config.frontend_url}/cancel`,
+    success_url: `${config.frontend_url}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${config.frontend_url}/payment/cancel`,
     client_reference_id: existingUser._id.toString(),
     metadata: {
       userId: existingUser._id.toString(),

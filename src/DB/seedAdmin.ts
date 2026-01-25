@@ -12,12 +12,15 @@ const payload = {
 };
 
 export const seedSuperAdmin = async () => {
-  const isExistSuperAdmin = await User.findOne({
-    email: config.super_admin.email,
+  // create/update super admin user
+  const existingSuperAdmin = await User.exists({
     role: USER_ROLES.SUPER_ADMIN,
   });
-  if (!isExistSuperAdmin) {
+  if (existingSuperAdmin) {
+    await User.findByIdAndUpdate(existingSuperAdmin._id, payload);
+    logger.info('✨ Super Admin account has been successfully updated!');
+  } else {
     await User.create(payload);
     logger.info('✨ Super Admin account has been successfully created!');
   }
-};
+};;
