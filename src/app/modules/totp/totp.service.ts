@@ -16,9 +16,9 @@ interface TOTPService {
 }
 
 // Generate & store secret in Redis
-async function generateSecret(): Promise<GeneratedSecret> {
+async function generateSecret(email: string): Promise<GeneratedSecret> {
   const secretObj = speakeasy.generateSecret({
-    name: 'Jobsin App',
+    name: `Jobsin (${email})`,
     issuer: 'Jobsin',
   });
   return secretObj;
@@ -71,13 +71,13 @@ async function generateQRCode(userId: string): Promise<{
     secretObj = user?.totpSecret as GeneratedSecret;
   } else {
     // if not generate new secret
-    secretObj = await generateSecret();
+    secretObj = await generateSecret(user?.email || '');
     // save to db
     await User.findByIdAndUpdate(userId, {
       totpSecret: secretObj,
     });
   }
-  
+
   if (!secretObj?.otpauth_url) {
     throw new Error('OTP Auth URL not found');
   }
