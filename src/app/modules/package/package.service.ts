@@ -46,8 +46,6 @@ const createPackageToDB = async (
       });
     } catch (stripeErr: any) {
       // Stripe failed → abort before DB write
-      await session.abortTransaction();
-      session.endSession();
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         `Stripe error: ${stripeErr.message}`,
@@ -70,22 +68,21 @@ const createPackageToDB = async (
       await stripe.products
         .update(product.id, { active: false })
         .catch(() => null);
-      await session.abortTransaction();
-      session.endSession();
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
         'Failed to create package',
       );
     }
 
+    // commit transaction
     await session.commitTransaction();
-    session.endSession();
-
     return result[0];
   } catch (err) {
     await session.abortTransaction();
-    session.endSession();
+    console.error(err);
     throw err;
+  } finally {
+    session.endSession();
   }
 };
 
