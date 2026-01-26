@@ -9,6 +9,9 @@ import { stripeWebhookController } from './app/webhooks/stripe/stripe.controller
 import { startCrons } from './app/cron';
 const app = express();
 
+// trust proxy to get client real ip
+app.set('trust proxy', true);
+
 //morgan
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
