@@ -115,6 +115,19 @@ const getAllJobs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all jobs
+const getAllJobsPublic = catchAsync(async (req: Request, res: Response) => {
+  const result = await JobServices.getAllJobsPublic(req.query);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Jobs retrieved successfully',
+    data: result?.data,
+    pagination: result?.pagination,
+  });
+});
+
 export const JobController = {
   createJob,
   updateJob,
@@ -124,4 +137,5 @@ export const JobController = {
   getJobsByEmployerId,
   getMyJobs,
   getAllJobs,
+  getAllJobsPublic,
 };

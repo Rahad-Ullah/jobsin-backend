@@ -244,6 +244,52 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
   return { data, pagination };
 };
 
+// -------------- get all jobs public api --------------
+const getAllJobsPublic = async (query: Record<string, unknown>) => {
+  const filter: Record<string, any> = { isDeleted: false };
+  // Nearby search (lat, lng, radius)
+  if (query.radius && query.lat && query.lng) {
+    const lat = parseFloat(query.lat as string);
+    const long = parseFloat(query.lng as string);
+    const radiusKm = parseFloat(query.radius as string); // radius in kilometers
+
+    if (
+      !isNaN(radiusKm) &&
+      radiusKm > 0 &&
+      lat !== undefined &&
+      long !== undefined
+    ) {
+      const EARTH_RADIUS = 6378.1; // km
+      const radiusInRadians = radiusKm / EARTH_RADIUS;
+
+      filter.location = {
+        $geoWithin: {
+          $centerSphere: [[long, lat], radiusInRadians],
+        },
+      };
+    }
+  }
+
+  if (query.salaryAmount) {
+    filter.salaryAmount = { $lte: Number(query.salaryAmount) };
+  }
+
+  const jobQuery = new QueryBuilder(Job.find(filter), query)
+    .search(['category', 'subCategory'])
+    .filter(['salaryAmount', 'location', 'lat', 'lng', 'radius'])
+    .sort()
+    .paginate()
+    .fields()
+    .populate(['author'], { author: 'name email phone address image' });
+
+  const [data, pagination] = await Promise.all([
+    jobQuery.modelQuery,
+    jobQuery.getPaginationInfo(),
+  ]);
+
+  return { data, pagination };
+};
+
 export const JobServices = {
   createJob,
   updateJob,
@@ -252,4 +298,5 @@ export const JobServices = {
   getSingleJobById,
   getJobsByEmployerId,
   getAllJobs,
+  getAllJobsPublic,
 };

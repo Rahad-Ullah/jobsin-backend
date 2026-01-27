@@ -49,4 +49,7 @@ router.get('/me', auth(USER_ROLES.EMPLOYER), JobController.getMyJobs);
 // get all jobs
 router.get('/', auth(), JobController.getAllJobs);
 
+// get all jobs public
+router.get('/public', JobController.getAllJobsPublic);
+
 export const jobRoutes = router;
