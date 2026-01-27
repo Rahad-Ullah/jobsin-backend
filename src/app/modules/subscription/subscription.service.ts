@@ -10,6 +10,7 @@ import { PaymentStatus, SubscriptionStatus } from './subscription.constants';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { USER_ROLES } from '../user/user.constant';
 import { calculateExpireDate } from '../../../util/calculateExpireDate';
+import mongoose from 'mongoose';
 
 // create subscription
 const createSubscription = async (payload: Partial<ISubscription>) => {
@@ -165,6 +166,58 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
   return result;
 };
 
+// cancel subscription
+const cancelSubscription = async (subscriptionId: string) => {
+  // 1. Start the Mongoose Session
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const subscription =
+      await Subscription.findById(subscriptionId).session(session);
+    if (!subscription) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Subscription not found');
+    }
+
+    if (subscription.cancelAtPeriodEnd) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Subscription is already set to cancel',
+      );
+    }
+
+    // 2. Stripe API Call (if it's failed, we won't proceed with DB changes)
+    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+      cancel_at_period_end: true,
+    });
+
+    // 3. DB Write: Update subscription status
+    await Subscription.findByIdAndUpdate(
+      subscriptionId,
+      { cancelAtPeriodEnd: true, status: SubscriptionStatus.CANCELED },
+      { session },
+    );
+
+    // 4. DB Write: Remove subscription link from user
+    await User.findByIdAndUpdate(
+      subscription.user,
+      { subscription: null },
+      { session },
+    );
+
+    // 5. Commit the changes
+    await session.commitTransaction();
+    return subscription;
+  } catch (error) {
+    // 6. If anything fails, abort the DB changes
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    // 7. End the session
+    session.endSession();
+  }
+};
+
 // get my subscriptions
 const getMySubscriptions = async (userId: string) => {
   // check if the user exists
@@ -224,6 +277,7 @@ const getAllSubscribers = async (query: Record<string, unknown>) => {
 export const SubscriptionServices = {
   createSubscription,
   giftSubscription,
+  cancelSubscription,
   getMySubscriptions,
   getAllSubscribers,
 };

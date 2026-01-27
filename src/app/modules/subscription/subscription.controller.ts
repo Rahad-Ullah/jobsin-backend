@@ -33,19 +33,31 @@ const giftSubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// get my subscriptions
-const getMySubscriptions = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await SubscriptionServices.getMySubscriptions(req.user.id);
+// cancel subscription
+const cancelSubscription = catchAsync(async (req: Request, res: Response) => {
+  const result = await SubscriptionServices.cancelSubscription(
+    req.params.id,
+  );
 
-    sendResponse(res, {
-      success: true,
-      statusCode: StatusCodes.OK,
-      message: 'Subscriptions retrieved successfully',
-      data: result,
-    });
-  }
-);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Subscription canceled successfully',
+    data: result,
+  });
+});
+
+// get my subscriptions
+const getMySubscriptions = catchAsync(async (req: Request, res: Response) => {
+  const result = await SubscriptionServices.getMySubscriptions(req.user.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Subscriptions retrieved successfully',
+    data: result,
+  });
+});
 
 // get all subscribers
 const getAllSubscribers = catchAsync(
@@ -59,12 +71,13 @@ const getAllSubscribers = catchAsync(
       data: result.data,
       pagination: result.pagination,
     });
-  }
+  },
 );
 
 export const SubscriptionController = {
   createSubscription,
   giftSubscription,
+  cancelSubscription,
   getMySubscriptions,
   getAllSubscribers,
 };

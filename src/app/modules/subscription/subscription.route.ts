@@ -23,6 +23,13 @@ router.post(
   SubscriptionController.giftSubscription
 );
 
+// cancel subscription
+router.patch(
+  '/cancel/:id',
+  auth(USER_ROLES.EMPLOYER, USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  SubscriptionController.cancelSubscription
+);
+
 // get my subscriptions
 router.get(
   '/me',
