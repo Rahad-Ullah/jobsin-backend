@@ -25,6 +25,13 @@ router.patch(
   ApplicationController.updateApplication
 );
 
+// delete application
+router.delete(
+  '/delete/:id',
+  auth(USER_ROLES.JOB_SEEKER, USER_ROLES.EMPLOYER),
+  ApplicationController.deleteApplication
+);
+
 // get applications by job id
 router.get(
   '/job/:id',

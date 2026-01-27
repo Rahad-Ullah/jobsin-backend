@@ -53,6 +53,24 @@ const updateApplicationToDB = async (
   return result;
 };
 
+// ------------- delete application ------------
+const deleteApplicationToDB = async (id: string) => {
+  // check if the application exists
+  const existingApplication = await Application.exists({ _id: id });
+  if (!existingApplication) {
+    throw new Error('Application not found');
+  }
+
+  const result = await Application.findByIdAndUpdate(
+    id,
+    { isDeleted: true },
+    {
+      new: true,
+    },
+  );
+  return result;
+};
+
 // ------------- get applications by job id ------------
 const getApplicationsByJobId = async (
   id: string,
@@ -93,7 +111,7 @@ const getApplicationsByJobId = async (
 // ------------- get my applications ------------
 const getApplicationsByUserId = async (
   id: string,
-  query: Record<string, any>
+  query: Record<string, any>,
 ) => {
   const applicationQuery = new QueryBuilder(
     Application.find({ user: id, isDeleted: false }).populate({
@@ -104,7 +122,7 @@ const getApplicationsByUserId = async (
         select: 'name email phone address image',
       },
     }),
-    query
+    query,
   )
     .filter()
     .sort()
@@ -143,6 +161,7 @@ const getSingleApplicationById = async (id: string) => {
 export const ApplicationServices = {
   createApplicationToDB,
   updateApplicationToDB,
+  deleteApplicationToDB,
   getApplicationsByJobId,
   getApplicationsByUserId,
   getSingleApplicationById,

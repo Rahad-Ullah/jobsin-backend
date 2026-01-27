@@ -39,6 +39,18 @@ const updateApplication = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete application
+const deleteApplication = catchAsync(async (req: Request, res: Response) => {
+  const result = await ApplicationServices.deleteApplicationToDB(req.params.id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Application deleted successfully',
+    data: result,
+  });
+});
+
 // get applications by job id
 const getApplicationsByJobId = catchAsync(
   async (req: Request, res: Response) => {
@@ -96,6 +108,7 @@ const getSingleApplicationById = catchAsync(
 export const ApplicationController = {
   createApplication,
   updateApplication,
+  deleteApplication,
   getApplicationsByJobId,
   getMyApplications,
   getSingleApplicationById,
