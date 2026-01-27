@@ -112,7 +112,7 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
     if (!existingUser?.stripeCustomerId) {
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to create Stripe customer'
+        'Failed to create Stripe customer',
       );
     }
   }
@@ -136,7 +136,7 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
   if (hasActiveSubscription) {
     throw new ApiError(
       StatusCodes.BAD_REQUEST,
-      'User already has an active subscription for this package'
+      'User already has an active subscription for this package',
     );
   }
 
@@ -165,13 +165,32 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
   return result;
 };
 
+// get my subscriptions
+const getMySubscriptions = async (userId: string) => {
+  // check if the user exists
+  const existingUser = await User.findById(userId).select('_id subscription');
+  if (!existingUser?.subscription) {
+    return null;
+  }
+
+  const result = await Subscription.findById(
+    existingUser.subscription,
+  ).populate({
+    path: 'package',
+    select:
+      'name interval dailyPrice intervalPrice intervalCount description benefits',
+  });
+
+  return result;
+};
+
 // get subscribers
 const getAllSubscribers = async (query: Record<string, unknown>) => {
   const status = typeof query.status === 'string' ? query.status : undefined;
 
   // Pre-filter subscriptions
   const subscriptionIds = await Subscription.find(
-    status ? { status } : {}
+    status ? { status } : {},
   ).select('_id');
 
   const subscribersQuery = new QueryBuilder(
@@ -188,7 +207,7 @@ const getAllSubscribers = async (query: Record<string, unknown>) => {
           'name interval dailyPrice intervalPrice intervalCount description benefits',
       },
     }),
-    query
+    query,
   )
     .paginate()
     .sort()
@@ -205,5 +224,6 @@ const getAllSubscribers = async (query: Record<string, unknown>) => {
 export const SubscriptionServices = {
   createSubscription,
   giftSubscription,
+  getMySubscriptions,
   getAllSubscribers,
 };

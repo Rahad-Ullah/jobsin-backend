@@ -23,6 +23,13 @@ router.post(
   SubscriptionController.giftSubscription
 );
 
+// get my subscriptions
+router.get(
+  '/me',
+  auth(USER_ROLES.EMPLOYER),
+  SubscriptionController.getMySubscriptions
+);
+
 // get all subscribers
 router.get(
   '/subscribers',
