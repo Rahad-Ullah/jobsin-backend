@@ -42,12 +42,10 @@ const userSchema = new Schema<IUser, UserModal>(
         type: String,
         enum: ['Point'],
         default: 'Point',
-        select: false,
       },
       coordinates: {
         type: [Number],
         default: [0, 0],
-        select: false,
       },
     },
     image: {
