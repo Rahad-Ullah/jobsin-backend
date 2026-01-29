@@ -51,8 +51,10 @@ export const readAllNotifications = catchAsync(
 // create notification
 const createTestNotification = catchAsync(
   async (req: Request, res: Response) => {
+    const { user, ...payload } = req.body;
     const result = await NotificationServices.createTestNotification(
-      req.params.id
+      user,
+      payload,
     );
 
     sendResponse(res, {

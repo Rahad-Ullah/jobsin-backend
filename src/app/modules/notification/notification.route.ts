@@ -17,6 +17,6 @@ router.patch(
 // read all notifications
 router.patch('/read-all', auth(), NotificationController.readAllNotifications);
 
-router.post('/test/:id', NotificationController.createTestNotification);
+router.post('/test', NotificationController.createTestNotification);
 
 export const notificationRoutes = router;

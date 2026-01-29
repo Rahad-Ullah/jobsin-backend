@@ -66,7 +66,7 @@ const readAllNotifications = async (userId: string) => {
 };
 
 // ----------------- create test notification -----------------
-const createTestNotification = async (userId: string) => {
+const createTestNotification = async (userId: string, payload?: any) => {
   // check if user exists
   const user = await User.exists({ _id: userId }).lean();
   if (!user) {
@@ -74,9 +74,9 @@ const createTestNotification = async (userId: string) => {
   }
 
   await sendNotifications({
-    type: 'testNotification',
-    title: 'Test Notification',
-    message: 'This is a test notification',
+    type: payload?.type || 'TEST',
+    title: payload?.title || 'Test Notification',
+    message: payload?.message || 'This is a test notification',
     receiver: user._id,
     referenceId: userId,
   });
