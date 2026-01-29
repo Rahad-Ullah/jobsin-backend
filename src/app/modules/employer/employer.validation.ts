@@ -15,15 +15,12 @@ const notificationSettingsSchema = z
 const updateEmployerSchema = z.object({
   body: z
     .object({
-      businessCategory: z
-        .string()
-        .nonempty('Business Category cannot be empty')
-        .optional(),
-      legalForm: z.string().nonempty('Legal Form cannot be empty').optional(),
-      taxNo: z.string().nonempty('Tax No cannot be empty').optional(),
-      deNo: z.string().nonempty('DE No cannot be empty').optional(),
-      whatsApp: z.string().nonempty('WhatsApp cannot be empty').optional(),
-      about: z.string().nonempty('About cannot be empty').optional(),
+      businessCategory: z.string().optional(),
+      legalForm: z.string().optional(),
+      taxNo: z.string().optional(),
+      deNo: z.string().optional(),
+      whatsApp: z.string().optional(),
+      about: z.string().optional(),
       notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
@@ -33,18 +30,15 @@ const updateEmployerSchema = z.object({
 const updateEmployerProfileSchema = z.object({
   body: z
     .object({
-      name: z.string().nonempty('Name cannot be empty').optional(),
-      address: z.string().nonempty('Address cannot be empty').optional(),
-      phone: z.string().nonempty('Phone cannot be empty').optional(),
-      businessCategory: z
-        .string()
-        .nonempty('Business Category cannot be empty')
-        .optional(),
-      legalForm: z.string().nonempty('Legal Form cannot be empty').optional(),
-      taxNo: z.string().nonempty('Tax No cannot be empty').optional(),
-      deNo: z.string().nonempty('DE No cannot be empty').optional(),
-      whatsApp: z.string().nonempty('WhatsApp cannot be empty').optional(),
-      about: z.string().nonempty('About cannot be empty').optional(),
+      name: z.string().optional(),
+      address: z.string().optional(),
+      phone: z.string().optional(),
+      businessCategory: z.string().optional(),
+      legalForm: z.string().optional(),
+      taxNo: z.string().optional(),
+      deNo: z.string().optional(),
+      whatsApp: z.string().optional(),
+      about: z.string().optional(),
       image: z.string().optional(),
       notificationSettings: notificationSettingsSchema.optional(),
     })

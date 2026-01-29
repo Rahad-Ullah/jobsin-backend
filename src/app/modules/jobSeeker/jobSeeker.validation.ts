@@ -16,12 +16,8 @@ export const experienceSchema = z
 export const jobSeekerSchema = z.object({
   body: z
     .object({
-      overview: z
-        .string()
-        .nonempty('Overview cannot be empty')
-        .max(500)
-        .optional(),
-      about: z.string().nonempty('About cannot be empty').max(2000).optional(),
+      overview: z.string().max(500).optional(),
+      about: z.string().max(2000).optional(),
       experiences: z.array(experienceSchema).optional(),
       doc: z.string().optional(),
       image: z.string().optional(),

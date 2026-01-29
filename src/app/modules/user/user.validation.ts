@@ -31,9 +31,9 @@ const createAdminZodSchema = z.object({
 const updateUserZodSchema = z.object({
   body: z
     .object({
-      name: z.string().nonempty('Name cannot be empty').optional(),
-      phone: z.string().nonempty('Phone cannot be empty').optional(),
-      address: z.string().nonempty('Address cannot be empty').optional(),
+      name: z.string().optional(),
+      phone: z.string().optional(),
+      address: z.string().optional(),
       location: z
         .array(z.number())
         .length(
