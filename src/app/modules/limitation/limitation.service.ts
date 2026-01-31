@@ -43,6 +43,7 @@ const onCreateJob = async (userId: string) => {
 
     const jobCount = await Job.countDocuments({
       author: userId,
+      isHiringRequest: false,
       createdAt: { $gte: startOfMonth },
     });
 
