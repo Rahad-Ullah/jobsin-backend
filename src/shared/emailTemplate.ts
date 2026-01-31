@@ -329,9 +329,9 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
                       <td style="padding: 12px 0;">${d.toLocaleDateString('de-DE')}</td>
                       <td style="padding: 12px 0;">${d.toLocaleDateString('en-US', { weekday: 'long' })}</td>
                       <td style="padding: 12px 0; text-align: center;">
-                        <span style="display: inline-block;">${plan.startTime}</span>
+                        <span style="display: inline-block;">${new Date(plan.startTime).toLocaleTimeString()}</span>
                         <span style="display: inline-block; width: 40px; height: 1px; background-color: #277E16; margin: 0 10px; vertical-align: middle;"></span>
-                        <span style="display: inline-block;">${plan.endTime}</span>
+                        <span style="display: inline-block;">${new Date(plan.endTime).toLocaleTimeString()}</span>
                       </td>
                       <td style="padding: 12px 0; text-align: right;">${plan.shift}</td>
                     </tr>
