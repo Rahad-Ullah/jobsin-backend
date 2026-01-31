@@ -33,6 +33,7 @@ export const createUserIntoDB = async (
         [
           {
             user: user._id,
+            'notificationSettings.email': user.email,
           },
         ],
         { session },
@@ -48,6 +49,7 @@ export const createUserIntoDB = async (
         [
           {
             user: user._id,
+            'notificationSettings.email': user.email,
           },
         ],
         { session },

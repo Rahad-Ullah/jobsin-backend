@@ -5,11 +5,12 @@ import { IEmployer } from './employer.interface';
 import { Employer } from './employer.model';
 import { IUser } from '../user/user.interface';
 import unlinkFile from '../../../shared/unlinkFile';
+import { UpdateQuery } from 'mongoose';
 
 // -------------- update employer service by user id --------------
 export const updateEmployerByUserId = async (
   userId: string,
-  payload: Partial<IEmployer>
+  payload: UpdateQuery<IEmployer>,
 ): Promise<IEmployer | null> => {
   // check if employer exists
   const existingEmployer = await Employer.findOne({ user: userId });
@@ -17,14 +18,22 @@ export const updateEmployerByUserId = async (
     throw new Error('Employer not found');
   }
 
+  // handle notificationSettings (PARTIAL UPDATE)
+  if (payload.notificationSettings) {
+    for (const [key, value] of Object.entries(payload.notificationSettings)) {
+      payload[`notificationSettings.${key}`] = value;
+    }
+    delete payload.notificationSettings;
+  }
+
   const result = await Employer.findByIdAndUpdate(
     existingEmployer._id,
-    payload,
-    { new: true }
+    { $set: payload },
+    { new: true },
   );
 
   return result;
-};
+};;
 
 // -------------- update employer user profile --------------
 const updateEmployerUserProfile = async (

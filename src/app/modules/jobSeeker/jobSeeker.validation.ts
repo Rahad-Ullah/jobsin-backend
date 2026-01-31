@@ -1,5 +1,15 @@
 import { z } from 'zod';
-import { SalaryType } from './jobSeeker.constants';
+import { RepeatType, SalaryType } from './jobSeeker.constants';
+
+// Notification Settings schema
+const notificationSettingsSchema = z
+  .object({
+    pushNotification: z.boolean().optional(),
+    emailNotification: z.boolean().optional(),
+    repeat: z.nativeEnum(RepeatType).optional(),
+    email: z.string().email('Email must be valid').optional(),
+  })
+  .strict();
 
 // Work Experience schema
 export const experienceSchema = z
@@ -23,6 +33,7 @@ export const jobSeekerSchema = z.object({
       image: z.string().optional(),
       removedImages: z.array(z.string()).optional(),
       isProfileVisible: z.boolean().default(true).optional(),
+      notificationSettings: notificationSettingsSchema.optional(),
     })
     .strict(),
 });

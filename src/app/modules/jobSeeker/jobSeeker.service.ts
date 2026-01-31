@@ -1,3 +1,4 @@
+import { UpdateQuery } from 'mongoose';
 import unlinkFile from '../../../shared/unlinkFile';
 import { Application } from '../application/application.model';
 import { Job } from '../job/job.model';
@@ -7,8 +8,9 @@ import { JobSeeker } from './jobSeeker.model';
 // ------------- update job seeker by user id -------------
 const updateJobSeekerByUserId = async (
   userId: string,
-  payload: Partial<IJobSeeker> & { removedImages?: string[] }
+  payload: UpdateQuery<IJobSeeker> & { removedImages?: string[] },
 ) => {
+  // console.log(payload);
   // check if job seeker exists
   const existingJobSeeker = await JobSeeker.findOne({ user: userId });
   if (!existingJobSeeker) {
@@ -19,7 +21,7 @@ const updateJobSeekerByUserId = async (
   let oldAttachments = existingJobSeeker.attachments;
   if (payload.removedImages && payload.removedImages.length > 0) {
     oldAttachments = existingJobSeeker.attachments.filter(
-      image => !payload.removedImages!.includes(image)
+      image => !payload.removedImages!.includes(image),
     );
   }
 
@@ -35,10 +37,20 @@ const updateJobSeekerByUserId = async (
     throw new Error('You can upload maximum 8 attachments');
   }
 
+  // handle notificationSettings (PARTIAL UPDATE)
+  if (payload.notificationSettings) {
+    for (const [key, value] of Object.entries(payload.notificationSettings)) {
+      payload[`notificationSettings.${key}`] = value;
+    }
+    delete payload.notificationSettings;
+  }
+
   // update job seeker
-  const result = await JobSeeker.findOneAndUpdate({ user: userId }, payload, {
-    new: true,
-  });
+  const result = await JobSeeker.findOneAndUpdate(
+    { user: userId },
+    { $set: payload },
+    { new: true },
+  );
 
   if (!result) {
     throw new Error('Failed to update job seeker');
@@ -60,7 +72,7 @@ const updateJobSeekerByUserId = async (
 const getJobSeekerByUserId = async (userId: string) => {
   const result = await JobSeeker.findOne({ user: userId }).populate(
     'user',
-    'name email role phone address image'
+    'name email role phone address image',
   );
   return result;
 };
@@ -68,7 +80,7 @@ const getJobSeekerByUserId = async (userId: string) => {
 // ------------ get job seeker with privacy -------------
 const getJobSeekerWithPrivacy = async (
   jobSeekerId: string,
-  employerId: string
+  employerId: string,
 ) => {
   const result = await JobSeeker.findOne({ user: jobSeekerId })
     .populate('user', 'name email role phone address image')
