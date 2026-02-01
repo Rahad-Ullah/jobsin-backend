@@ -47,9 +47,25 @@ const cancelSubscription = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get subscription by user id
+const getSubscriptionByUserId = catchAsync(async (req: Request, res: Response) => {
+  const result = await SubscriptionServices.getSubscriptionByUserId(
+    req.params.id,
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Subscriptions retrieved successfully',
+    data: result,
+  });
+});
+
 // get my subscriptions
 const getMySubscriptions = catchAsync(async (req: Request, res: Response) => {
-  const result = await SubscriptionServices.getMySubscriptions(req.user.id);
+  const result = await SubscriptionServices.getSubscriptionByUserId(
+    req.user.id,
+  );
 
   sendResponse(res, {
     success: true,
@@ -78,6 +94,7 @@ export const SubscriptionController = {
   createSubscription,
   giftSubscription,
   cancelSubscription,
+  getSubscriptionByUserId,
   getMySubscriptions,
   getAllSubscribers,
 };

@@ -218,8 +218,8 @@ const cancelSubscription = async (subscriptionId: string) => {
   }
 };
 
-// get my subscriptions
-const getMySubscriptions = async (userId: string) => {
+// get subscription by user id
+const getSubscriptionByUserId = async (userId: string) => {
   // check if the user exists
   const existingUser = await User.findById(userId).select('_id subscription');
   if (!existingUser?.subscription) {
@@ -278,6 +278,6 @@ export const SubscriptionServices = {
   createSubscription,
   giftSubscription,
   cancelSubscription,
-  getMySubscriptions,
+  getSubscriptionByUserId,
   getAllSubscribers,
 };

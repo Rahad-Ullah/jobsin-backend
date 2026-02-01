@@ -30,6 +30,13 @@ router.patch(
   SubscriptionController.cancelSubscription
 );
 
+// get by user id
+router.get(
+  '/single/user/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  SubscriptionController.getSubscriptionByUserId
+);
+
 // get my subscriptions
 router.get(
   '/me',
