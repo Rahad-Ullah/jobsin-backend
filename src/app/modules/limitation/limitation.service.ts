@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { User } from '../user/user.model';
-import { SubscriptionStatus } from '../subscription/subscription.constants';
 import { Job } from '../job/job.model';
 import { isSameCalendarMonth } from '../../../util/isSameCalendarMonth';
 import { Appointment } from '../appointment/appointment.model';
@@ -22,7 +21,11 @@ const getUserPlan = async (userId: string) => {
 
   const sub = user.subscription as any;
 
-  if (sub && sub?.status === SubscriptionStatus.ACTIVE && sub?.package?.name) {
+  if (
+    sub &&
+    new Date(sub?.currentPeriodEnd) > new Date() &&
+    sub?.package?.name
+  ) {
     return sub.package.name;
   }
 
