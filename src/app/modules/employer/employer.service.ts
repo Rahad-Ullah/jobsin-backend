@@ -46,12 +46,12 @@ const updateEmployerUserProfile = async (
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   }
 
-  const { name, phone, address, image, ...employerData } = payload;
+  const { name, phone, address, location, image, ...employerData } = payload;
 
   const result = await User.findByIdAndUpdate(
     userId,
-    { name, phone, address, image },
-    { new: true }
+    { name, phone, address, location, image },
+    { new: true },
   );
 
   await Employer.findOneAndUpdate({ user: userId }, employerData, {

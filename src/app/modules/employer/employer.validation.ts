@@ -32,6 +32,12 @@ const updateEmployerProfileSchema = z.object({
     .object({
       name: z.string().optional(),
       address: z.string().optional(),
+      location: z
+        .array(z.number())
+        .length(2, {
+          message: 'Location must be in the format [longitude, latitude]',
+        })
+        .optional(),
       phone: z.string().optional(),
       businessCategory: z.string().optional(),
       legalForm: z.string().optional(),

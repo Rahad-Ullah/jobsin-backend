@@ -22,16 +22,27 @@ export const updateMyEmployerProfile = catchAsync(
   }
 );
 
-// update my employer profile
+// update both employer and user profile
 export const updateEmployerUserProfile = catchAsync(
   async (req: Request, res: Response) => {
+    const payload = req.body;
+    // handle image upload
     const image = getSingleFilePath(req.files, 'image');
     if (image) {
-      req.body.image = image;
+      payload.image = image;
     }
+    // handle location update
+    if(payload.location) {
+      const [longitude, latitude] = payload.location;
+      payload.location = {
+        type: 'Point',
+        coordinates: [longitude, latitude],
+      };
+    }
+    
     const result = await EmployerServices.updateEmployerUserProfile(
       req.user.id,
-      req.body
+      payload
     );
 
     sendResponse(res, {

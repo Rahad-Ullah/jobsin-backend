@@ -16,7 +16,7 @@ router.patch(
   EmployerController.updateMyEmployerProfile
 );
 
-// update my employer profile
+// update both employer and user profile
 router.patch(
   '/profile',
   auth(USER_ROLES.EMPLOYER),
