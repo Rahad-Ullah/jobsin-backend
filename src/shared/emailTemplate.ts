@@ -417,7 +417,7 @@ const jobSeekerAlert = (
                   </div>
 
                   <p style="margin: 12px 0 0 0; font-size: 13px; color: #777; line-height: 1.4;">
-                    "${candidate.jobSeeker.overview.substring(0, 120)}${candidate.jobSeeker.overview.length > 120 ? '...' : ''}"
+                    "${candidate.jobSeeker.overview?.substring(0, 120)}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
                   </p>
                 </div>
               `;

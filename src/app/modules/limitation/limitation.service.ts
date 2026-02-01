@@ -10,7 +10,7 @@ const getUserPlan = async (userId: string) => {
   const user = await User.findById(userId)
     .populate({
       path: 'subscription',
-      select: 'package status',
+      select: 'package currentPeriodEnd status',
       populate: { path: 'package', select: 'name' },
     })
     .lean();

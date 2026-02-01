@@ -13,6 +13,7 @@ import { IInvoice } from '../../modules/invoice/invoice.interface';
 import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { logger } from '../../../shared/logger';
 
 // on payment intent succeeded
 const onPaymentIntentSucceeded = async (event: Stripe.Event) => {
@@ -115,6 +116,9 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
         'Subscription creation failed',
       );
     }
+    logger.info(
+      `[Stripe Webhook] Subscription created successfully: ${result._id}`,
+    );
 
     // DB write: update user subscription
     await User.findByIdAndUpdate(stripeSub.metadata?.userId, {
@@ -146,6 +150,9 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     if (!invoiceResult) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Invoice creation failed');
     }
+    logger.info(
+      `[Stripe Webhook] Invoice created successfully: ${invoiceResult._id}`,
+    );
   } catch (error) {
     console.error('Error onCheckoutSessionCompleted  ~~ ', error);
   }
@@ -222,6 +229,8 @@ const onInvoicePaid = async (event: Stripe.Event) => {
         'Invoice creation failed',
       );
     }
+
+    logger.info(`[Stripe Webhook] Invoice paid successfully: ${result._id}`);
   } catch (error) {
     console.error('Error onInvoicePaid  ~~ ', error);
   }
@@ -288,6 +297,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
         'Invoice creation failed',
       );
     }
+    logger.info(`[Stripe Webhook] Invoice payment failed: ${result._id}`);
 
     // send email to user
     if ((subscription?.user as any)?.email) {
@@ -357,6 +367,8 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
         },
       );
     }
+
+    logger.info(`[Stripe Webhook] Invoice updated: ${stripeInvoice.id}`);
   } catch (error) {
     console.error('Error onInvoiceUpdate  ~~ ', error);
   }
@@ -385,6 +397,8 @@ const onRefundCreated = async (event: Stripe.Event) => {
     { status: SubscriptionStatus.CANCELED },
     { new: true },
   );
+
+  logger.info(`[Stripe Webhook] Invoice refunded: ${invoiceId}`);
 };
 
 export const StripeWebhookServices = {
