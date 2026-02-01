@@ -91,79 +91,86 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
-  // check if the user exists
-  const existingUser = await User.findById(payload.user);
-  if (!existingUser) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
-  }
+  // 1. Start Session
+  const session = await mongoose.startSession();
 
-  // create new Stripe customer if not exist
-  if (!existingUser.stripeCustomerId) {
-    const customer = await stripe.customers.create({
-      email: existingUser.email || '',
-      name: existingUser.name,
-      metadata: { userId: existingUser._id.toString() },
-    });
+  try {
+    session.startTransaction();
 
-    existingUser.stripeCustomerId = customer.id;
-    await User.findByIdAndUpdate(existingUser._id, {
-      stripeCustomerId: customer.id,
-    });
+    const existingUser = await User.findById(payload.user).session(session);
+    if (!existingUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+    }
 
-    if (!existingUser?.stripeCustomerId) {
+    if (!existingUser.stripeCustomerId) {
+      const customer = await stripe.customers.create({
+        email: existingUser.email || '',
+        name: existingUser.name,
+        metadata: { userId: existingUser._id.toString() },
+      });
+
+      // Update user with stripe ID within session
+      await User.findByIdAndUpdate(
+        existingUser._id,
+        { stripeCustomerId: customer.id },
+        { session },
+      );
+      existingUser.stripeCustomerId = customer.id;
+    }
+
+    const pkg = await Package.findOne({
+      _id: payload.package,
+      isDeleted: false,
+    }).session(session);
+    if (!pkg) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
+    }
+
+    const hasActiveSubscription = await Subscription.exists({
+      user: payload.user,
+      package: payload.package,
+      status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+    }).session(session);
+
+    if (hasActiveSubscription) {
       throw new ApiError(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        'Failed to create Stripe customer',
+        StatusCodes.BAD_REQUEST,
+        'User already has an active subscription',
       );
     }
-  }
 
-  // check if the package exists
-  const pkg = await Package.findOne({
-    _id: payload.package,
-    isDeleted: false,
-  });
-  if (!pkg) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
-  }
+    const expiryDate = calculateExpireDate(pkg.interval, pkg.intervalCount);
+    const subscriptionData = {
+      ...payload,
+      price: 0,
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: expiryDate,
+      cancelAtPeriodEnd: true,
+      status: SubscriptionStatus.TRIALING,
+      paymentStatus: PaymentStatus.UNPAID,
+    };
 
-  // check if the user already has an active subscription
-  const hasActiveSubscription = await Subscription.exists({
-    user: payload.user,
-    package: payload.package,
-    status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
-  });
+    // 2. Create Subscription within session
+    const [result] = await Subscription.create([subscriptionData], { session });
 
-  if (hasActiveSubscription) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'User already has an active subscription for this package',
+    // 3. Update User within session
+    await User.findByIdAndUpdate(
+      existingUser._id,
+      { subscription: result._id },
+      { session },
     );
+
+    // 4. Commit changes
+    await session.commitTransaction();
+    return result;
+  } catch (error) {
+    // 5. Abort on error
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    // 6. End session
+    await session.endSession();
   }
-
-  // DB write: create subscription
-  const expiryDate = calculateExpireDate(pkg.interval, pkg.intervalCount);
-  payload = {
-    ...payload,
-    price: 0,
-    currentPeriodStart: new Date(),
-    currentPeriodEnd: expiryDate,
-    cancelAtPeriodEnd: true,
-    status: SubscriptionStatus.TRIALING,
-    paymentStatus: PaymentStatus.UNPAID,
-  };
-
-  const result = await Subscription.create(payload);
-  if (!result) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription creation failed');
-  }
-
-  // update user subscription
-  await User.findByIdAndUpdate(existingUser._id, {
-    subscription: result._id,
-  });
-
-  return result;
 };
 
 // cancel subscription
@@ -179,17 +186,19 @@ const cancelSubscription = async (subscriptionId: string) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Subscription not found');
     }
 
-    if (subscription.cancelAtPeriodEnd) {
+    if (subscription.status === SubscriptionStatus.CANCELED) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Subscription is already set to cancel',
+        'Subscription is already canceled',
       );
     }
 
     // 2. Stripe API Call (if it's failed, we won't proceed with DB changes)
-    await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
-      cancel_at_period_end: true,
-    });
+    if (subscription.stripeSubscriptionId) {
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
+    }
 
     // 3. DB Write: Update subscription status
     await Subscription.findByIdAndUpdate(
