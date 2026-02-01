@@ -186,8 +186,8 @@ async function cleanupEmployer(employerId: string) {
 const PER_USER_DELAY_MS = 300; // throttle between users
 
 // ----------- CRON STARTER -------------
-export function startJobSeekerJobAlertCron() {
-  nodeCron.schedule('0 0 * * *', async () => {
+export function startJobAlertCron() {
+  nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Job seeker job alert started');
 
     try {
