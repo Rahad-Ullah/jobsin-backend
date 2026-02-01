@@ -395,7 +395,7 @@ const jobSeekerAlert = (
                       ${candidate.name?.charAt(0) || 'JS'}
                     </div>
                     <div>
-                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name}</h3>
+                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name || 'Unknown Name'}</h3>
                       <p style="margin: 0; font-size: 13px; color: #1a73e8; font-weight: bold;">${mainCategories}</p>
                     </div>
                   </div>
@@ -409,7 +409,7 @@ const jobSeekerAlert = (
                         exp => `
                       <div style="font-size: 13px; color: #555; margin-bottom: 4px;">
                         • ${exp.subCategory} (${exp.experience} Years) 
-                        <span style="color: #2e7d32; font-weight: 500;"> - Expected: ${exp.salaryAmount.toLocaleString()} ${exp.salaryType}</span>
+                        <span style="color: #2e7d32; font-weight: 500;"> - Expected: $${exp.salaryAmount.toLocaleString()} / ${exp.salaryType}</span>
                       </div>
                     `,
                       )
@@ -417,7 +417,7 @@ const jobSeekerAlert = (
                   </div>
 
                   <p style="margin: 12px 0 0 0; font-size: 13px; color: #777; line-height: 1.4;">
-                    "${candidate.jobSeeker.overview?.substring(0, 120)}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
+                    "${candidate.jobSeeker.overview?.substring(0, 120) || 'No overview provided'}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
                   </p>
                 </div>
               `;
