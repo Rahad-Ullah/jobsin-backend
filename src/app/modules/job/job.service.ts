@@ -12,6 +12,7 @@ import { IJob } from './job.interface';
 import { Job } from './job.model';
 import { redisClient } from '../../../config/redis';
 import { JwtPayload } from 'jsonwebtoken';
+import { Contact } from '../contact/contact.model';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
@@ -73,24 +74,20 @@ const sendHiringPostToAdmin = async (jobId: string) => {
   if (!existingJob) {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Job not found');
   }
-  // get admin email with fallback to super admin
-  let adminEmail = config.super_admin.email;
-  if (!adminEmail) {
-    const admin = await User.findOne({ role: USER_ROLES.SUPER_ADMIN }).select(
-      'email',
-    );
-    adminEmail = admin?.email;
-  }
+  // get platform contact email. If not found, use default reply email
+  const contactInfo = await Contact.findOne({}).select('email');
+  let platformEmail = contactInfo?.email;
+  if (!platformEmail) platformEmail = config.email.reply_to;
 
   // send mail
-  if (adminEmail) {
+  if (platformEmail) {
     const template = emailTemplate.hiringRequestToAdmin(
       existingJob,
       existingJob.author as any,
-      adminEmail,
+      platformEmail,
     );
     await emailHelper.sendEmail({
-      to: adminEmail,
+      to: platformEmail,
       subject: template.subject,
       html: template.html,
     });
