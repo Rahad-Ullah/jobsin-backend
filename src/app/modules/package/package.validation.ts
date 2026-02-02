@@ -12,7 +12,7 @@ export const createPackageValidation = z.object({
         .int()
         .positive('Interval count must be positive'),
       dailyPrice: z.number().nonnegative('Daily price must be non-negative'),
-      description: z.string().default(''),
+      description: z.string().nonempty('Description cannot be empty'),
       benefits: z.array(z.string()).default([]),
     })
     .strict(),
@@ -33,7 +33,10 @@ export const updatePackageValidation = z.object({
       //   .number()
       //   .nonnegative('Unit price must be non-negative')
       //   .optional(),
-      description: z.string().default('').optional(),
+      description: z
+        .string()
+        .nonempty('Description cannot be empty')
+        .optional(),
       benefits: z.array(z.string()).default([]).optional(),
     })
     .strict(),
