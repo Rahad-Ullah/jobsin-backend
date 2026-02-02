@@ -9,7 +9,11 @@ import { LimitationServices } from '../limitation/limitation.service';
 // create appointment
 const createAppointment = catchAsync(async (req: Request, res: Response) => {
   if (req.user.role === USER_ROLES.EMPLOYER){
-    await LimitationServices.onCreateAppointment(req.user.id, req.body.receiver);
+    await LimitationServices.onCreateAppointment(
+      req.user.id,
+      req.body.job,
+      req.body.receiver,
+    );
   }
   
   const result = await AppointmentServices.createAppointmentToDB({

@@ -90,6 +90,7 @@ export const onJobSeekerMatchNotification = async (
 // on create appointment
 export const onCreateAppointment = async (
   userId: string,
+  jobId: string,
   candidateId: string,
 ) => {
   const plan = await getUserPlan(userId);
@@ -110,6 +111,20 @@ export const onCreateAppointment = async (
   });
 
   if (appointmentCount >= 5) {
+    throw new ApiError(
+      StatusCodes.PAYMENT_REQUIRED,
+      'Monthly limit reached. Please upgrade your plan.',
+    );
+  }
+
+  // check if max appointment limit is 1 on the month for this job
+  const jobAppointmentCount = await Appointment.countDocuments({
+    sender: userId,
+    job: jobId,
+    createdAt: { $gte: startOfMonth },
+  });
+
+  if (jobAppointmentCount >= 1) {
     throw new ApiError(
       StatusCodes.PAYMENT_REQUIRED,
       'Monthly limit reached. Please upgrade your plan.',

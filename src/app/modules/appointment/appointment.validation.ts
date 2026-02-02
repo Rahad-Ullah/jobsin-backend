@@ -10,7 +10,7 @@ export const createAppointmentZodSchema = z.object({
   body: z
     .object({
       receiver: objectIdSchema,
-      job: objectIdSchema.optional(),
+      job: objectIdSchema,
       scheduledAt: z
         .string({
           required_error: 'Scheduled date and time is required',
