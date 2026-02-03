@@ -6,5 +6,5 @@ if (!config.stripe.secret_key) {
 }
 
 export const stripe = new Stripe(config.stripe.secret_key as string, {
-  apiVersion: '2025-12-15.clover',
+  apiVersion: '2026-01-28.clover',
 });

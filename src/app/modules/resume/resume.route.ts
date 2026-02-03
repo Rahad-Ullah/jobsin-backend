@@ -23,4 +23,7 @@ router.get('/single/:id', auth(), ResumeController.getResumeByUserId);
 // get my resume
 router.get('/me', auth(USER_ROLES.JOB_SEEKER), ResumeController.getMyResume);
 
+// get my resume as pdf
+router.get('/me/pdf', auth(USER_ROLES.JOB_SEEKER), ResumeController.getMyResumeAsPdf);
+
 export const resumeRoutes = router;
