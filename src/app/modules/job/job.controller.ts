@@ -8,7 +8,9 @@ import { LimitationServices } from '../limitation/limitation.service';
 // create job post
 const createJob = catchAsync(async (req: Request, res: Response) => {
   // check user job limit
-  await LimitationServices.onCreateJob(req.user.id);
+  if (req.body.isHiringRequest !== true) {
+    await LimitationServices.onCreateJob(req.user.id);
+  }
 
   const result = await JobServices.createJob({
     ...req.body,
