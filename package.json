@@ -65,6 +65,7 @@
     "nodemailer": "^7.0.10",
     "openai": "^6.16.0",
     "pdfkit": "^0.17.2",
+    "puppeteer": "^24.36.1",
     "qrcode": "^1.5.4",
     "socket.io": "^4.7.5",
     "speakeasy": "^2.0.0",

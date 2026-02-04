@@ -13,6 +13,7 @@ import { Job } from './job.model';
 import { redisClient } from '../../../config/redis';
 import { JwtPayload } from 'jsonwebtoken';
 import { Contact } from '../contact/contact.model';
+import { generatePdfFromHtml } from '../../../util/htmlToPdf';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
@@ -86,10 +87,20 @@ const sendHiringPostToAdmin = async (jobId: string) => {
       existingJob.author as any,
       platformEmail,
     );
+
+    const fileName = `hiring-request-${existingJob._id}-${Date.now()}`;
+    await generatePdfFromHtml(template.html, fileName);
+
+    // Public URL (served via express static)
+    const pdfUrl = `${config.backend_url}/uploads/documents/${fileName}.pdf`;
+
     await emailHelper.sendEmail({
       to: platformEmail,
       subject: template.subject,
-      html: template.html,
+      html: `
+              <p>Your hiring request contract is ready.</p>
+              <a href="${pdfUrl}" target="_blank">Download PDF</a>
+            `,
     });
   }
 };
@@ -231,7 +242,10 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
 
       // 3️. TTL
       await redisClient.expire(`job_search:${employerUserId}`, TTL_8_DAYS);
-      await redisClient.expire(`job_search:dedup:${employerUserId}`, TTL_8_DAYS);
+      await redisClient.expire(
+        `job_search:dedup:${employerUserId}`,
+        TTL_8_DAYS,
+      );
 
       // 4️. Track employer
       await redisClient.sadd('job_search:employers', employerUserId);
