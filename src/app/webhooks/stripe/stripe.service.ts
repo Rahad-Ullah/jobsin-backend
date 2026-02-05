@@ -81,6 +81,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
         expand: ['items.data.price', 'latest_invoice.lines.data.price'],
       },
     );
+    console.log('stripe sub', stripeSub);
 
     const stripePrice = stripeSub.items.data[0].price;
     const unitAmount = stripePrice.unit_amount! / 100;
@@ -91,11 +92,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     const period = stripeInvoice.lines.data[0].period;
 
-    console.log('[Stripe] period raw', {
-      start: period?.start,
-      end: period?.end,
-      invoiceLine: stripeInvoice.lines.data[0],
-    });
+    console.log('[Stripe] period raw', period);
 
     // DB write: create subscription
     const payload = {
