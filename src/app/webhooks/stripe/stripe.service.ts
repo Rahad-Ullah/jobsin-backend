@@ -81,7 +81,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
         expand: ['items.data.price', 'latest_invoice.lines.data.price'],
       },
     );
-    console.log('stripe sub', stripeSub);
 
     const stripePrice = stripeSub.items.data[0].price;
     const unitAmount = stripePrice.unit_amount! / 100;
@@ -92,7 +91,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     const period = stripeInvoice.lines.data[0].period;
 
-    console.log('[Stripe] period raw', period);
+    console.log('[Stripe] period raw  -----> ', period);
 
     // DB write: create subscription
     const payload = {
@@ -111,6 +110,8 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
           ? PaymentStatus.UNPAID
           : PaymentStatus.PAID,
     };
+
+    console.log('sub payload -------> ', payload);
 
     const result = await Subscription.create(payload);
     if (!result) {
@@ -145,6 +146,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
+    console.log('invoice payload -------> ', invoicePayload);
     const invoiceResult = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
       invoicePayload,
