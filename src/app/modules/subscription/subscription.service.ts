@@ -50,20 +50,6 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
   }
 
-  // check if the user already has an active subscription
-  const hasActiveSubscription = await Subscription.findOne({
-    user: payload.user,
-    package: payload.package,
-    status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
-  });
-
-  if (hasActiveSubscription) {
-    throw new ApiError(
-      StatusCodes.BAD_REQUEST,
-      'User already has an active subscription for this package',
-    );
-  }
-
   // Create Checkout Session
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: existingUser.stripeCustomerId,
