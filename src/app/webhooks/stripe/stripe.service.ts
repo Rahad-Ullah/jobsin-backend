@@ -91,7 +91,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     const period = stripeInvoice.lines.data[0].period;
 
-    logger.info('[Stripe] period raw', {
+    console.log('[Stripe] period raw', {
       start: period?.start,
       end: period?.end,
       invoiceLine: stripeInvoice.lines.data[0],
