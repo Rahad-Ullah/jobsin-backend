@@ -20,7 +20,6 @@ const getUserPlan = async (userId: string) => {
   }
 
   const sub = user.subscription as any;
-  console.log(sub);
 
   if (
     sub &&
@@ -36,7 +35,6 @@ const getUserPlan = async (userId: string) => {
 // on create job
 const onCreateJob = async (userId: string) => {
   const plan = await getUserPlan(userId);
-  console.log('-----> plan : ', plan);
 
   // check job limit for basic plan - 5 jobs per month
   if (plan === 'BASIC') {
@@ -96,7 +94,6 @@ export const onCreateAppointment = async (
   candidateId: string,
 ) => {
   const plan = await getUserPlan(userId);
-  console.log('-----> plan : ', plan);
 
   if (plan !== 'BASIC') {
     return;
