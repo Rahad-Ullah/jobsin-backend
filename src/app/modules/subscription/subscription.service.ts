@@ -257,6 +257,7 @@ const getAllSubscribers = async (query: Record<string, unknown>) => {
     }),
     query,
   )
+    .search(['name', 'email'])
     .paginate()
     .sort()
     .fields();
