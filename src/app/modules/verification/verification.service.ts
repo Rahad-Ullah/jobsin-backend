@@ -1,11 +1,12 @@
 import QueryBuilder from '../../builder/QueryBuilder';
+import { User } from '../user/user.model';
 import { VerificationStatus } from './verification.constants';
 import { IVerification } from './verification.interface';
 import { Verification } from './verification.model';
 
 // ------------- create verification -------------
 const createVerificationToDB = async (
-  payload: Partial<IVerification>
+  payload: Partial<IVerification>,
 ): Promise<IVerification> => {
   // check if a request of this user is already pending
   const existingVerification = await Verification.exists({
@@ -23,7 +24,7 @@ const createVerificationToDB = async (
 // ------------- update verification -------------
 const updateVerificationToDB = async (
   id: string,
-  payload: Partial<IVerification>
+  payload: Partial<IVerification>,
 ) => {
   // check if the verification exists
   const existingVerification = await Verification.exists({ _id: id });
@@ -45,10 +46,23 @@ const getVerificationByUserId = async (userId: string) => {
 
 // get all verifications
 const getAllVerifications = async (query: Record<string, any>) => {
-  const verificationQuery = new QueryBuilder(
-    Verification.find({ isDeleted: false }),
-    query
-  )
+  const filter = { isDeleted: false } as any;
+  if (query.searchTerm?.trim()) {
+    // 1. Find users matching the search term
+    const users = await User.find({
+      $or: [
+        { name: { $regex: query.searchTerm, $options: 'i' } },
+        { email: { $regex: query.searchTerm, $options: 'i' } },
+      ],
+    }).select('_id');
+
+    const userIds = users.map(u => u._id);
+
+    // 2. Filter verifications where the user field matches these IDs
+    filter.user = { $in: userIds };
+  }
+
+  const verificationQuery = new QueryBuilder(Verification.find(filter), query)
     .filter()
     .sort()
     .paginate()
