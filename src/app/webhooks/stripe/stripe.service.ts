@@ -111,8 +111,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
           : PaymentStatus.PAID,
     };
 
-    console.log('sub payload -------> ', payload);
-
     const result = await Subscription.create(payload);
     if (!result) {
       throw new ApiError(
@@ -146,7 +144,10 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
-    console.log('invoice payload -------> ', invoicePayload);
+    console.log(
+      'onCustomerSubscriptionCreated: invoice payload -------> ',
+      invoicePayload,
+    );
     const invoiceResult = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
       invoicePayload,
@@ -223,6 +224,8 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
 
+    console.log('onInvoicePaid: invoice payload ----->', invoicePayload);
+
     const result = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
       invoicePayload,
@@ -291,6 +294,11 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       paidAt: null,
     };
 
+    console.log(
+      'onInvoicePaymentFailed: invoice payload ----->',
+      invoicePayload,
+    );
+
     const result = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
       invoicePayload,
@@ -358,8 +366,6 @@ const onInvoiceUpdate = async (event: Stripe.Event) => {
         {
           paymentStatus: PaymentStatus.FAILED,
           status: SubscriptionStatus.PAST_DUE,
-          currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
-          currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
         },
         { new: true },
       );
