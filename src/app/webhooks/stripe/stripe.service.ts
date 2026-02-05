@@ -195,6 +195,8 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
     }
 
+    console.log('onInvoicePaid: stripe invoice ----->', stripeInvoice);
+
     // DB write: update subscription
     const subscription = await Subscription.findOneAndUpdate(
       { stripeSubscriptionId: stripeSubscriptionId },
@@ -223,8 +225,6 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
-
-    console.log('onInvoicePaid: invoice payload ----->', invoicePayload);
 
     const result = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
