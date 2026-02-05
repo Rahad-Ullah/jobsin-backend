@@ -187,6 +187,9 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       );
     }
 
+    const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    console.log('onInvoicePaid: stripe sub ----->', stripeSub);
+
     // check if subscription exists
     const existingSubscription = await Subscription.exists({
       stripeSubscriptionId: stripeSubscriptionId,
