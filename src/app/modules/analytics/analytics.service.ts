@@ -8,7 +8,10 @@ import { User } from '../user/user.model';
 const getOverview = async () => {
   const jobSeekers = User.countDocuments({ role: USER_ROLES.JOB_SEEKER });
   const employers = User.countDocuments({ role: USER_ROLES.EMPLOYER });
-  const subscribers = Subscription.countDocuments();
+  const subscribers = User.countDocuments({
+    role: USER_ROLES.EMPLOYER,
+    subscription: { $ne: null },
+  });
   const revenue = await Invoice.aggregate([
     {
       $match: {
