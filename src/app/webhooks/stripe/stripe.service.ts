@@ -91,8 +91,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     const period = stripeInvoice.lines.data[0].period;
 
-    console.log('[Stripe] period raw  -----> ', period);
-
     // DB write: create subscription
     const payload = {
       user: stripeSub.metadata?.userId,
@@ -144,10 +142,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
-    console.log(
-      'onCustomerSubscriptionCreated: invoice payload -------> ',
-      invoicePayload,
-    );
+
     const invoiceResult = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
       invoicePayload,
@@ -168,7 +163,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
 const onInvoicePaid = async (event: Stripe.Event) => {
   try {
     const stripeInvoice = event.data.object as Stripe.Invoice;
-    const stripeInvoicePeriod = stripeInvoice.lines.data[0].period;
     let stripeSubscriptionId = (stripeInvoice as any).subscription as
       | string
       | null;
@@ -196,14 +190,17 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
     }
 
+    // stripe invoice period
+    const period = stripeInvoice.lines.data[0].period;
+
     // DB write: update subscription
     const subscription = await Subscription.findOneAndUpdate(
       { stripeSubscriptionId: stripeSubscriptionId },
       {
         paymentStatus: PaymentStatus.PAID,
         status: SubscriptionStatus.ACTIVE,
-        currentPeriodStart: new Date(stripeInvoicePeriod.start * 1000),
-        currentPeriodEnd: new Date(stripeInvoicePeriod.end * 1000),
+        currentPeriodStart: new Date(period.start * 1000),
+        currentPeriodEnd: new Date(period.end * 1000),
       },
       { new: true },
     );
@@ -215,8 +212,8 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       stripeSubscriptionId: stripeSubscriptionId,
       stripeInvoiceId: stripeInvoice.id,
       invoiceNumber: stripeInvoice.number!,
-      periodStart: new Date(stripeInvoicePeriod.start * 1000),
-      periodEnd: new Date(stripeInvoicePeriod.end * 1000),
+      periodStart: new Date(period.start * 1000),
+      periodEnd: new Date(period.end * 1000),
       amount: stripeInvoice.total / 100,
       currency: stripeInvoice.currency,
       status: InvoiceStatus.PAID,
@@ -224,8 +221,6 @@ const onInvoicePaid = async (event: Stripe.Event) => {
       invoicePdfUrl: stripeInvoice.invoice_pdf,
       hostedInvoiceUrl: stripeInvoice.hosted_invoice_url,
     };
-
-    console.log('onInvoicePaid: invoice payload ----->', invoicePayload);
 
     const result = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
@@ -249,7 +244,6 @@ const onInvoicePaid = async (event: Stripe.Event) => {
 const onInvoicePaymentFailed = async (event: Stripe.Event) => {
   try {
     const stripeInvoice = event.data.object as Stripe.Invoice;
-    const stripeInvoicePeriod = stripeInvoice.lines.data[0].period;
     const stripeSubscriptionId = (stripeInvoice as any).subscription as
       | string
       | null;
@@ -269,14 +263,17 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Subscription not found');
     }
 
+    // stripe invoice period
+    const period = stripeInvoice.lines.data[0].period;
+
     // DB write: update subscription
     const subscription = await Subscription.findOneAndUpdate(
       { stripeSubscriptionId: stripeSubscriptionId },
       {
         paymentStatus: PaymentStatus.UNPAID,
         status: SubscriptionStatus.PAST_DUE,
-        currentPeriodStart: new Date(stripeInvoice.period_start * 1000),
-        currentPeriodEnd: new Date(stripeInvoice.period_end * 1000),
+        currentPeriodStart: new Date(period.start * 1000),
+        currentPeriodEnd: new Date(period.end * 1000),
       },
       { new: true },
     ).populate('user package');
@@ -288,18 +285,13 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       stripeSubscriptionId: stripeSubscriptionId,
       stripeInvoiceId: stripeInvoice.id,
       invoiceNumber: stripeInvoice.number!,
-      periodStart: new Date(stripeInvoice.period_start * 1000),
-      periodEnd: new Date(stripeInvoice.period_end * 1000),
+      periodStart: new Date(period.start * 1000),
+      periodEnd: new Date(period.end * 1000),
       amount: stripeInvoice.total / 100,
       currency: stripeInvoice.currency,
       status: InvoiceStatus.RETRYING,
       paidAt: null,
     };
-
-    console.log(
-      'onInvoicePaymentFailed: invoice payload ----->',
-      invoicePayload,
-    );
 
     const result = await Invoice.findOneAndUpdate(
       { stripeInvoiceId: stripeInvoice.id },
