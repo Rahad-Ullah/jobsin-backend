@@ -78,7 +78,7 @@ const createTestNotification = async (userId: string, payload?: any) => {
     title: payload?.title || 'Test Notification',
     message: payload?.message || 'This is a test notification',
     receiver: user._id,
-    referenceId: userId,
+    referenceId: payload?.referenceId || user._id,
   });
 };
 
