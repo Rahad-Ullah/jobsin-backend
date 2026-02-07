@@ -5,7 +5,7 @@ import { RepeatType, SalaryType } from './jobSeeker.constants';
 // Notification Settings sub-schema
 const notificationSettingsSchema = new Schema(
   {
-    pushNotification: { type: Boolean, default: false },
+    pushNotification: { type: Boolean, default: true },
     emailNotification: { type: Boolean, default: false },
     repeat: {
       type: String,

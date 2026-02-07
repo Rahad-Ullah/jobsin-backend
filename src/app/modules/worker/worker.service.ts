@@ -10,7 +10,7 @@ const createWorkerToDB = async (
   // check if worker already exists
   const existingWorker = await Worker.exists({ email: payload.email });
   if (existingWorker) {
-    throw new ApiError(StatusCodes.CONFLICT, 'Worker already exists');
+    throw new ApiError(StatusCodes.CONFLICT, 'Email already exists');
   }
 
   const result = await Worker.create(payload);
