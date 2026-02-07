@@ -92,7 +92,7 @@ const sendHiringPostToAdmin = async (jobId: string) => {
     await generatePdfFromHtml(template.html, fileName);
 
     // Public URL (served via express static)
-    const pdfUrl = `${config.backend_url}/uploads/documents/${fileName}.pdf`;
+    const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;
 
     await emailHelper.sendEmail({
       to: platformEmail,
