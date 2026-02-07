@@ -192,7 +192,7 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
   }
 
   if (query.salaryAmount) {
-    filter.salaryAmount = { $lte: Number(query.salaryAmount) };
+    filter.salaryAmount = { $gte: Number(query.salaryAmount) };
   }
 
   const jobQuery = new QueryBuilder(Job.find(filter), query)
