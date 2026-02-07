@@ -85,29 +85,32 @@ const getShiftPlanByAuthorId = async (
 ) => {
   const filter: Record<string, any> = { author: authorId };
 
-  const start = new Date(query.startDate as string);
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(query.endDate as string);
-  end.setHours(23, 59, 59, 999);
+  const elemMatchConditions: Record<string, any> = {};
 
   if (query.startDate || query.endDate) {
-    filter.plans = {
-      $elemMatch: {
-        days: {
-          ...(query.startDate ? { $gte: start } : {}),
-          ...(query.endDate ? { $lte: end } : {}),
-        },
-      },
-    };
+    const dateQuery: Record<string, any> = {};
+    
+    if (query.startDate) {
+      const start = new Date(query.startDate as string);
+      start.setUTCHours(0, 0, 0, 0);
+      dateQuery.$gte = start;
+    }
+
+    if (query.endDate) {
+      const end = new Date(query.endDate as string);
+      end.setUTCHours(23, 59, 59, 999);
+      dateQuery.$lte = end;
+    }
+
+    elemMatchConditions.days = dateQuery;
   }
 
   if (query.shift) {
-    filter.plans = {
-      $elemMatch: {
-        shift: query.shift,
-      },
-    };
+    elemMatchConditions.shift = query.shift;
+  }
+
+  if (Object.keys(elemMatchConditions).length > 0) {
+    filter.plans = { $elemMatch: elemMatchConditions };
   }
 
   const planQuery = new QueryBuilder(
@@ -123,6 +126,7 @@ const getShiftPlanByAuthorId = async (
     planQuery.modelQuery.lean(),
     planQuery.getPaginationInfo(),
   ]);
+  
   return { data, pagination };
 };
 
