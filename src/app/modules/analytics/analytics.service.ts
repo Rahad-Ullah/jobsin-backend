@@ -6,8 +6,14 @@ import { User } from '../user/user.model';
 
 // -------------- get overview --------------
 const getOverview = async () => {
-  const jobSeekers = User.countDocuments({ role: USER_ROLES.JOB_SEEKER });
-  const employers = User.countDocuments({ role: USER_ROLES.EMPLOYER });
+  const jobSeekers = User.countDocuments({
+    role: USER_ROLES.JOB_SEEKER,
+    isDeleted: false,
+  });
+  const employers = User.countDocuments({
+    role: USER_ROLES.EMPLOYER,
+    isDeleted: false,
+  });
   const subscribers = User.countDocuments({
     role: USER_ROLES.EMPLOYER,
     subscription: { $ne: null },
