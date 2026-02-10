@@ -17,15 +17,15 @@ const createAccount = (values: ICreateAccount) => {
           style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
           <div
               style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
-              <h2 style="color: #277E16; font-size: 24px; margin-bottom: 20px;">
+              <img src="" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              <h2 style="color: #074E5E; font-size: 24px; margin-bottom: 20px;">
                 Hey! ${values.name}${values.name && ','} 
                 Your ${config.server_name} Account Credentials
               </h2>
               <div style="text-align: center;">
                   <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
                   <span
-                      style="background-color: #277E16; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
+                      style="background-color: #074E5E; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
                       ${values.otp}
                   </span>
                   <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
@@ -45,11 +45,11 @@ const resetPassword = (values: IResetPassword) => {
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
           <div
               style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              <img src="" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               <div style="text-align: center;">
                   <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
                   <span
-                      style="background-color: #277E16; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
+                      style="background-color: #074E5E; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
                       ${values.otp}
                   </span>
                   <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
@@ -71,10 +71,10 @@ const confirmAppointment = (values: IAppointment) => {
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              <img src="" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               
               <div style="text-align: center;">
-                  <h2 style="color: #277E16; margin-bottom: 10px;">New Appointment Available!</h2>
+                  <h2 style="color: #074E5E; margin-bottom: 10px;">New Appointment Available!</h2>
                   <p style="font-size: 16px; line-height: 1.5; margin-bottom: 25px;">An appointment is available for you. Kindly confirm it in your JobsinApp account and please come to our address at the scheduled time.</p>
                   
                   <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
@@ -108,17 +108,17 @@ const supportReply = (values: ISupport & { reply: string }) => {
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-              <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+              <img src="" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               
               <div style="">
-                  <h2 style="color: #277E16; margin-bottom: 10px; text-align: center;">Support Update</h2>
+                  <h2 style="color: #074E5E; margin-bottom: 10px; text-align: center;">Support Update</h2>
                   <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
                       Hi <strong>${values.name || 'there'}</strong>,<br><br>
                       Thank you for reaching out to the JobsinApp support team. We have reviewed your inquiry.
                   </p>
                   
                   <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
-                      <p style="margin: 5px 0; color: #277E16; font-weight: bold;">Our Response:</p>
+                      <p style="margin: 5px 0; color: #074E5E; font-weight: bold;">Our Response:</p>
                       <p style="margin: 10px 0; line-height: 1.5;">
                           ${values.reply}
                       </p>
@@ -147,7 +147,7 @@ const paymentFailed = (values: any) => {
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
         <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-            <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
+            <img src="" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
             
             <div>
                 <h2 style="color: #D93025; margin-bottom: 10px; text-align: center;">Payment Failed</h2>
@@ -161,7 +161,7 @@ const paymentFailed = (values: any) => {
                     <p style="margin: 10px 0; line-height: 1.5; font-size: 15px;">
                         Our last attempt on <strong>${new Date().toLocaleDateString()}</strong> failed. To maintain your access to premium features, please update your billing information.
                     </p>
-                    <a href="${values.billingUrl || '#'}" style="display: inline-block; padding: 12px 25px; background-color: #277E16; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Update Payment Method</a>
+                    <a href="${values.billingUrl || '#'}" style="display: inline-block; padding: 12px 25px; background-color: #074E5E; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Update Payment Method</a>
                 </div>
 
                 <p style="font-size: 15px; line-height: 1.5; margin-bottom: 25px;">
@@ -201,7 +201,7 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                         JobsinApp<br>
                     </p>
                 </div>
-                <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="Logo" style="width: 120px;" />
+                <img src="" alt="Logo" style="width: 120px;" />
             </div>
 
             <div style="margin-bottom: 20px;">
@@ -302,7 +302,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
             <div style="display: flex; align-items: center;">
                <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Shift Plan View</h1>
             </div>
-            <img src="https://i.postimg.cc/kMKg91ps/Screenshot-2025-11-03-170353.png" alt="JobsinApp Logo" style="width: 80px;" />
+            <img src="" alt="JobsinApp Logo" style="width: 80px;" />
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 15px;">
@@ -342,7 +342,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
                       <td style="padding: 12px 0;">${d.toLocaleDateString('en-US', { weekday: 'long' })}</td>
                       <td style="padding: 12px 0; text-align: center;">
                         <span style="display: inline-block;">${new Date(plan.startTime).toLocaleTimeString()}</span>
-                        <span style="display: inline-block; width: 40px; height: 1px; background-color: #277E16; margin: 0 10px; vertical-align: middle;"></span>
+                        <span style="display: inline-block; width: 40px; height: 1px; background-color: #074E5E; margin: 0 10px; vertical-align: middle;"></span>
                         <span style="display: inline-block;">${new Date(plan.endTime).toLocaleTimeString()}</span>
                       </td>
                       <td style="padding: 12px 0; text-align: right;">${plan.shift}</td>
