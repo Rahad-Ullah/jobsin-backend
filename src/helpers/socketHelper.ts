@@ -36,8 +36,8 @@ const socket = (io: Server) => {
     });
 
     // leave chat
-    socket.on('leaveChat', (chatId: string) => {
-      if (!chatId || !chatId.match(/^[0-9a-fA-F]{24}$/)) {
+    socket.on('leaveChat', (chatId: string = '') => {
+      if (!chatId || !chatId?.match(/^[0-9a-fA-F]{24}$/)) {
         return socket.emit('error', 'Invalid chatId');
       }
       socket.leave(`chat:${chatId}`);
