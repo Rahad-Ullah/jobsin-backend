@@ -17,7 +17,7 @@ const socket = (io: Server) => {
     socket.join(`user:${userId}`);
 
     // join chat room
-    socket.on('joinChat', async (chatId: string) => {
+    socket.on('joinChat', async (chatId: string = '') => {
       if (!chatId || !chatId?.match(/^[0-9a-fA-F]{24}$/)) {
         return socket.emit('error', 'Invalid chatId');
       }
