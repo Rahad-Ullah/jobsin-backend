@@ -18,29 +18,44 @@ const socket = (io: Server) => {
 
     // join chat room
     socket.on('joinChat', async (chatId: string = '') => {
-      if (!chatId || !chatId?.match(/^[0-9a-fA-F]{24}$/)) {
-        return socket.emit('error', 'Invalid chatId');
-      }
-      const chat = await Chat.findOne({
-        _id: chatId,
-        isDeleted: false,
-        participants: { $in: [userId] },
-      });
+      try {
+        if (!chatId || !chatId.match(/^[0-9a-fA-F]{24}$/)) {
+          return socket.emit('error', 'Invalid chatId');
+        }
 
-      if (!chat) {
-        return socket.emit('error', 'Chat not found');
-      }
+        const chat = await Chat.findOne({
+          _id: chatId,
+          isDeleted: false,
+          participants: { $in: [userId] },
+        });
 
-      socket.join(`chat:${chatId}`);
-      logger.info(colors.blue(`User:${userId} joined chat:${chatId}`));
+        if (!chat) {
+          return socket.emit('error', 'Chat not found');
+        }
+
+        socket.join(`chat:${chatId}`);
+        logger.info(colors.blue(`User:${userId} joined chat:${chatId}`));
+      } catch (err) {
+        logger.error(colors.red(`~ error on joinChat for user:${userId}`), err);
+        socket.emit('error', 'Something went wrong while joining the chat');
+      }
     });
 
     // leave chat
     socket.on('leaveChat', (chatId: string = '') => {
-      if (!chatId || !chatId?.match(/^[0-9a-fA-F]{24}$/)) {
-        return socket.emit('error', 'Invalid chatId');
+      try {
+        if (!chatId || !chatId.match(/^[0-9a-fA-F]{24}$/)) {
+          return socket.emit('error', 'Invalid chatId');
+        }
+
+        socket.leave(`chat:${chatId}`);
+        logger.info(colors.yellow(`User:${userId} left chat:${chatId}`));
+      } catch (err) {
+        logger.error(
+          colors.red(`~ error on leaveChat for user:${userId}`),
+          err,
+        );
       }
-      socket.leave(`chat:${chatId}`);
     });
 
     socket.on('disconnect', () => {
@@ -48,5 +63,6 @@ const socket = (io: Server) => {
     });
   });
 };
+
 
 export const socketHelper = { socket };
