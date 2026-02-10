@@ -210,24 +210,36 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
             </div>
 
             <div style="font-size: 13px; line-height: 1.5;">
-                <h4 style="margin: 15px 0 5px 0;">1 Subject Of The Agreement</h4>
-                <p style="margin: 0;">The Recruiter Undertakes To Search For And Present Suitable Candidates To The Client For A Position Advertised By The Client.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 1 Subject of the Agreement</h4>
+                <p style="margin: 0;">The Recruiter undertakes to search for and present suitable candidates to the Employer for a position advertised by the Employer. The Client undertakes to provide the Recruiter with all relevant information necessary for the search, such as candidate requirements and a detailed job description.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">2 Recruiter's Services</h4>
-                <p style="margin: 0;">1. The Recruiter Will Identify Suitable Candidates... 2. Conduct Preliminary Selection... 3. Provide List of Candidates.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 2 Services of the Recruiter</h4>
+                <p style="margin: 0;">1. Identify suitable candidates and propose them to the Employer. 2. Conduct preliminary selection, verify qualifications, and conduct interviews if applicable. 3. Provide a list of suitable candidates. 4. Advise the Client during selection and assist in organizing interviews.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">3 Client's Obligations</h4>
-                <p style="margin: 0;">The Client Shall Provide All Necessary Information... Review Candidates... Conduct Interviews and Inform the Recruiter of Any Hiring Decision.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 3 Obligations of the Client</h4>
+                <p style="margin: 0;">The Employer shall provide timely info on position requirements and contact data. The Client undertakes to review candidates, maintain communication, conduct interviews, and make the final hiring decision. The Client must immediately inform the Recruiter in writing once a candidate is hired.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">4 Fees And Payment Terms</h4>
-                <p style="margin: 0;"><strong>Placement Fee:</strong> The Client Agrees To Pay A Placement Fee Of 25% Of The Agreed Gross Annual Salary Of The Candidate. <br>
-                <strong>Payment Deadline:</strong> No Later Than 14 Days After The Start Of Employment.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 4 Compensation and Payment Terms</h4>
+                <p style="margin: 0;"><strong>Placement Fee:</strong> 25% (excluding VAT) of the agreed gross annual salary. <br>
+                <strong>Payment Term:</strong> Due no later than 14 days after the start of employment. <br>
+                <strong>Additional Costs:</strong> Only borne by Client if expressly agreed upon in advance.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">5 Guarantees And Refunds</h4>
-                <p style="margin: 0;">Replacement Provided Free Of Charge Within 3 Months. 50% Refund Between 3 To 6 Months.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 5 Guarantees and Refunds</h4>
+                <p style="margin: 0;"><strong>50% Refund:</strong> If candidate resigns within 3 months. <br>
+                <strong>30% Refund:</strong> If candidate resigns between 3 and 6 months. <br>
+                Refund rights lapse if candidate is re-employed by the Client or an affiliated/partner company (pursuant to §§ 15 et seq. AktG) within the scope of this agreement.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">6 Confidentiality And Data Protection</h4>
-                <p style="margin: 0;">Both Parties Agree To Treat All Personal Data In Accordance With BDSG and GDPR.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 6 Confidentiality and Data Protection</h4>
+                <p style="margin: 0;">Both parties agree to treat personal data of candidates in accordance with BDSG and GDPR. This obligation remains in effect even after contract termination.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">§ 7 Liability</h4>
+                <p style="margin: 0;">Recruiter is not liable for accuracy of candidate info. Client assumes full responsibility for final hiring decisions. Recruiter is not liable for damages from incorrect info provided by the Client.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">§ 8 Duration and Termination</h4>
+                <p style="margin: 0;">Effective upon confirmation (checkmark) on the JobsinApp platform. May be terminated by either party with 14 days’ written notice.</p>
+
+                <h4 style="margin: 15px 0 5px 0;">§ 9 Final Provisions</h4>
+                <p style="margin: 0;">Amendments must be in writing. If any provision is invalid, the remainder remains in effect, replaced by terms reflecting the original economic intent.</p>
             </div>
 
             <div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
