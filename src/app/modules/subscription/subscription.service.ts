@@ -193,13 +193,6 @@ const cancelSubscription = async (subscriptionId: string) => {
       { session },
     );
 
-    // 4. DB Write: Remove subscription link from user
-    await User.findByIdAndUpdate(
-      subscription.user,
-      { subscription: null },
-      { session },
-    );
-
     // 5. Commit the changes
     await session.commitTransaction();
     return subscription;
