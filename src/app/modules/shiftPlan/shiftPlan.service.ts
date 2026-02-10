@@ -82,7 +82,7 @@ const sendShiftPlanToWorker = async (shiftPlanId: string) => {
       to: worker.email,
       subject: template.subject,
       html: `
-              <p>Your hiring request contract is ready.</p>
+              <p>You have a new shift plan.</p>
               <a href="${pdfUrl}" target="_blank">Download PDF</a>
             `,
     });
