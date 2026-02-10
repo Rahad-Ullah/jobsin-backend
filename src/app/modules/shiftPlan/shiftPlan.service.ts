@@ -7,6 +7,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { IWorker } from '../worker/worker.interface';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
+import { generatePdfFromHtml } from '../../../util/htmlToPdf';
+import config from '../../../config';
 
 // ------------ create shift plan --------------
 const createShiftPlanToDB = async (
@@ -70,10 +72,19 @@ const sendShiftPlanToWorker = async (shiftPlanId: string) => {
   // send mail
   if (worker.email) {
     const template = emailTemplate.shiftPlanToWorker(worker, existingPlan);
+    const fileName = `shift-plan-${existingPlan._id}-${Date.now()}`;
+    await generatePdfFromHtml(template.html, fileName);
+
+    // Public URL (served via express static)
+    const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;
+
     await emailHelper.sendEmail({
       to: worker.email,
       subject: template.subject,
-      html: template.html,
+      html: `
+              <p>Your hiring request contract is ready.</p>
+              <a href="${pdfUrl}" target="_blank">Download PDF</a>
+            `,
     });
   }
 };
