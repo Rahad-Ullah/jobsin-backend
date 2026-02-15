@@ -194,11 +194,13 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                     <p style="margin: 10px 0 0 0;">
                         <strong>Client</strong><br>
                         ${employer.name}<br>
+                        ${employer.email}<br>
                         ${employer.address}
                     </p>
                     <p style="margin: 10px 0 0 0;">
                         <strong>Recruiter</strong><br>
                         JobsinApp<br>
+                        ${email}<br>
                     </p>
                 </div>
                 <img src="https://jobsinapp.de/logo.png" alt="Logo" style="width: 120px;" />
@@ -239,7 +241,8 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                 <p style="margin: 0;">Effective upon confirmation (checkmark) on the JobsinApp platform. May be terminated by either party with 14 days’ written notice.</p>
 
                 <h4 style="margin: 15px 0 5px 0;">§ 9 Final Provisions</h4>
-                <p style="margin: 0;">Amendments must be in writing. If any provision is invalid, the remainder remains in effect, replaced by terms reflecting the original economic intent.</p>
+                <p style="margin: 0;">Any amendments or supplements to this agreement must be made in writing. Oral agreements are only valid if confirmed in writing.
+                Should individual provisions of this agreement be invalid or unenforceable, the remainder of the agreement shall remain in effect. The invalid provision shall be replaced by a valid one that most closely reflects the economic intent of the invalid provision.</p>
             </div>
 
             <div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
@@ -247,7 +250,7 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                 <p style="margin: 0; color: #666;">${employer.address}</p>
                 <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${job.subCategory}</h3>
                 <p style="margin: 0; font-size: 14px;"><strong>${job.jobType}</strong></p>
-                <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">$${job.salaryAmount}/${job.salaryType}</p>
+                <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">€${job.salaryAmount}/${job.salaryType}</p>
                 <p style="margin: 0; color: #888; font-size: 12px;">📅 ${new Date(job.deadline).toLocaleDateString()}</p>
 
                 <h4 style="margin: 20px 0 5px 0;">Job Description</h4>
@@ -274,7 +277,7 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                     <p style="margin: 0; font-size: 14px;"><strong>${new Date().toLocaleDateString()}</strong></p>
                 </div>
             </div>
-            <p style="font-size: 11px; font-style: italic; margin-top: 5px;">The Contract Was Confirmed By the Client And Has Thus Come Into Effect.</p>
+            <p style="font-size: 11px; font-style: italic; margin-top: 5px;">The client confirmed the contract by selecting the checkbox, so no signature was required, and the agreement is now in effect.</p>
 
         </div>
       </body>
