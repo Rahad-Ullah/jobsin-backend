@@ -205,7 +205,6 @@ const hiringRequestToAdmin = (
                     <p style="margin: 10px 0 0 0;">
                         <strong>Recruiter</strong><br>
                         JobsinApp<br>
-                        ${email}<br>
                         ${address}
                     </p>
                 </div>
