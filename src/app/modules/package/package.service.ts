@@ -221,8 +221,6 @@ export const deletePackageFromDB = async (
         });
       }
     } catch (stripeErr: any) {
-      await session.abortTransaction();
-      session.endSession();
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         `Stripe cleanup failed: ${stripeErr.message}`,
