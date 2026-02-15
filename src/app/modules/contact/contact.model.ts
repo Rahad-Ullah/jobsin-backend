@@ -6,8 +6,9 @@ const contactSchema = new Schema<IContact, ContactModel>(
     email: { type: String, default: '' },
     phone: { type: String, default: '' },
     whatsApp: { type: String, default: '' },
+    address: { type: String, default: '' },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Contact = model<IContact, ContactModel>('Contact', contactSchema);

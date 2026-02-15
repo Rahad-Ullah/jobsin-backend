@@ -5,6 +5,7 @@ export interface IContact {
   email: string;
   phone: string;
   whatsApp: string;
+  address: string;
 }
 
 export type ContactModel = Model<IContact>;

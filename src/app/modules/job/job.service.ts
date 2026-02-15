@@ -77,7 +77,7 @@ const sendHiringPostToAdmin = async (jobId: string) => {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Job not found');
   }
   // get platform contact email. If not found, use default reply email
-  const contactInfo = await Contact.findOne({}).select('email');
+  const contactInfo = await Contact.findOne({}).select('email address');
   let platformEmail = contactInfo?.email;
   if (!platformEmail) platformEmail = config.email.reply_to;
 
@@ -87,6 +87,7 @@ const sendHiringPostToAdmin = async (jobId: string) => {
       existingJob,
       existingJob.author as any,
       platformEmail,
+      contactInfo?.address as string,
     );
 
     const fileName = `hiring-request-${existingJob._id}-${Date.now()}`;

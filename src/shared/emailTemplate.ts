@@ -180,7 +180,12 @@ const paymentFailed = (values: any) => {
   return data;
 };
 
-const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
+const hiringRequestToAdmin = (
+  job: IJob,
+  employer: IUser,
+  email: string,
+  address: string,
+) => {
   const data = {
     to: email,
     subject: `Hiring Request: ${employer.name} - ${job.category}`,
@@ -201,6 +206,7 @@ const hiringRequestToAdmin = (job: IJob, employer: IUser, email: string) => {
                         <strong>Recruiter</strong><br>
                         JobsinApp<br>
                         ${email}<br>
+                        ${address}
                     </p>
                 </div>
                 <img src="https://jobsinapp.de/logo.png" alt="Logo" style="width: 120px;" />

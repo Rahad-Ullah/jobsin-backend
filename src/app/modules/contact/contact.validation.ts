@@ -15,6 +15,7 @@ export const contactValidation = z.object({
         .min(10, 'WhatsApp must be at least 10 characters')
         .max(15, 'WhatsApp must be at most 15 characters')
         .optional(),
+      address: z.string().optional(),
     })
     .strict(),
 });
