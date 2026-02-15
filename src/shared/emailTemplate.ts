@@ -326,7 +326,6 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
 
           <div style="margin-bottom: 25px;">
             <h2 style="font-size: 18px; margin: 0;">Plan For ${planMonthYear}</h2>
-            <p style="color: #666; margin: 5px 0;">Holiday Weekend</p>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
