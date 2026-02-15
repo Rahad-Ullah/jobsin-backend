@@ -65,7 +65,7 @@ const sendHiringPostToAdmin = catchAsync(
 
 // get single job by id
 const getSingleJobById = catchAsync(async (req: Request, res: Response) => {
-  const result = await JobServices.getSingleJobById(req.params.id);
+  const result = await JobServices.getSingleJobById(req.params.id, req.query);
 
   sendResponse(res, {
     success: true,

@@ -107,7 +107,7 @@ const sendHiringPostToAdmin = async (jobId: string) => {
 };
 
 // --------------- get single job by id --------------
-const getSingleJobById = async (id: string) => {
+const getSingleJobById = async (id: string, query: Record<string, unknown>) => {
   const [job, applicationCount] = await Promise.all([
     Job.findById(id)
       .populate({
@@ -123,6 +123,19 @@ const getSingleJobById = async (id: string) => {
   ]);
 
   if (!job) return null;
+
+  // get distance between user and job location
+  if (query.lat && query.lng) {
+    const lat = parseFloat(query.lat as string);
+    const long = parseFloat(query.lng as string);
+    const distance = getDistance(
+      lat,
+      long,
+      job.location.coordinates[1],
+      job.location.coordinates[0],
+    );
+    return { ...job, distance, totalApplications: applicationCount };
+  }
 
   return {
     ...job,
