@@ -17,13 +17,14 @@ const experienceSchema = new Schema(
   {
     designation: { type: String, required: true },
     company: { type: String, required: true },
+    address: { type: String, required: true },
     isCurrentlyWorking: { type: Boolean, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, default: null },
     workDetails: { type: String, required: true },
     portfolioUrls: [{ type: String }, { default: [] }],
   },
-  { _id: false }
+  { _id: false },
 );
 
 // License sub-schema

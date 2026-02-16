@@ -24,6 +24,7 @@ const experienceSchema = z
   .object({
     designation: z.string().nonempty('Designation cannot be empty'),
     company: z.string().nonempty('Company cannot be empty'),
+    address: z.string().nonempty('Address cannot be empty'),
     isCurrentlyWorking: z.boolean({
       required_error: 'Is currently working is required',
     }),

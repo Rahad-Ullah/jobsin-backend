@@ -21,6 +21,7 @@ export interface IEducation {
 export interface IExperience {
   designation: string;
   company: string;
+  address: string;
   isCurrentlyWorking: boolean;
   startDate: Date;
   endDate?: Date;
