@@ -36,7 +36,7 @@ const createPackageToDB = async (
         unit_amount: Math.round(
           (payload.intervalPrice ?? 0) * (payload.intervalCount ?? 1) * 100,
         ),
-        currency: 'usd',
+        currency: 'eur',
         recurring: {
           interval: payload.interval!,
           interval_count: payload.intervalCount ?? 1,
@@ -130,7 +130,7 @@ const updatePackageInDB = async (
         unit_amount: Math.round(
           (payload.intervalPrice ?? existingPackage.intervalPrice) * 100,
         ),
-        currency: 'usd',
+        currency: 'eur',
         recurring: {
           interval: payload.interval ?? existingPackage.interval,
           interval_count:

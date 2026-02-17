@@ -40,7 +40,7 @@ export const salaryComparisonByAI = async (
           - Estimate salaries based on role, category, and location.
           - Respond ONLY in JSON.
           - All values must be numbers.
-          - Salaries must be monthly gross amounts in USD currency.
+          - Salaries must be monthly gross amounts in EUR currency.
           - minSalary <= averageSalary <= maxSalary.
           - Do NOT include explanations or text.
           `,
