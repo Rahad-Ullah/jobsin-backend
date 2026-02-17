@@ -149,6 +149,10 @@ const getSingleApplicationById = async (id: string) => {
     {
       path: 'user',
       select: 'name email phone address image jobSeeker',
+      populate: {
+        path: 'jobSeeker',
+        select: 'overview about experiences attachments',
+      },
     },
     {
       path: 'resume',
