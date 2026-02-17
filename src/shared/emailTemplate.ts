@@ -402,7 +402,7 @@ const jobSeekerAlert = (
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h1 style="margin: 0; color: #1a73e8; font-size: 22px;">New Talent Matches</h1>
+            <h1 style="margin: 0; color: #074E5E; font-size: 22px;">New Talent Matches</h1>
             <p style="margin: 5px 0 0 0; color: #666;">Hi ${employerUser.name || 'there'}, we found candidates matching your requirements.</p>
           </div>
 
@@ -418,12 +418,12 @@ const jobSeekerAlert = (
                 return `
                 <div style="padding: 20px 0; border-bottom: ${index === jobSeekerUsers.length - 1 ? 'none' : '1px solid #eee'};">
                   <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <div style="height: 40px; width: 40px; background: #e8f0fe; color: #1a73e8; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 12px;">
+                    <div style="height: 40px; width: 40px; background: #e8f0fe; color: #074E5E; border-radius: 50%; text-align: center; line-height: 40px; font-weight: bold; margin-right: 12px;">
                       ${candidate.name?.charAt(0) || 'JS'}
                     </div>
                     <div>
-                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name || 'Unknown Name'}</h3>
-                      <p style="margin: 0; font-size: 13px; color: #1a73e8; font-weight: bold;">${mainCategories}</p>
+                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name.trim() || 'Unknown Name'}</h3>
+                      <p style="margin: 0; font-size: 13px; color: #074E5E; font-weight: bold;">${mainCategories}</p>
                     </div>
                   </div>
 
@@ -436,7 +436,7 @@ const jobSeekerAlert = (
                         exp => `
                       <div style="font-size: 13px; color: #555; margin-bottom: 4px;">
                         • ${exp.subCategory} (${exp.experience} Years) 
-                        <span style="color: #2e7d32; font-weight: 500;"> - Expected: $${exp.salaryAmount.toLocaleString()} / ${exp.salaryType}</span>
+                        <span style="color: #074E5E; font-weight: 500;"> - Expected: €${exp.salaryAmount.toLocaleString()} / ${exp.salaryType}</span>
                       </div>
                     `,
                       )
@@ -481,7 +481,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h1 style="margin: 0; color: #2e7d32; font-size: 24px;">New Job Alerts</h1>
+            <h1 style="margin: 0; color: #074E5E; font-size: 24px;">New Job Alerts</h1>
             <p style="margin: 5px 0 0 0; color: #666;">Hi ${user.name || 'there'}, we found matches for your profile.</p>
           </div>
 
@@ -490,7 +490,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .map(
                 (job, index) => `
               <div style="padding: 20px 0; border-bottom: ${index === jobs.length - 1 ? 'none' : '1px solid #eee'};">
-                <h3 style="color: #2e7d32; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
+                <h3 style="color: #074E5E; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
                 
                 <p style="margin: 0; font-size: 14px; color: #444;">
                   <strong style="color: #202124;">Type:</strong> ${job.jobType} • 
@@ -500,14 +500,14 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
                 ${
                   job.salaryAmount
                     ? `
-                  <p style="margin: 5px 0 0 0; color: #2e7d32; font-size: 14px; font-weight: bold;">
-                    Salary: ${job.salaryAmount.toLocaleString()} (${job.salaryType})
+                  <p style="margin: 5px 0 0 0; color: #074E5E; font-size: 14px; font-weight: bold;">
+                    Salary: €${job.salaryAmount.toLocaleString()} (${job.salaryType})
                   </p>`
                     : ''
                 }
 
                 <p style="margin: 8px 0 0 0; font-size: 13px; color: #777; font-style: italic;">
-                  Deadline: ${new Date(job.deadline).toLocaleDateString()}
+                  Deadline: ${new Date(job.deadline).toLocaleDateString()} UTC
                 </p>
               </div>
             `,
@@ -515,7 +515,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .join('')}
           </div>
 
-          <div style="background: #2e7d32; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+          <div style="background: #074E5E; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
             <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
             <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
               These jobs are waiting for you! Open the <strong>Jobsin App</strong> to view responsibilities and apply instantly.
