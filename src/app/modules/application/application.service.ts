@@ -152,7 +152,7 @@ const getSingleApplicationById = async (id: string) => {
     },
     {
       path: 'resume',
-      select: 'educations',
+      select: 'personalInfo educations experiences',
     },
   ]);
   return result;
