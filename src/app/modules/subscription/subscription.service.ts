@@ -57,6 +57,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     line_items: [{ price: pkg.stripePriceId, quantity: 1 }],
     success_url: `${config.frontend_url}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.frontend_url}/payment/cancel`,
+    payment_method_collection: 'always', // Ensures Stripe collects the necessary info for PayPal/Klarna mandates
     client_reference_id: existingUser._id.toString(),
     metadata: {
       userId: existingUser._id.toString(),
