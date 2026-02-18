@@ -227,18 +227,19 @@ const getSubscriptionByUserId = async (userId: string) => {
 
 // get subscribers
 const getAllSubscribers = async (query: Record<string, unknown>) => {
+  const filter = { role: USER_ROLES.EMPLOYER } as Record<string, unknown>;
   const status = typeof query.status === 'string' ? query.status : undefined;
-
   // Pre-filter subscriptions
-  const subscriptionIds = await Subscription.find(
-    status ? { status } : {},
-  ).select('_id');
+  if (status) {
+    const subscriptionIds = await Subscription.find({ status }).select('_id');
+
+    if (subscriptionIds.length) {
+      filter.subscription = { $in: subscriptionIds.map(s => s._id) };
+    }
+  }
 
   const subscribersQuery = new QueryBuilder(
-    User.find({
-      role: USER_ROLES.EMPLOYER,
-      subscription: { $in: subscriptionIds.map(s => s._id) },
-    }).populate({
+    User.find(filter).populate({
       path: 'subscription',
       select:
         'package price status paymentStatus currentPeriodStart currentPeriodEnd',
