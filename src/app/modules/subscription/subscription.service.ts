@@ -11,6 +11,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { USER_ROLES } from '../user/user.constant';
 import { calculateExpireDate } from '../../../util/calculateExpireDate';
 import mongoose from 'mongoose';
+import { logger } from '../../../shared/logger';
 
 // create subscription
 const createSubscription = async (payload: Partial<ISubscription>) => {
@@ -207,6 +208,39 @@ const cancelSubscription = async (subscriptionId: string) => {
   }
 };
 
+// cleanup old subscriptions
+const cleanupOldSubscriptions = async (
+  stripeCustomerId: string,
+  userId: string,
+  currentStripeSubId: string,
+) => {
+  const allStripeSubs = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+    status: 'active',
+  });
+
+  // 1. Stripe cancellations by all promises
+  const stripePromises = allStripeSubs.data
+    .filter(sub => sub.id !== currentStripeSubId)
+    .map(sub => stripe.subscriptions.cancel(sub.id, { prorate: true })); // prorate the remaining period
+
+  await Promise.all([...stripePromises]);
+
+  // 2. DB cancellations
+  await Subscription.updateMany(
+    {
+      user: userId,
+      stripeSubscriptionId: { $ne: currentStripeSubId },
+      status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+    },
+    { $set: { status: SubscriptionStatus.CANCELED, cancelAtPeriodEnd: true } },
+  );
+
+  logger.info(
+    `[Subscription] Cleaned up ${stripePromises.length} old subscriptions.`,
+  );
+};
+
 // get subscription by user id
 const getSubscriptionByUserId = async (userId: string) => {
   // check if the user exists
@@ -269,6 +303,7 @@ export const SubscriptionServices = {
   createSubscription,
   giftSubscription,
   cancelSubscription,
+  cleanupOldSubscriptions,
   getSubscriptionByUserId,
   getAllSubscribers,
 };

@@ -14,6 +14,7 @@ import { InvoiceStatus } from '../../modules/invoice/invoice.constants';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import { logger } from '../../../shared/logger';
+import { SubscriptionServices } from '../../modules/subscription/subscription.service';
 
 // on payment intent succeeded
 const onPaymentIntentSucceeded = async (event: Stripe.Event) => {
@@ -74,6 +75,13 @@ const onPaymentIntentSucceeded = async (event: Stripe.Event) => {
 const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
   try {
     const stripeSubscription = event.data.object as Stripe.Subscription;
+
+    // 1. CLEANUP: Cancel other active subscriptions in Stripe & DB
+    await SubscriptionServices.cleanupOldSubscriptions(
+      stripeSubscription.customer as string,
+      stripeSubscription.metadata?.userId as string,
+      stripeSubscription.id,
+    );
 
     const stripeSub: Stripe.Subscription = await stripe.subscriptions.retrieve(
       stripeSubscription.id as string,
