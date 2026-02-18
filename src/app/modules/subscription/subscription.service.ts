@@ -262,7 +262,11 @@ const getSubscriptionByUserId = async (userId: string) => {
 
 // get subscribers
 const getAllSubscribers = async (query: Record<string, unknown>) => {
-  const filter = { role: USER_ROLES.EMPLOYER } as Record<string, unknown>;
+  const filter = {
+    isDeleted: false,
+    role: USER_ROLES.EMPLOYER,
+    subscription: { $ne: null },
+  } as Record<string, unknown>;
   const status = typeof query.status === 'string' ? query.status : undefined;
   // Pre-filter subscriptions
   if (status) {

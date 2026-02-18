@@ -15,6 +15,7 @@ const getOverview = async () => {
     isDeleted: false,
   });
   const subscribers = User.countDocuments({
+    isDeleted: false,
     role: USER_ROLES.EMPLOYER,
     subscription: { $ne: null },
   });
