@@ -76,13 +76,6 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
   try {
     const stripeSubscription = event.data.object as Stripe.Subscription;
 
-    // 1. CLEANUP: Cancel other active subscriptions in Stripe & DB
-    await SubscriptionServices.cleanupOldSubscriptions(
-      stripeSubscription.customer as string,
-      stripeSubscription.metadata?.userId as string,
-      stripeSubscription.id,
-    );
-
     const stripeSub: Stripe.Subscription = await stripe.subscriptions.retrieve(
       stripeSubscription.id as string,
       {
@@ -126,6 +119,14 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     logger.info(
       `[Stripe Webhook] Subscription created successfully: ${result._id}`,
+    );
+
+    // CLEANUP: Cancel other active subscriptions in Stripe & DB
+    await SubscriptionServices.cleanupOldSubscriptions(
+      stripeSubscription.customer as string,
+      stripeSubscription.metadata?.userId as string,
+      stripeSubscription.id,
+      result._id.toString(),
     );
 
     // DB write: update user subscription

@@ -123,18 +123,28 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
     if (hasActiveSubscription) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'User already has an active subscription',
+        'User already has an active subscription for this plan',
       );
     }
 
     const expiryDate = calculateExpireDate(pkg.interval, pkg.intervalCount);
+
+    const hasUsedThePlanBefore = await Subscription.exists({
+      user: payload.user,
+      package: payload.package,
+    }).session(session);
+    // add 15 days trial period for the first time
+    if (!hasUsedThePlanBefore) {
+      expiryDate.setUTCDate(expiryDate.getUTCDate() + 15);
+    }
+
     const subscriptionData = {
       ...payload,
       price: 0,
       currentPeriodStart: new Date(),
       currentPeriodEnd: expiryDate,
       cancelAtPeriodEnd: true,
-      status: SubscriptionStatus.TRIALING,
+      status: SubscriptionStatus.ACTIVE,
       paymentStatus: PaymentStatus.UNPAID,
     };
 
@@ -148,7 +158,14 @@ const giftSubscription = async (payload: Partial<ISubscription>) => {
       { session },
     );
 
-    // 4. Commit changes
+    // 4. Cleanup old subscriptions
+    await SubscriptionServices.cleanupOldSubscriptions(
+      existingUser.stripeCustomerId,
+      existingUser._id.toString(),
+      result.stripeSubscriptionId,
+      result._id.toString(),
+    );
+
     await session.commitTransaction();
     return result;
   } catch (error) {
@@ -213,6 +230,7 @@ const cleanupOldSubscriptions = async (
   stripeCustomerId: string,
   userId: string,
   currentStripeSubId: string,
+  currentSubId: string,
 ) => {
   const allStripeSubs = await stripe.subscriptions.list({
     customer: stripeCustomerId,
@@ -227,17 +245,20 @@ const cleanupOldSubscriptions = async (
   await Promise.all([...stripePromises]);
 
   // 2. DB cancellations
-  await Subscription.updateMany(
+  const result = await Subscription.updateMany(
     {
       user: userId,
-      stripeSubscriptionId: { $ne: currentStripeSubId },
+      _id: { $ne: currentSubId },
       status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
     },
     { $set: { status: SubscriptionStatus.CANCELED, cancelAtPeriodEnd: true } },
   );
 
   logger.info(
-    `[Subscription] Cleaned up ${stripePromises.length} old subscriptions.`,
+    `[Stripe] Cleaned up ${stripePromises.length} old subscriptions.`,
+  );
+  logger.info(
+    `[Subscription] Cleaned up ${result.modifiedCount} old subscriptions.`,
   );
 };
 

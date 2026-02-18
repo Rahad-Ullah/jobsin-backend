@@ -13,15 +13,15 @@ export const calculateExpireDate = (
 
   switch (interval) {
     case PackageInterval.DAY:
-      result.setDate(result.getDate() + intervalCount);
+      result.setUTCDate(result.getUTCDate() + intervalCount);
       return result;
 
     case PackageInterval.WEEK:
-      result.setDate(result.getDate() + intervalCount * 7);
+      result.setUTCDate(result.getUTCDate() + intervalCount * 7);
       return result;
 
     case PackageInterval.MONTH:
-      result.setMonth(result.getMonth() + intervalCount);
+      result.setUTCMonth(result.getUTCMonth() + intervalCount);
       return result;
 
     default:
