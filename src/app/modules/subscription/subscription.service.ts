@@ -51,6 +51,12 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
   }
 
+  // create basic plan for free
+  if (pkg.price === 0) {
+    const subscription = await SubscriptionServices.giftSubscription(payload);
+    return subscription;
+  }
+
   // Create Checkout Session
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: existingUser.stripeCustomerId,
@@ -75,7 +81,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   });
 
   return checkoutSession.url;
-};
+};;
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
