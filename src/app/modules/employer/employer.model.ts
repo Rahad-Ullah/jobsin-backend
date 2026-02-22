@@ -5,7 +5,7 @@ import { RepeatType } from './employer.constant';
 // Notification Settings sub-schema
 const notificationSettingsSchema = new Schema(
   {
-    pushNotification: { type: Boolean, default: false },
+    pushNotification: { type: Boolean, default: true },
     emailNotification: { type: Boolean, default: false },
     repeat: {
       type: String,
