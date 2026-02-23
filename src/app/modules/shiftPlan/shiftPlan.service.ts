@@ -9,6 +9,7 @@ import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import { generatePdfFromHtml } from '../../../util/htmlToPdf';
 import config from '../../../config';
+import { translateHelper } from '../../../helpers/translateHelper';
 
 // ------------ create shift plan --------------
 const createShiftPlanToDB = async (
@@ -59,7 +60,10 @@ const deleteShiftPlan = async (id: string): Promise<IShiftPlan | null> => {
 };
 
 // ------------- send shift plan to worker --------------
-const sendShiftPlanToWorker = async (shiftPlanId: string) => {
+const sendShiftPlanToWorker = async (
+  shiftPlanId: string,
+  language?: string,
+) => {
   // check if plan exists
   const existingPlan =
     await ShiftPlan.findById(shiftPlanId).populate('author worker');
@@ -72,8 +76,12 @@ const sendShiftPlanToWorker = async (shiftPlanId: string) => {
   // send mail
   if (worker.email) {
     const template = emailTemplate.shiftPlanToWorker(worker, existingPlan);
+    const translatedHtml = await translateHelper.translateHTML(
+      template.html,
+      language || 'en',
+    );
     const fileName = `shift-plan-${existingPlan._id}-${Date.now()}`;
-    await generatePdfFromHtml(template.html, fileName);
+    await generatePdfFromHtml(translatedHtml, fileName);
 
     // Public URL (served via express static)
     const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;

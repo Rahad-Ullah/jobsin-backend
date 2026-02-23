@@ -36,4 +36,9 @@ export default {
   deepseek: {
     api_key: process.env.DEEPSEEK_API_KEY,
   },
+  google: {
+    place_api_key: process.env.GOOGLE_PLACE_API_KEY,
+    translate_api_key: process.env.GOOGLE_TRANSLATE_API_KEY,
+    translate_project_id: process.env.GOOGLE_TRANSLATE_PROJECT_ID,
+  },
 };

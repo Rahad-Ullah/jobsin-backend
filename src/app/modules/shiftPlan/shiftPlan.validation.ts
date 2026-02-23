@@ -72,7 +72,17 @@ const updateShiftPlanValidation = z.object({
   }),
 });
 
+const sendShiftPlanToWorkerValidation = z.object({
+  body: z.object({
+    language: z
+      .string({ required_error: 'Language is required' })
+      .length(2, 'Invalid language code')
+      .nonempty('Language cannot be empty'),
+  }),
+});
+
 export const ShiftPlanValidations = {
   createShiftPlanValidation,
   updateShiftPlanValidation,
+  sendShiftPlanToWorkerValidation,
 };

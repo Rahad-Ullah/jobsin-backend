@@ -45,7 +45,10 @@ const deleteShiftPlan = catchAsync(async (req: Request, res: Response) => {
 
 // send shift plan to worker
 const sendShiftPlanToWorker = catchAsync(async (req: Request, res: Response) => {
-  const result = await ShiftPlanServices.sendShiftPlanToWorker(req.params.id);
+  const result = await ShiftPlanServices.sendShiftPlanToWorker(
+    req.params.id,
+    req.body.language,
+  );
 
   sendResponse(res, {
     success: true,

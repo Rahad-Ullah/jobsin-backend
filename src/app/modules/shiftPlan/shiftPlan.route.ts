@@ -34,7 +34,8 @@ router.delete(
 router.post(
   '/send-worker/:id',
   auth(USER_ROLES.EMPLOYER),
-  ShiftPlanController.sendShiftPlanToWorker
+  validateRequest(ShiftPlanValidations.sendShiftPlanToWorkerValidation),
+  ShiftPlanController.sendShiftPlanToWorker,
 );
 
 // get my shift plans
