@@ -3,19 +3,15 @@ import { Device } from './device.model';
 
 // -------------- create device --------------
 const createDeviceToDB = async (
-  payload: Partial<IDevice>
+  payload: Partial<IDevice>,
 ): Promise<IDevice> => {
-  // check if the user logged in from same device
-  const existingDevice = await Device.findOne({
-    user: payload.user,
-    model: payload.model,
-    os: payload.os,
-  });
-  if (existingDevice) {
-    return existingDevice;
-  }
+  // create or update device based on user, model and os
+  const result = await Device.findOneAndUpdate(
+    { user: payload.user, model: payload.model, os: payload.os },
+    { ...payload, loginAt: new Date() },
+    { new: true, upsert: true },
+  );
 
-  const result = await Device.create(payload);
   return result;
 };
 
@@ -27,7 +23,7 @@ const removeDeviceById = async (id: string): Promise<IDevice | null> => {
 
 // ------------- get all devices by user id -------------
 const getDevicesByUserId = async (userId: string): Promise<IDevice[]> => {
-  const result = await Device.find({ user: userId });
+  const result = await Device.find({ user: userId }).sort({ loginAt: -1 });
   return result;
 };
 
