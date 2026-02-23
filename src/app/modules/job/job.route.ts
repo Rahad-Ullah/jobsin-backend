@@ -34,7 +34,8 @@ router.delete(
 router.post(
   '/send-hiring-post/:id',
   auth(USER_ROLES.EMPLOYER),
-  JobController.sendHiringPostToAdmin
+  validateRequest(JobValidations.sendHiringRequestValidation),
+  JobController.sendHiringPostToAdmin,
 );
 
 // get single job by id

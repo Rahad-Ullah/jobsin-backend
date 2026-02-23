@@ -15,6 +15,7 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Contact } from '../contact/contact.model';
 import { generatePdfFromHtml } from '../../../util/htmlToPdf';
 import { getDistance } from '../../../util/getDistance';
+import { translateHelper } from '../../../helpers/translateHelper';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
@@ -70,7 +71,7 @@ const deleteJob = async (id: string) => {
 };
 
 // --------------- send hiring post to admin --------------
-const sendHiringPostToAdmin = async (jobId: string) => {
+const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
   // check if job exists
   const existingJob = await Job.findById(jobId).populate('author');
   if (!existingJob) {
@@ -89,9 +90,12 @@ const sendHiringPostToAdmin = async (jobId: string) => {
       platformEmail,
       contactInfo?.address as string,
     );
-
+    const translatedHtml = await translateHelper.translateHTML(
+      template.html,
+      language || 'en',
+    );
     const fileName = `hiring-request-${existingJob._id}-${Date.now()}`;
-    await generatePdfFromHtml(template.html, fileName);
+    await generatePdfFromHtml(translatedHtml, fileName);
 
     // Public URL (served via express static)
     const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;

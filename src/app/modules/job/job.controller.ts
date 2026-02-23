@@ -52,7 +52,10 @@ const deleteJob = catchAsync(async (req: Request, res: Response) => {
 // hiring post to admin
 const sendHiringPostToAdmin = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await JobServices.sendHiringPostToAdmin(req.params.id);
+    const result = await JobServices.sendHiringPostToAdmin(
+      req.params.id,
+      req.body.language,
+    );
 
     sendResponse(res, {
       success: true,

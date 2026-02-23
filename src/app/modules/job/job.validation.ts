@@ -62,7 +62,17 @@ export const updateJobValidation = z.object({
     .strict(),
 });
 
+const sendHiringRequestValidation = z.object({
+  body: z.object({
+    language: z
+      .string({ required_error: 'Language is required' })
+      .length(2, 'Language must be a 2-letter code')
+      .nonempty('Language is required'),
+  }),
+});
+
 export const JobValidations = {
   createJobValidation,
   updateJobValidation,
+  sendHiringRequestValidation,
 };
