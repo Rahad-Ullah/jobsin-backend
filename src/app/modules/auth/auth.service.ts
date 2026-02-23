@@ -220,6 +220,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       { _id: isExistUser._id },
       {
         $set: {
+          'authentication.is2FAProcessing': false,
           'authentication.oneTimeCode': null,
           'authentication.expireAt': null,
         },
