@@ -14,6 +14,8 @@ import { USER_ROLES } from '../user/user.constant';
 import { IUser } from '../user/user.interface';
 import { IEmployer } from '../employer/employer.interface';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
+import { PackageName } from '../package/package.constants';
+import { logger } from '../../../shared/logger';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -356,4 +358,53 @@ async function findMatchingJobs(user: any, lastSentAt: Date | null) {
   return Job.find(query)
     .select('_id category subCategory jobType location')
     .limit(20);
+}
+
+// ############## CRON FOR PRIORITIZE JOB LIST ############
+export function startPrioritizedJobListCron() {
+  // runs every day at 1:00 AM
+  nodeCron.schedule('0 1 * * *', async () => {
+    console.log('[CRON] Prioritizing job list started');
+    try {
+      // get all employer users who have premium subscription
+      const usersWithSubscription = await User.find({
+        isDeleted: false,
+        role: USER_ROLES.EMPLOYER,
+        subscription: { $ne: null },
+      })
+        .populate({
+          path: 'subscription',
+          select: 'package currentPeriodEnd status',
+          populate: { path: 'package', select: 'name' },
+        })
+        .lean();
+
+      const premiumEmployerIds = usersWithSubscription
+        .filter(user => {
+          const sub = (user as any).subscription;
+          return (
+            sub &&
+            new Date(sub?.currentPeriodEnd) > new Date() &&
+            (sub?.package?.name === PackageName.STANDARD ||
+              sub?.package?.name === PackageName.BOOSTER)
+          );
+        })
+        .map(user => user._id.toString());
+
+      // update all jobs that have been updated in 7 days ago to prioritize
+      const result = await Job.updateMany(
+        {
+          author: { $in: premiumEmployerIds },
+          deadline: { $gt: new Date() },
+          updatedAt: { $lte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+        },
+        {},
+      );
+      console.log(
+        `[CRON] Prioritized ${result.modifiedCount} jobs for premium employers`,
+      );
+    } catch (err) {
+      console.error('[CRON] Prioritized job list update failed', err);
+    }
+  });
 }
