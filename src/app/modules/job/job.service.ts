@@ -214,10 +214,13 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
     filter.salaryAmount = { $gte: Number(query.salaryAmount) };
   }
 
-  const jobQuery = new QueryBuilder(Job.find(filter).lean(), query)
+  const jobQuery = new QueryBuilder(
+    Job.find(filter).sort('-updatedAt').lean(),
+    query,
+  )
     .search(['category', 'subCategory'])
     .filter(['salaryAmount', 'location', 'lat', 'lng', 'radius'])
-    .sort()
+    // .sort()
     .paginate()
     .fields()
     .populate(['author'], { author: 'name email phone address image' });
@@ -272,20 +275,25 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
   }
 
   // attach distance to each job
-  if(query.lat && query.lng) {
+  if (query.lat && query.lng) {
     const lat = parseFloat(query.lat as string);
     const lng = parseFloat(query.lng as string);
     const jobsWithDistance = await Promise.all(
-    data.map(async (job: IJob) => {
-      const distance = getDistance(job.location.coordinates[1], job.location.coordinates[0], lat, lng);
-      return { ...job, distance };
-    }),
-  );
+      data.map(async (job: IJob) => {
+        const distance = getDistance(
+          job.location.coordinates[1],
+          job.location.coordinates[0],
+          lat,
+          lng,
+        );
+        return { ...job, distance };
+      }),
+    );
     return { data: jobsWithDistance, pagination };
   }
 
   return { data, pagination };
-};;
+};
 
 // -------------- get all jobs public api --------------
 const getAllJobsPublic = async (query: Record<string, unknown>) => {
@@ -317,10 +325,13 @@ const getAllJobsPublic = async (query: Record<string, unknown>) => {
     filter.salaryAmount = { $gte: Number(query.salaryAmount) };
   }
 
-  const jobQuery = new QueryBuilder(Job.find(filter), query)
+  const jobQuery = new QueryBuilder(
+    Job.find(filter).sort('-updatedAt').lean(),
+    query,
+  )
     .search(['category', 'subCategory'])
     .filter(['salaryAmount', 'location', 'lat', 'lng', 'radius'])
-    .sort()
+    // .sort()
     .paginate()
     .fields()
     .populate(['author'], { author: 'name email phone address image' });
