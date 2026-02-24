@@ -179,7 +179,7 @@ async function sendEmployerNotification(
       await sendNotifications({
         type: 'JOB_SEEKER_ALERT',
         receiver: employerUser._id,
-        title: `${user.name} - ${category}`,
+        title: `Job alert for ${category}`,
         message: `${user.name} is looking for ${category}`,
         referenceId: user._id.toString(),
       });
@@ -259,7 +259,7 @@ export function startJobAlertCron() {
             await sendNotifications({
               type: 'JOB_ALERT',
               receiver: new Types.ObjectId(user._id),
-              title: `New job available: ${job.subCategory}`,
+              title: `New job available for ${job.subCategory}`,
               message: `New job available for you: ${job.subCategory}`,
               referenceId: job._id.toString(),
             });
