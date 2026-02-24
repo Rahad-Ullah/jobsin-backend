@@ -6,7 +6,7 @@ import { ISendEmail } from '../types/email';
 const transporter = nodemailer.createTransport({
   host: config.email.host,
   port: Number(config.email.port),
-  secure: true,
+  secure: false,
   auth: {
     user: config.email.user,
     pass: config.email.pass,
@@ -25,7 +25,7 @@ const sendEmail = async (values: ISendEmail) => {
 
     logger.info('Mail send successfully', info.accepted);
   } catch (error) {
-    errorLogger.error('Email', error);
+    errorLogger.error('Email Error: ', error);
   }
 };
 
