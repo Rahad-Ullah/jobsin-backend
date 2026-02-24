@@ -341,7 +341,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
               <tr style="color: #333;">
                 <th style="padding: 10px 0; font-weight: normal; width: 20%;">Date</th>
                 <th style="padding: 10px 0; font-weight: normal; width: 20%;">Day</th>
-                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">From — Until</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">Start — End</th>
                 <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Timeline</th>
               </tr>
             </thead>
