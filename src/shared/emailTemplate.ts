@@ -11,7 +11,7 @@ import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 const createAccount = (values: ICreateAccount) => {
   const data = {
     to: values.email,
-    subject: 'Verify your account',
+    subject: 'Bestätigen Sie Ihr Konto', // "Verify your account"
     html: `
       <body
           style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
@@ -19,16 +19,16 @@ const createAccount = (values: ICreateAccount) => {
               style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
               <img src="https://jobsinapp.de/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               <h2 style="color: #074E5E; font-size: 24px; margin-bottom: 20px;">
-                Hey! ${values.name}${values.name && ','} 
-                Your ${config.server_name} Account Credentials
+                Hallo ${values.name}${values.name && ','} 
+                Ihre Zugangsdaten für ${config.server_name}
               </h2>
               <div style="text-align: center;">
-                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
+                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Ihr Einmal-Code lautet:</p>
                   <span
                       style="background-color: #074E5E; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
                       ${values.otp}
                   </span>
-                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
+                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Dieser Code ist für 3 Minuten gültig.</p>
               </div>
           </div>
       </body>
@@ -40,21 +40,21 @@ const createAccount = (values: ICreateAccount) => {
 const resetPassword = (values: IResetPassword) => {
   const data = {
     to: values.email,
-    subject: 'Reset your password',
+    subject: 'Passwort zurücksetzen', // "Reset your password"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
           <div
               style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
               <img src="https://jobsinapp.de/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               <div style="text-align: center;">
-                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
+                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Ihr Einmal-Code lautet:</p>
                   <span
                       style="background-color: #074E5E; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">
                       ${values.otp}
                   </span>
-                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
+                  <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Dieser Code ist für 3 Minuten gültig.</p>
                   <p style="color: #b9b4b4; font-size: 16px; line-height: 1.5; margin-bottom: 20px;text-align:center">
-                    If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.
+                    Falls Sie diesen Code nicht angefordert haben, können Sie diese E-Mail einfach ignorieren. Eventuell hat jemand anderes versehentlich Ihre E-Mail-Adresse eingegeben.
                   </p>
               </div>
           </div>
@@ -67,31 +67,31 @@ const resetPassword = (values: IResetPassword) => {
 const confirmAppointment = (values: IAppointment) => {
   const data = {
     to: values.receiver,
-    subject: 'New Appointment Available!',
+    subject: 'Neuer Termin verfügbar!', // "New Appointment Available!"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
               <img src="https://jobsinapp.de/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               
               <div style="text-align: center;">
-                  <h2 style="color: #074E5E; margin-bottom: 10px;">New Appointment Available!</h2>
-                  <p style="font-size: 16px; line-height: 1.5; margin-bottom: 25px;">An appointment is available for you. Kindly confirm it in your JobsinApp account and please come to our address at the scheduled time.</p>
+                  <h2 style="color: #074E5E; margin-bottom: 10px;">Neuer Termin verfügbar!</h2>
+                  <p style="font-size: 16px; line-height: 1.5; margin-bottom: 25px;">Ein Termin ist für Sie verfügbar. Bitte bestätigen Sie diesen in Ihrem JobsinApp-Konto und erscheinen Sie zum vereinbarten Zeitpunkt an unserer Adresse.</p>
                   
                   <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
-                      <p style="margin: 5px 0;"><strong>📅 Date & Time:</strong> ${new Date(
+                      <p style="margin: 5px 0;"><strong>📅 Datum & Uhrzeit:</strong> ${new Date(
                         values.scheduledAt,
-                      ).toLocaleString()}</p>
+                      ).toLocaleString('de-DE')}</p>
                       ${
                         values.address &&
-                        `<p style="margin: 5px 0;"><strong>📍 Address:</strong> ${values.address}</p>`
+                        `<p style="margin: 5px 0;"><strong>📍 Adresse:</strong> ${values.address}</p>`
                       }
-                      <p style="margin: 5px 0;"><strong>✉️ Message:</strong> ${
+                      <p style="margin: 5px 0;"><strong>✉️ Nachricht:</strong> ${
                         values.message
                       }</p>
                   </div>
 
                   <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
-                    If you need to reschedule or cancel this appointment, please log in to your account or contact support.
+                    Falls Sie diesen Termin verschieben oder absagen müssen, melden Sie sich bitte in Ihrem Konto an oder kontaktieren Sie den Support.
                   </p>
               </div>
           </div>
@@ -104,33 +104,33 @@ const confirmAppointment = (values: IAppointment) => {
 const supportReply = (values: ISupport & { reply: string }) => {
   const data = {
     to: values.email,
-    subject: 'Support Update',
+    subject: 'Support-Update', // "Support Update"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
               <img src="https://jobsinapp.de/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
               
               <div style="">
-                  <h2 style="color: #074E5E; margin-bottom: 10px; text-align: center;">Support Update</h2>
+                  <h2 style="color: #074E5E; margin-bottom: 10px; text-align: center;">Support-Update</h2>
                   <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                      Hi <strong>${values.name || 'there'}</strong>,<br><br>
-                      Thank you for reaching out to the JobsinApp support team. We have reviewed your inquiry.
+                      Hallo <strong>${values.name || 'zusammen'}</strong>,<br><br>
+                      vielen Dank, dass Sie sich an das Support-Team von JobsinApp gewendet haben. Wir haben Ihre Anfrage geprüft.
                   </p>
                   
                   <div style="background-color: #f4fdf3; border: 1px solid #e0eee0; border-radius: 8px; padding: 20px; text-align: left; margin-bottom: 25px;">
-                      <p style="margin: 5px 0; color: #074E5E; font-weight: bold;">Our Response:</p>
+                      <p style="margin: 5px 0; color: #074E5E; font-weight: bold;">Unsere Antwort:</p>
                       <p style="margin: 10px 0; line-height: 1.5;">
                           ${values.reply}
                       </p>
                   </div>
 
                   <p style="font-size: 15px; line-height: 1.5; margin-bottom: 25px;">
-                      If you have any further questions or if this doesn't fully resolve your issue, please simply reply to this email or visit our help center.
+                      Falls Sie weitere Fragen haben oder Ihr Anliegen noch nicht vollständig geklärt ist, antworten Sie einfach auf diese E-Mail oder besuchen Sie unser Hilfe-Center.
                   </p>
 
                   <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
-                      Best regards,<br>
-                      <strong>The JobsinApp Support Team</strong>
+                      Mit freundlichen Grüßen,<br>
+                      <strong>Ihr JobsinApp Support-Team</strong>
                   </p>
               </div>
           </div>
@@ -139,38 +139,39 @@ const supportReply = (values: ISupport & { reply: string }) => {
   };
   return data;
 };
+
 // payment failed
 const paymentFailed = (values: any) => {
   const data = {
     to: values.email,
-    subject: values.subject,
+    subject: values.subject || 'Zahlung fehlgeschlagen', // "Payment Failed"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
         <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
             <img src="https://jobsinapp.de/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
             
             <div>
-                <h2 style="color: #D93025; margin-bottom: 10px; text-align: center;">Payment Failed</h2>
+                <h2 style="color: #D93025; margin-bottom: 10px; text-align: center;">Zahlung fehlgeschlagen</h2>
                 <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
-                    Hi <strong>${values.name || 'there'}</strong>,<br><br>
-                    We were unable to process the payment for your <strong>${values.packageName || 'JobsinApp Subscription'}</strong>. This can sometimes happen due to an expired card, insufficient funds, or a bank restriction.
+                    Hallo <strong>${values.name || 'zusammen'}</strong>,<br><br>
+                    wir konnten die Zahlung für Ihr <strong>${values.packageName || 'JobsinApp-Abonnement'}</strong> nicht bearbeiten. Dies kann an einer abgelaufenen Karte, unzureichender Deckung oder einer Bankbeschränkung liegen.
                 </p>
                 
                 <div style="background-color: #fff5f5; border: 1px solid #f8d7da; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 25px;">
-                    <p style="margin: 5px 0; color: #D93025; font-weight: bold;">What happened?</p>
+                    <p style="margin: 5px 0; color: #D93025; font-weight: bold;">Was ist passiert?</p>
                     <p style="margin: 10px 0; line-height: 1.5; font-size: 15px;">
-                        Our last attempt on <strong>${new Date().toLocaleDateString()}</strong> failed. To maintain your access to premium features, please update your billing information.
+                        Unser letzter Versuch am <strong>${new Date().toLocaleDateString('de-DE')}</strong> ist fehlgeschlagen. Um den Zugriff auf Premium-Funktionen zu behalten, aktualisieren Sie bitte Ihre Zahlungsinformationen.
                     </p>
-                    <a href="${values.billingUrl || '#'}" style="display: inline-block; padding: 12px 25px; background-color: #074E5E; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Update Payment Method</a>
+                    <a href="${values.billingUrl || '#'}" style="display: inline-block; padding: 12px 25px; background-color: #074E5E; color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px;">Zahlungsmethode aktualisieren</a>
                 </div>
 
                 <p style="font-size: 15px; line-height: 1.5; margin-bottom: 25px;">
-                    Don't worry, your account is still active for now. However, if the payment isn't resolved soon, your subscription may be downgraded to the free tier.
+                    Keine Sorge, Ihr Konto ist vorerst noch aktiv. Wenn das Problem jedoch nicht bald behoben wird, könnte Ihr Abonnement auf die kostenlose Version zurückgestuft werden.
                 </p>
 
                 <p style="color: #b9b4b4; font-size: 14px; line-height: 1.5; margin-top: 30px;">
-                    Best regards,<br>
-                    <strong>The JobsinApp Billing Team</strong>
+                    Mit freundlichen Grüßen,<br>
+                    <strong>Ihr JobsinApp Billing-Team</strong>
                 </p>
             </div>
         </div>
@@ -188,22 +189,22 @@ const hiringRequestToAdmin = (
 ) => {
   const data = {
     to: email,
-    subject: `Hiring Request: ${employer.name} - ${job.category}`,
+    subject: `Vermittlungsanfrage: ${employer.name} - ${job.category}`, // "Hiring Request"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
         <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
             
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
                 <div style="font-size: 18px; line-height: 1.4;">
-                    <h2 style="margin: 0; font-size: 20px;">Personnel Placement Agreement</h2>
+                    <h2 style="margin: 0; font-size: 20px;">Personalvermittlungsvertrag</h2>
                     <p style="margin: 10px 0 0 0;">
-                        <strong>Client</strong><br>
+                        <strong>Auftraggeber</strong><br>
                         ${employer.name}<br>
                         ${employer.email}<br>
                         ${employer.address}
                     </p>
                     <p style="margin: 10px 0 0 0;">
-                        <strong>Recruiter</strong><br>
+                        <strong>Vermittler</strong><br>
                         JobsinApp<br>
                         ${address}
                     </p>
@@ -212,61 +213,61 @@ const hiringRequestToAdmin = (
             </div>
 
             <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 16px; margin-bottom: 5px;">Contract Content</h3>
-                <p style="font-size: 13px; line-height: 1.5; margin: 0;">The Client Commissions The Recruiter To Search For Suitable Candidates For A Position To Be Filled In Their Company. This Agreement Governs The Conditions of the Personnel Placement And The Mutual Rights And Obligations Of The Contracting Parties.</p>
+                <h3 style="font-size: 16px; margin-bottom: 5px;">Vertragsinhalt</h3>
+                <p style="font-size: 13px; line-height: 1.5; margin: 0;">Der Auftraggeber beauftragt den Vermittler mit der Suche nach geeigneten Kandidaten für eine zu besetzende Stelle in seinem Unternehmen. Diese Vereinbarung regelt die Bedingungen der Personalvermittlung sowie die gegenseitigen Rechte und Pflichten der Vertragsparteien.</p>
             </div>
 
             <div style="font-size: 13px; line-height: 1.5;">
-                <h4 style="margin: 15px 0 5px 0;">§ 1 Subject of the Agreement</h4>
-                <p style="margin: 0;">The Recruiter undertakes to search for and present suitable candidates to the Employer for a position advertised by the Employer. The Client undertakes to provide the Recruiter with all relevant information necessary for the search, such as candidate requirements and a detailed job description.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 1 Gegenstand der Vereinbarung</h4>
+                <p style="margin: 0;">Der Vermittler verpflichtet sich, für eine vom Arbeitgeber ausgeschriebene Stelle geeignete Kandidaten zu suchen und dem Arbeitgeber vorzustellen. Der Auftraggeber verpflichtet sich, dem Vermittler alle für die Suche notwendigen relevanten Informationen zur Verfügung zu stellen, wie z. B. Anforderungsprofile und eine detaillierte Stellenbeschreibung.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 2 Services of the Recruiter</h4>
-                <p style="margin: 0;">1. Identify suitable candidates and propose them to the Employer. 2. Conduct preliminary selection, verify qualifications, and conduct interviews if applicable. 3. Provide a list of suitable candidates. 4. Advise the Client during selection and assist in organizing interviews.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 2 Leistungen des Vermittlers</h4>
+                <p style="margin: 0;">1. Identifizierung geeigneter Kandidaten und Vorschlag an den Arbeitgeber. 2. Durchführung einer Vorauswahl, Prüfung der Qualifikationen und ggf. Durchführung von Vorstellungsgesprächen. 3. Bereitstellung einer Liste geeigneter Kandidaten. 4. Beratung des Auftraggebers bei der Auswahl und Unterstützung bei der Organisation von Vorstellungsgesprächen.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 3 Obligations of the Client</h4>
-                <p style="margin: 0;">The Employer shall provide timely info on position requirements and contact data. The Client undertakes to review candidates, maintain communication, conduct interviews, and make the final hiring decision. The Client must immediately inform the Recruiter in writing once a candidate is hired.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 3 Pflichten des Auftraggebers</h4>
+                <p style="margin: 0;">Der Arbeitgeber informiert rechtzeitig über die Anforderungen der Stelle und die Kontaktdaten. Der Auftraggeber verpflichtet sich, Kandidaten zu prüfen, die Kommunikation aufrechtzuerhalten, Vorstellungsgespräche zu führen und die endgültige Einstellungsentscheidung zu treffen. Der Auftraggeber muss den Vermittler unverzüglich schriftlich informieren, sobald ein Kandidat eingestellt wurde.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 4 Compensation and Payment Terms</h4>
-                <p style="margin: 0;"><strong>Placement Fee:</strong> 25% (excluding VAT) of the agreed gross annual salary. <br>
-                <strong>Payment Term:</strong> Due no later than 14 days after the start of employment. <br>
-                <strong>Additional Costs:</strong> Only borne by Client if expressly agreed upon in advance.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 4 Vergütung und Zahlungsbedingungen</h4>
+                <p style="margin: 0;"><strong>Vermittlungsgebühr:</strong> 25% (zzgl. MwSt.) des vereinbarten Bruttojahresgehalts. <br>
+                <strong>Zahlungsziel:</strong> Fällig spätestens 14 Tage nach Arbeitsbeginn. <br>
+                <strong>Zusatzkosten:</strong> Werden vom Auftraggeber nur getragen, wenn dies vorher ausdrücklich vereinbart wurde.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 5 Guarantees and Refunds</h4>
-                <p style="margin: 0;"><strong>50% Refund:</strong> If candidate resigns within 3 months. <br>
-                <strong>30% Refund:</strong> If candidate resigns between 3 and 6 months. <br>
-                Refund rights lapse if candidate is re-employed by the Client or an affiliated/partner company (pursuant to §§ 15 et seq. AktG) within the scope of this agreement.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 5 Garantien und Rückerstattungen</h4>
+                <p style="margin: 0;"><strong>50% Rückerstattung:</strong> Wenn der Kandidat innerhalb von 3 Monaten kündigt. <br>
+                <strong>30% Rückerstattung:</strong> Wenn der Kandidat zwischen 3 und 6 Monaten kündigt. <br>
+                Rückerstattungsansprüche erlöschen, wenn der Kandidat innerhalb des Geltungsbereichs dieser Vereinbarung vom Auftraggeber oder einem verbundenen Unternehmen/Partnerunternehmen (gemäß §§ 15 ff. AktG) wiedereingestellt wird.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 6 Confidentiality and Data Protection</h4>
-                <p style="margin: 0;">Both parties agree to treat personal data of candidates in accordance with BDSG and GDPR. This obligation remains in effect even after contract termination.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 6 Vertraulichkeit und Datenschutz</h4>
+                <p style="margin: 0;">Beide Parteien vereinbaren, personenbezogene Daten von Kandidaten gemäß BDSG und DSGVO zu behandeln. Diese Verpflichtung bleibt auch nach Vertragsbeendigung bestehen.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 7 Liability</h4>
-                <p style="margin: 0;">Recruiter is not liable for accuracy of candidate info. Client assumes full responsibility for final hiring decisions. Recruiter is not liable for damages from incorrect info provided by the Client.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 7 Haftung</h4>
+                <p style="margin: 0;">Der Vermittler haftet nicht für die Richtigkeit der Kandidateninformationen. Der Auftraggeber übernimmt die volle Verantwortung für die endgültigen Einstellungsentscheidungen. Der Vermittler haftet nicht für Schäden, die aus fehlerhaften Informationen des Auftraggebers resultieren.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 8 Duration and Termination</h4>
-                <p style="margin: 0;">Effective upon confirmation (checkmark) on the JobsinApp platform. May be terminated by either party with 14 days’ written notice.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 8 Dauer und Kündigung</h4>
+                <p style="margin: 0;">Wirksam ab Bestätigung (Häkchen) auf der JobsinApp-Plattform. Kann von jeder Partei mit einer Frist von 14 Tagen schriftlich gekündigt werden.</p>
 
-                <h4 style="margin: 15px 0 5px 0;">§ 9 Final Provisions</h4>
-                <p style="margin: 0;">Any amendments or supplements to this agreement must be made in writing. Oral agreements are only valid if confirmed in writing.
-                Should individual provisions of this agreement be invalid or unenforceable, the remainder of the agreement shall remain in effect. The invalid provision shall be replaced by a valid one that most closely reflects the economic intent of the invalid provision.</p>
+                <h4 style="margin: 15px 0 5px 0;">§ 9 Schlussbestimmungen</h4>
+                <p style="margin: 0;">Änderungen oder Ergänzungen dieser Vereinbarung bedürfen der Schriftform. Mündliche Nebenabreden sind nur wirksam, wenn sie schriftlich bestätigt wurden.
+                Sollten einzelne Bestimmungen dieses Vertrages unwirksam oder undurchführbar sein, bleibt die Wirksamkeit des Vertrages im Übrigen unberührt. Die unwirksame Bestimmung ist durch eine wirksame zu ersetzen, die dem wirtschaftlichen Zweck der unwirksamen Bestimmung am nächsten kommt.</p>
             </div>
 
             <div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
-                <h2 style="margin: 0 0 10px 0; font-size: 22px;">Job Details</h2>
+                <h2 style="margin: 0 0 10px 0; font-size: 22px;">Job-Details</h2>
                 <p style="margin: 0; color: #666;">${employer.address}</p>
                 <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${job.subCategory}</h3>
                 <p style="margin: 0; font-size: 14px;"><strong>${job.jobType}</strong></p>
                 <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">€${job.salaryAmount}/${job.salaryType}</p>
-                <p style="margin: 0; color: #888; font-size: 12px;">📅 ${new Date(job.deadline).toLocaleDateString()}</p>
+                <p style="margin: 0; color: #888; font-size: 12px;">📅 Frist: ${new Date(job.deadline).toLocaleDateString('de-DE')}</p>
 
-                <h4 style="margin: 20px 0 5px 0;">Job Description</h4>
+                <h4 style="margin: 20px 0 5px 0;">Stellenbeschreibung</h4>
                 <p style="margin: 0; font-size: 13px;">${job.description}</p>
 
-                <h4 style="margin: 15px 0 5px 0;">Responsibilities</h4>
+                <h4 style="margin: 15px 0 5px 0;">Aufgabenbereiche</h4>
                 <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
                     ${job.responsibilities.map(res => `<li>${res}</li>`).join('')}
                 </ul>
 
-                <h4 style="margin: 15px 0 5px 0;">Qualifications</h4>
+                <h4 style="margin: 15px 0 5px 0;">Qualifikationen</h4>
                 <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
                     ${job.qualifications.map(qual => `<li>${qual}</li>`).join('')}
                 </ul>
@@ -274,15 +275,15 @@ const hiringRequestToAdmin = (
 
             <div style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">
                 <div style="width: 45%;">
-                    <p style="margin: 0; font-size: 12px; color: #888;">Place</p>
+                    <p style="margin: 0; font-size: 12px; color: #888;">Ort</p>
                     <p style="margin: 0; font-size: 14px;"><strong>${employer.address || 'Online'}</strong></p>
                 </div>
                 <div style="width: 45%;">
-                    <p style="margin: 0; font-size: 12px; color: #888;">Date</p>
-                    <p style="margin: 0; font-size: 14px;"><strong>${new Date().toLocaleDateString()}</strong></p>
+                    <p style="margin: 0; font-size: 12px; color: #888;">Datum</p>
+                    <p style="margin: 0; font-size: 14px;"><strong>${new Date().toLocaleDateString('de-DE')}</strong></p>
                 </div>
             </div>
-            <p style="font-size: 11px; font-style: italic; margin-top: 5px;">The client confirmed the contract by selecting the checkbox, so no signature was required, and the agreement is now in effect.</p>
+            <p style="font-size: 11px; font-style: italic; margin-top: 5px;">Der Auftraggeber hat den Vertrag durch Auswahl des Kontrollkästchens bestätigt, daher war keine Unterschrift erforderlich und die Vereinbarung ist nun in Kraft.</p>
 
         </div>
       </body>
@@ -292,9 +293,9 @@ const hiringRequestToAdmin = (
 };
 
 const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
-  // Extract month/year for the title from the first plan date
+  // Extract month/year for the title using German locale
   const firstPlanDate = shiftPlan.plans[0]?.days[0] || new Date();
-  const planMonthYear = new Intl.DateTimeFormat('en-US', {
+  const planMonthYear = new Intl.DateTimeFormat('de-DE', {
     month: 'long',
     year: 'numeric',
   }).format(firstPlanDate);
@@ -304,19 +305,19 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'Europe/Berlin', // Force German time regardless of server location
+    timeZone: 'Europe/Berlin', 
   };
 
   const data = {
     to: worker.email,
-    subject: `Your Shift Plan for ${planMonthYear}`,
+    subject: `Ihr Schichtplan für ${planMonthYear}`, // "Your Shift Plan"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
         <div style="max-width: 800px; margin: 0 auto;">
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <div style="display: flex; align-items: center;">
-               <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Shift Plan View</h1>
+               <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Schichtplanansicht</h1>
             </div>
             <img src="https://jobsinapp.de/logo.png" alt="JobsinApp Logo" style="width: 80px;" />
           </div>
@@ -324,25 +325,25 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 15px;">
             <div>
               <p style="margin: 5px 0;"><strong>Name</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${worker.name}</p>
-              <p style="margin: 5px 0;"><strong>Address</strong> &nbsp;: ${worker.address}</p>
+              <p style="margin: 5px 0;"><strong>Adresse</strong> &nbsp;: ${worker.address}</p>
             </div>
             <div>
-              <p style="margin: 5px 0;"><strong>Email</strong> &nbsp;&nbsp;&nbsp;&nbsp;: ${worker.email}</p>
-              <p style="margin: 5px 0;"><strong>Contact</strong> &nbsp;: ${worker.phone}</p>
+              <p style="margin: 5px 0;"><strong>E-Mail</strong> &nbsp;&nbsp;&nbsp;&nbsp;: ${worker.email}</p>
+              <p style="margin: 5px 0;"><strong>Kontakt</strong> &nbsp;: ${worker.phone}</p>
             </div>
           </div>
 
           <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 18px; margin: 0;">Plan For ${planMonthYear}</h2>
+            <h2 style="font-size: 18px; margin: 0;">Plan für ${planMonthYear}</h2>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
             <thead>
               <tr style="color: #333;">
-                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Date</th>
-                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Day</th>
-                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">Start — End</th>
-                <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Timeline</th>
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Datum</th>
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Tag</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">Beginn — Ende</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Zeitraum</th>
               </tr>
             </thead>
             <tbody>
@@ -354,7 +355,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
                       return `
                     <tr style="border-bottom: none;">
                       <td style="padding: 12px 0;">${d.toLocaleDateString('de-DE')}</td>
-                      <td style="padding: 12px 0;">${d.toLocaleDateString('en-US', { weekday: 'long' })}</td>
+                      <td style="padding: 12px 0;">${d.toLocaleDateString('de-DE', { weekday: 'long' })}</td>
                       <td style="padding: 12px 0; text-align: center;">
                         <span style="display: inline-block;">${new Date(plan.startTime).toLocaleTimeString('de-DE', timeOptions)}</span>
                         <span style="display: inline-block; width: 40px; height: 1px; background-color: #074E5E; margin: 0 10px; vertical-align: middle;"></span>
@@ -371,13 +372,13 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           </table>
 
           <div style="margin-top: 40px;">
-            <h3 style="font-size: 18px; margin-bottom: 10px;">Remarks</h3>
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Anmerkungen</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
               ${
                 shiftPlan.plans
                   .map(p => p.remarks)
                   .filter(r => r)
-                  .join('<br>') || 'No specific remarks for this period.'
+                  .join('<br>') || 'Keine spezifischen Anmerkungen für diesen Zeitraum.'
               }
             </p>
           </div>
@@ -396,20 +397,19 @@ const jobSeekerAlert = (
 ) => {
   const data = {
     to: employerUser.email,
-    subject: `🚀 ${jobSeekerUsers.length} Qualified Candidates Found - Jobsin App`,
+    subject: `🚀 ${jobSeekerUsers.length} passende Kandidaten gefunden - Jobsin App`, // "Qualified Candidates Found"
     html: `
       <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h1 style="margin: 0; color: #074E5E; font-size: 22px;">New Talent Matches</h1>
-            <p style="margin: 5px 0 0 0; color: #666;">Hi ${employerUser.name || 'there'}, we found candidates matching your requirements.</p>
+            <h1 style="margin: 0; color: #074E5E; font-size: 22px;">Neue passende Talente</h1>
+            <p style="margin: 5px 0; color: #666;">Hallo ${employerUser.name || 'zusammen'}, wir haben Kandidaten gefunden, die Ihren Anforderungen entsprechen.</p>
           </div>
 
           <div style="margin-top: 10px;">
             ${jobSeekerUsers
               .map((candidate, index) => {
-                // Extract unique categories to show at a glance
                 const mainCategories = candidate.jobSeeker.experiences
                   .map(exp => exp.category)
                   .filter((v, i, a) => a.indexOf(v) === i)
@@ -422,21 +422,21 @@ const jobSeekerAlert = (
                       ${candidate.name?.charAt(0) || 'JS'}
                     </div>
                     <div>
-                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name.trim() || 'Unknown Name'}</h3>
+                      <h3 style="margin: 0; font-size: 17px; color: #202124;">${candidate.name.trim() || 'Unbekannter Name'}</h3>
                       <p style="margin: 0; font-size: 13px; color: #074E5E; font-weight: bold;">${mainCategories}</p>
                     </div>
                   </div>
 
                   <div style="background: #fafafa; border-radius: 6px; padding: 12px; margin-top: 10px;">
                     <p style="margin: 0 0 8px 0; font-size: 14px; color: #444;">
-                      <strong>Experience Details:</strong>
+                      <strong>Erfahrung Details:</strong>
                     </p>
                     ${candidate.jobSeeker.experiences
                       .map(
                         exp => `
                       <div style="font-size: 13px; color: #555; margin-bottom: 4px;">
-                        • ${exp.subCategory} (${exp.experience} Years) 
-                        <span style="color: #074E5E; font-weight: 500;"> - Expected: €${exp.salaryAmount.toLocaleString()} / ${exp.salaryType}</span>
+                        • ${exp.subCategory} (${exp.experience} Jahre) 
+                        <span style="color: #074E5E; font-weight: 500;"> - Erwartet: €${exp.salaryAmount.toLocaleString('de-DE')} / ${exp.salaryType}</span>
                       </div>
                     `,
                       )
@@ -444,7 +444,7 @@ const jobSeekerAlert = (
                   </div>
 
                   <p style="margin: 12px 0 0 0; font-size: 13px; color: #777; line-height: 1.4;">
-                    "${candidate.jobSeeker.overview?.substring(0, 120) || 'No overview provided'}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
+                    "${candidate.jobSeeker.overview?.substring(0, 120) || 'Keine Beschreibung verfügbar'}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
                   </p>
                 </div>
               `;
@@ -453,16 +453,16 @@ const jobSeekerAlert = (
           </div>
 
           <div style="background: #202124; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">Want to review their profiles?</p>
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">Möchten Sie die Profile einsehen?</p>
             <p style="margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.5;">
-              Open the <strong>Jobsin App</strong> to view full resumes, contact details, and start the hiring process.
+              Öffnen Sie die <strong>Jobsin App</strong>, um vollständige Lebensläufe und Kontaktdaten einzusehen und den Einstellungsprozess zu starten.
             </p>
           </div>
 
         </div>
 
         <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. All rights reserved.</p>
+          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     `,
@@ -475,14 +475,14 @@ const jobSeekerAlert = (
 const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
   const data = {
     to: user.email,
-    subject: `🚀 ${jobs.length} New Job Alerts - Jobsin App`,
+    subject: `🚀 ${jobs.length} neue Job-Angebote - Jobsin App`, // "New Job Alerts"
     html: `
       <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
-            <h1 style="margin: 0; color: #074E5E; font-size: 24px;">New Job Alerts</h1>
-            <p style="margin: 5px 0 0 0; color: #666;">Hi ${user.name || 'there'}, we found matches for your profile.</p>
+            <h1 style="margin: 0; color: #074E5E; font-size: 24px;">Neue Job-Angebote</h1>
+            <p style="margin: 5px 0 0 0; color: #666;">Hallo ${user.name || 'zusammen'}, wir haben passende Stellen für Ihr Profil gefunden.</p>
           </div>
 
           <div style="margin-top: 10px;">
@@ -493,21 +493,21 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
                 <h3 style="color: #074E5E; margin: 0 0 5px 0; font-size: 18px;">${job.category} - ${job.subCategory}</h3>
                 
                 <p style="margin: 0; font-size: 14px; color: #444;">
-                  <strong style="color: #202124;">Type:</strong> ${job.jobType} • 
-                  <strong style="color: #202124;">Exp:</strong> ${job.experience}
+                  <strong style="color: #202124;">Art:</strong> ${job.jobType} • 
+                  <strong style="color: #202124;">Erfahrung:</strong> ${job.experience}
                 </p>
 
                 ${
                   job.salaryAmount
                     ? `
                   <p style="margin: 5px 0 0 0; color: #074E5E; font-size: 14px; font-weight: bold;">
-                    Salary: €${job.salaryAmount.toLocaleString()} (${job.salaryType})
+                    Gehalt: €${job.salaryAmount.toLocaleString('de-DE')} (${job.salaryType})
                   </p>`
                     : ''
                 }
 
                 <p style="margin: 8px 0 0 0; font-size: 13px; color: #777; font-style: italic;">
-                  Deadline: ${new Date(job.deadline).toLocaleDateString()} UTC
+                  Bewerbungsfrist: ${new Date(job.deadline).toLocaleDateString('de-DE')}
                 </p>
               </div>
             `,
@@ -516,16 +516,16 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
           </div>
 
           <div style="background: #074E5E; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Bereit sich zu bewerben?</p>
             <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
-              These jobs are waiting for you! Open the <strong>Jobsin App</strong> to view responsibilities and apply instantly.
+              Diese Jobs warten auf Sie! Öffnen Sie die <strong>Jobsin App</strong>, um die Aufgabenbereiche zu sehen und sich sofort zu bewerben.
             </p>
           </div>
 
         </div>
 
         <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. All rights reserved.</p>
+          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     `,
