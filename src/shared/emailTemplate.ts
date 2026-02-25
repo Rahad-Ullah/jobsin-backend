@@ -325,7 +325,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 15px;">
             <div>
               <p style="margin: 5px 0;"><strong>Name</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${worker.name}</p>
-              <p style="margin: 5px 0;"><strong>Adresse</strong> &nbsp;: ${worker.address}</p>
+              <p style="margin: 5px 0; display: flex; gap: 7px"><strong>Adresse</strong> &nbsp;: <span>${worker.address}</span></p>
             </div>
             <div>
               <p style="margin: 5px 0;"><strong>E-Mail</strong> &nbsp;&nbsp;&nbsp;&nbsp;: ${worker.email}</p>
@@ -378,7 +378,8 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
                 shiftPlan.plans
                   .map(p => p.remarks)
                   .filter(r => r)
-                  .join('<br>') || 'Keine spezifischen Anmerkungen für diesen Zeitraum.'
+                  .join('<br>') ||
+                'Keine spezifischen Anmerkungen für diesen Zeitraum.'
               }
             </p>
           </div>
