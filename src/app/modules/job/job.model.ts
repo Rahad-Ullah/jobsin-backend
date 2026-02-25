@@ -57,4 +57,6 @@ const jobSchema = new Schema<IJob, JobModel>(
   { timestamps: true },
 );
 
+jobSchema.index({ location: '2dsphere' });
+
 export const Job = model<IJob, JobModel>('Job', jobSchema);

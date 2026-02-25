@@ -10,12 +10,13 @@ import { LimitationServices } from '../limitation/limitation.service';
 import { Job } from './job.model';
 import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
-import { USER_ROLES } from '../user/user.constant';
+import { USER_ROLES, USER_STATUS } from '../user/user.constant';
 import { IUser } from '../user/user.interface';
 import { IEmployer } from '../employer/employer.interface';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { PackageName } from '../package/package.constants';
 import { logger } from '../../../shared/logger';
+import { JobStatus } from './job.constants';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -218,7 +219,7 @@ const PER_USER_DELAY_MS = 300; // throttle between users
 
 // ----------- CRON STARTER -------------
 export function startJobAlertCron() {
-  nodeCron.schedule('*/10 * * * *', async () => {
+  nodeCron.schedule('* * * * *', async () => {
     console.log('[CRON] Job seeker job alert started');
 
     try {
@@ -226,7 +227,9 @@ export function startJobAlertCron() {
 
       // 1️⃣ Load all job seekers with notification settings
       const jobSeekers = await User.find({
-        role: 'JOB_SEEKER',
+        role: USER_ROLES.JOB_SEEKER,
+        isDeleted: false,
+        status: USER_STATUS.ACTIVE
       })
         .select('jobSeeker name email location')
         .populate('jobSeeker', 'experiences notificationSettings');
@@ -234,7 +237,6 @@ export function startJobAlertCron() {
       for (const user of jobSeekers) {
         const settings = (user as any).jobSeeker?.notificationSettings;
         if (!settings) continue;
-
         const { pushNotification, emailNotification, repeat, lastSentAt } =
           settings;
 
@@ -249,7 +251,7 @@ export function startJobAlertCron() {
         }
 
         // 3️⃣ Find new matching jobs
-        const jobs = await findMatchingJobs(user, lastSentAt);
+        const jobs = await findMatchingJobs(user);
 
         if (jobs.length === 0) {
           continue; // ⛔ no jobs → no notification, don't update lastSentAt
@@ -266,6 +268,7 @@ export function startJobAlertCron() {
               referenceId: job._id.toString(),
             });
           }
+          console.log('[CRON] sent push notification : ', user.email);
         }
 
         // 4️⃣ Send email notification
@@ -276,6 +279,7 @@ export function startJobAlertCron() {
             subject: template.subject,
             html: template.html,
           });
+          console.log('[CRON] sent email notification : ', user.email);
         }
 
         // 5️⃣ Update lastSentAt after success
@@ -315,47 +319,28 @@ function shouldSendJobAlert(
   return false;
 }
 
-async function findMatchingJobs(user: any, lastSentAt: Date | null) {
+async function findMatchingJobs(user: any) {
   const experiences = user.jobSeeker?.experiences ?? [];
+  // if user has no experience, return empty to avoid sending irrelevant job alerts
+  if (experiences.length === 0) return [];
+  // if user has no location, return empty to avoid sending irrelevant job alerts
+  if (user.location?.coordinates?.length !== 2) return [];
 
-  const query: any = {
-    status: 'ACTIVE',
-  };
-
-  // Preference matching on nearby location
-  if (user?.location?.coordinates?.length === 2) {
-    const lat = parseFloat(user.location.coordinates[1] as string);
-    const long = parseFloat(user.location.coordinates[0] as string);
-    const radiusKm = 200; // radius in kilometers
-
-    if (
-      !isNaN(radiusKm) &&
-      radiusKm > 0 &&
-      lat !== undefined &&
-      long !== undefined
-    ) {
-      const EARTH_RADIUS = 6378.1; // km
-      const radiusInRadians = radiusKm / EARTH_RADIUS;
-
-      query.location = {
-        $geoWithin: {
-          $centerSphere: [[long, lat], radiusInRadians],
+  return Job.find({
+    isDeleted: false,
+    status: JobStatus.OPEN,
+    deadline: { $gt: new Date() },
+    category: { $in: experiences.map((exp: any) => exp.category) },
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: user.location.coordinates,
         },
-      };
-    }
-  }
-
-  // Preference matching on recent jobs
-  if (lastSentAt) {
-    query.createdAt = { $gt: lastSentAt };
-  }
-
-  //  preference matching on category
-  if (experiences.length > 0) {
-    query.category = { $in: experiences.map((exp: any) => exp.category) };
-  }
-
-  return Job.find(query)
+        $maxDistance: 2000 * 1000, // 10km in meters
+      },
+    },
+  })
     .select('_id category subCategory jobType location')
     .limit(20);
 }
