@@ -108,7 +108,9 @@ export function startJobSeekerAlertCron() {
         await sleep(EMPLOYER_DELAY_MS);
       }
 
-      console.log('[CRON] Job seeker alert completed');
+      console.log(
+        `[CRON] Job seeker alert completed for ${employers.length} employers`,
+      ); 
     } catch (err) {
       console.error('[CRON] Job seeker alert failed', err);
     }
@@ -219,7 +221,7 @@ const PER_USER_DELAY_MS = 300; // throttle between users
 // ----------- CRON STARTER -------------
 export function startJobAlertCron() {
   nodeCron.schedule('*/10 * * * *', async () => {
-    console.log('[CRON] Job seeker job alert started');
+    console.log('[CRON] Job alert started');
 
     try {
       const now = new Date();
@@ -267,7 +269,6 @@ export function startJobAlertCron() {
               referenceId: job._id.toString(),
             });
           }
-          console.log('[CRON] sent push notification : ', user.email);
         }
 
         // 4️⃣ Send email notification
@@ -278,7 +279,6 @@ export function startJobAlertCron() {
             subject: template.subject,
             html: template.html,
           });
-          console.log('[CRON] sent email notification : ', user.email);
         }
 
         // 5️⃣ Update lastSentAt after success
@@ -291,9 +291,11 @@ export function startJobAlertCron() {
         await sleep(PER_USER_DELAY_MS);
       }
 
-      console.log('[CRON] Job seeker job alert completed');
+      console.log(
+        `[CRON] Job alert completed for ${jobSeekers.length} job seekers`,
+      );
     } catch (err) {
-      console.error('[CRON] Job seeker job alert failed', err);
+      console.error('[CRON] Job alert failed', err);
     }
   });
 }
