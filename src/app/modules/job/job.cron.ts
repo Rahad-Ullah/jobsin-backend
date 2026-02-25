@@ -15,7 +15,6 @@ import { IUser } from '../user/user.interface';
 import { IEmployer } from '../employer/employer.interface';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { PackageName } from '../package/package.constants';
-import { logger } from '../../../shared/logger';
 import { JobStatus } from './job.constants';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
@@ -219,7 +218,7 @@ const PER_USER_DELAY_MS = 300; // throttle between users
 
 // ----------- CRON STARTER -------------
 export function startJobAlertCron() {
-  nodeCron.schedule('* * * * *', async () => {
+  nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Job seeker job alert started');
 
     try {
@@ -229,7 +228,7 @@ export function startJobAlertCron() {
       const jobSeekers = await User.find({
         role: USER_ROLES.JOB_SEEKER,
         isDeleted: false,
-        status: USER_STATUS.ACTIVE
+        status: USER_STATUS.ACTIVE,
       })
         .select('jobSeeker name email location')
         .populate('jobSeeker', 'experiences notificationSettings');
