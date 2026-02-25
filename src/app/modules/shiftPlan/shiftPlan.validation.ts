@@ -65,7 +65,10 @@ const updateShiftPlanValidation = z.object({
           )
           .min(1, 'At least 1 day is required')
           .optional(),
-        tasks: z.array(z.string()).min(1, 'At least 1 task is required'),
+        tasks: z
+          .array(z.string())
+          .min(1, 'At least 1 task is required')
+          .optional(),
         remarks: z.string().optional(),
       }),
     ),
