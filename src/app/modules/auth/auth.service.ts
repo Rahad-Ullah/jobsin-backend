@@ -16,9 +16,7 @@ import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { User } from '../user/user.model';
-import { USER_ROLES, USER_STATUS } from '../user/user.constant';
-import { JobSeeker } from '../jobSeeker/jobSeeker.model';
-import { Employer } from '../employer/employer.model';
+import { USER_STATUS } from '../user/user.constant';
 
 //------------------ login service ------------------
 const loginUserFromDB = async (payload: ILoginData) => {
