@@ -184,7 +184,7 @@ async function sendEmployerNotification(
         type: 'JOB_SEEKER_ALERT',
         receiver: employerUser._id,
         title: `Job alert for ${category}`,
-        message: `${user.name} is looking for ${category}`,
+        message: `Job alert for ${category}`,
         referenceId: user._id.toString(),
       });
 
