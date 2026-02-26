@@ -35,14 +35,7 @@ const employerSchema = new Schema<IEmployer, EmployerModel>(
 // check if employer profile is fulfilled
 employerSchema.statics.isProfileFulfilled = async (userId: Types.ObjectId) => {
   const employer = await Employer.findOne({ user: userId });
-  const arr = [
-    employer?.businessCategory,
-    employer?.legalForm,
-    employer?.taxNo,
-    employer?.deNo,
-    employer?.whatsApp,
-    employer?.about,
-  ];
+  const arr = [employer?.businessCategory, employer?.legalForm];
   for (let item of arr) {
     if (!item) {
       return false;

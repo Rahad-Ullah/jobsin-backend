@@ -378,8 +378,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
                 shiftPlan.plans
                   .map(p => p.remarks)
                   .filter(r => r)
-                  .join('<br>') ||
-                'Keine spezifischen Anmerkungen für diesen Zeitraum.'
+                  .join('<br>') || ''
               }
             </p>
           </div>

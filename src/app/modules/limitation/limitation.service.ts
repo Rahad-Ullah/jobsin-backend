@@ -4,6 +4,25 @@ import { User } from '../user/user.model';
 import { Job } from '../job/job.model';
 import { isSameCalendarMonth } from '../../../util/isSameCalendarMonth';
 import { Appointment } from '../appointment/appointment.model';
+import { JwtPayload } from 'jsonwebtoken';
+import { USER_ROLES } from '../user/user.constant';
+import { Employer } from '../employer/employer.model';
+
+// complete profile
+const completeProfile = async (user: JwtPayload) => {
+  const isCompleteUserProfile = await User.isProfileFulfilled(user.id);
+
+  if (!isCompleteUserProfile) {
+    throw new ApiError(StatusCodes.FORBIDDEN, 'Incomplete profile');
+  }
+
+  if (user.role === USER_ROLES.EMPLOYER) {
+    const isComplete = await Employer.isProfileFulfilled(user.id);
+    if (!isComplete) {
+      throw new ApiError(StatusCodes.FORBIDDEN, 'Incomplete profile');
+    }
+  }
+};
 
 // get user subscription
 const getUserPlan = async (userId: string) => {
@@ -151,4 +170,5 @@ export const LimitationServices = {
   onGetCandidateApplications,
   onJobSeekerMatchNotification,
   onCreateAppointment,
+  completeProfile,
 };
