@@ -254,10 +254,11 @@ const hiringRequestToAdmin = (
             <div style="margin-top: 30px; border: 1px solid #ccc; padding: 20px;">
                 <h2 style="margin: 0 0 10px 0; font-size: 22px;">Job-Details</h2>
                 <p style="margin: 0; color: #666;">${employer.address}</p>
+                <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${job.category}</h3>
                 <h3 style="margin: 10px 0 5px 0; font-size: 18px;">${job.subCategory}</h3>
                 <p style="margin: 0; font-size: 14px;"><strong>${job.jobType}</strong></p>
                 <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">€${job.salaryAmount}/${job.salaryType}</p>
-                <p style="margin: 0; color: #888; font-size: 12px;">📅 Frist: ${new Date(job.deadline).toLocaleDateString('de-DE')}</p>
+                <p style="margin: 0; color: #888; font-size: 12px;">Frist: ${new Date(job.deadline).toLocaleDateString('de-DE')}</p>
 
                 <h4 style="margin: 20px 0 5px 0;">Stellenbeschreibung</h4>
                 <p style="margin: 0; font-size: 13px;">${job.description}</p>
