@@ -7,6 +7,7 @@ import { Appointment } from '../appointment/appointment.model';
 import { JwtPayload } from 'jsonwebtoken';
 import { USER_ROLES } from '../user/user.constant';
 import { Employer } from '../employer/employer.model';
+import { PackageName } from '../package/package.constants';
 
 // complete profile
 const completeProfile = async (user: JwtPayload) => {
@@ -48,7 +49,7 @@ const getUserPlan = async (userId: string) => {
     return sub.package.name;
   }
 
-  return 'BASIC';
+  return PackageName.BASIC;
 };
 
 // on create job
@@ -56,7 +57,7 @@ const onCreateJob = async (userId: string) => {
   const plan = await getUserPlan(userId);
 
   // check job limit for basic plan - 5 jobs per month
-  if (plan === 'BASIC') {
+  if (plan === PackageName.BASIC) {
     const startOfMonth = new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -81,7 +82,7 @@ const onCreateJob = async (userId: string) => {
 // on get candidate applications
 const onGetCandidateApplications = async (userId: string) => {
   const plan = await getUserPlan(userId);
-  const hasLimitation = plan === 'BASIC';
+  const hasLimitation = plan === PackageName.BASIC;
   return hasLimitation;
 };
 
@@ -93,7 +94,7 @@ export const onJobSeekerMatchNotification = async (
   const plan = await getUserPlan(userId);
 
   // Premium users → no limitation
-  if (plan !== 'BASIC') {
+  if (plan !== PackageName.BASIC) {
     return false;
   }
 
@@ -114,7 +115,7 @@ export const onCreateAppointment = async (
 ) => {
   const plan = await getUserPlan(userId);
 
-  if (plan !== 'BASIC') {
+  if (plan !== PackageName.BASIC) {
     return;
   }
 
