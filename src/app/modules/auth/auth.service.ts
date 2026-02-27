@@ -80,7 +80,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
   // if 2fa is active, send otp
   if (
     (isExistUser.authentication?.is2FAEmailActive && isExistUser.email) ||
-    isExistUser?.totpSecret
+    isExistUser?.authentication?.is2FAAppActive
   ) {
     const otp = generateOTP(6);
     const values = {
@@ -102,8 +102,8 @@ const loginUserFromDB = async (payload: ILoginData) => {
     data = {
       role: isExistUser.role,
       userId: isExistUser._id,
-      is2FAEmail: isExistUser.authentication?.is2FAEmailActive,
-      is2FAAuthenticator: !!isExistUser?.totpSecret,
+      is2FAEmailActive: isExistUser.authentication?.is2FAEmailActive,
+      is2FAAppActive: isExistUser.authentication?.is2FAAppActive,
       isProfileFulfilled: await User.isProfileFulfilled(isExistUser._id),
     };
     message = 'Please check your email and enter otp to login';

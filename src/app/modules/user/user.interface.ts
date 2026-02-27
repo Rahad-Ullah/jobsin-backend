@@ -34,6 +34,7 @@ export type IUser = {
   authentication?: {
     isResetPassword: boolean;
     is2FAEmailActive: boolean;
+    is2FAAppActive: boolean;
     is2FAProcessing: boolean;
     oneTimeCode: number;
     expireAt: Date;

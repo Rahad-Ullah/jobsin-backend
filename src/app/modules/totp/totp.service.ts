@@ -52,6 +52,13 @@ async function verifyToken(userId: string, userOtp: string) {
     config.jwt.jwt_expire_in as string,
   );
 
+  // update user to set 2FA app active
+  if (!user.authentication?.is2FAAppActive) {
+    await User.findByIdAndUpdate(user._id, {
+      'authentication.is2FAAppActive': true,
+    });
+  }
+
   return {
     accessToken,
     role: user.role,

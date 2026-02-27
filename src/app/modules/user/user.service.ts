@@ -131,9 +131,10 @@ const updateUserByIdIntoDB = async (
     delete payload.is2FAEmailActive;
   }
 
-  if (payload.is2FAAuthenticatorActive === false) {
+  if (payload.is2FAAppActive === false) {
     payload['totpSecret'] = null;
-    delete payload.is2FAAuthenticatorActive;
+    payload['authentication.is2FAAppActive'] = false;
+    delete payload.is2FAAppActive;
   }
 
   const updateDoc = await User.findByIdAndUpdate(id, payload, {
@@ -214,7 +215,7 @@ const getUserProfileFromDB = async (id: string) => {
     ...result,
     authentication: {
       is2FAEmailActive: result.authentication?.is2FAEmailActive,
-      is2FAAuthenticatorActive: !!result.totpSecret,
+      is2FAAppActive: result.authentication?.is2FAAppActive,
     },
     totpSecret: null,
   };

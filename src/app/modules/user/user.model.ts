@@ -128,6 +128,10 @@ const userSchema = new Schema<IUser, UserModal>(
           type: Boolean,
           default: false,
         },
+        is2FAAppActive: {
+          type: Boolean,
+          default: false,
+        },
         is2FAProcessing: {
           type: Boolean,
           default: null,

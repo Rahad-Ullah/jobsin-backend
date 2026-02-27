@@ -43,7 +43,7 @@ const updateUserZodSchema = z.object({
         .optional(),
       image: z.string().optional(),
       is2FAEmailActive: z.boolean().optional(),
-      is2FAAuthenticatorActive: z.boolean().optional(),
+      is2FAAppActive: z.boolean().optional(),
     })
     .strict(),
 });
