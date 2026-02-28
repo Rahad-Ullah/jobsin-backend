@@ -373,6 +373,17 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           </table>
 
           <div style="margin-top: 40px;">
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Aufgaben</h3>
+            <p style="color: #666; font-size: 14px; line-height: 1.6;">
+              ${
+                shiftPlan.plans
+                  .map(p => p.tasks)
+                  .filter(t => t)
+                  .join('<br>') || ''
+              }
+            </p>
+          </div>
+          <div style="margin-top: 40px;">
             <h3 style="font-size: 18px; margin-bottom: 10px;">Anmerkungen</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
               ${
