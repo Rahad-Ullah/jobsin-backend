@@ -14,13 +14,16 @@ const completeProfile = async (user: JwtPayload) => {
   const isCompleteUserProfile = await User.isProfileFulfilled(user.id);
 
   if (!isCompleteUserProfile) {
-    throw new ApiError(StatusCodes.FORBIDDEN, 'Incomplete profile');
+    throw new ApiError(StatusCodes.FORBIDDEN, 'Please complete your profile.');
   }
 
   if (user.role === USER_ROLES.EMPLOYER) {
     const isComplete = await Employer.isProfileFulfilled(user.id);
     if (!isComplete) {
-      throw new ApiError(StatusCodes.FORBIDDEN, 'Incomplete profile');
+      throw new ApiError(
+        StatusCodes.FORBIDDEN,
+        'Please complete your profile.',
+      );
     }
   }
 };
