@@ -189,7 +189,7 @@ const hiringRequestToAdmin = (
 ) => {
   const data = {
     to: email,
-    subject: `Vermittlungsanfrage: ${employer.name} - ${job.category}`, // "Hiring Request"
+    subject: `Hiring Request: ${employer.name} - ${job.category}`, // "Hiring Request"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
         <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
@@ -306,7 +306,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
-    timeZone: 'Europe/Berlin', 
+    timeZone: 'Europe/Berlin',
   };
 
   const data = {
@@ -527,11 +527,32 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .join('')}
           </div>
 
-          <div style="background: #074E5E; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Bereit sich zu bewerben?</p>
-            <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
-              Diese Jobs warten auf Sie! Öffnen Sie die <strong>JobsinApp</strong>, um die Aufgabenbereiche zu sehen und sich sofort zu bewerben.
+          <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
+            <p style="margin: 0 0 20px 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
+              These jobs are waiting for you! Open <strong>JobsinApp</strong> to view details and apply instantly.
             </p>
+            
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="center">
+                  <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="padding: 0 20px;">
+                        <a href="https://jobsinapp.de" style="text-decoration: none;">
+                          <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Download on the App Store" style="width: 30px; display: block;" />
+                        </a>
+                      </td>
+                      <td style="padding: 0 20px;">
+                        <a href="https://jobsinapp.de" style="text-decoration: none;">
+                          <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Get it on Google Play" style="width: 30px; display: block;" />
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </div>
 
         </div>

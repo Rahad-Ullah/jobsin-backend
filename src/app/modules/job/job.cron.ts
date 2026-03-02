@@ -16,6 +16,7 @@ import { IEmployer } from '../employer/employer.interface';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { PackageName } from '../package/package.constants';
 import { JobStatus } from './job.constants';
+import { translateHelper } from '../../../helpers/translateHelper';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -110,7 +111,7 @@ export function startJobSeekerAlertCron() {
 
       console.log(
         `[CRON] Job seeker alert completed for ${employers.length} employers`,
-      ); 
+      );
     } catch (err) {
       console.error('[CRON] Job seeker alert failed', err);
     }
@@ -220,7 +221,7 @@ const PER_USER_DELAY_MS = 300; // throttle between users
 
 // ----------- CRON STARTER -------------
 export function startJobAlertCron() {
-  nodeCron.schedule('*/10 * * * *', async () => {
+  nodeCron.schedule('*/1 * * * *', async () => {
     console.log('[CRON] Job alert started');
 
     try {
@@ -238,8 +239,13 @@ export function startJobAlertCron() {
       for (const user of jobSeekers) {
         const settings = (user as any).jobSeeker?.notificationSettings;
         if (!settings) continue;
-        const { pushNotification, emailNotification, repeat, lastSentAt } =
-          settings;
+        const {
+          pushNotification,
+          emailNotification,
+          email,
+          repeat,
+          lastSentAt,
+        } = settings;
 
         // if both settings are off, skip
         if (!pushNotification && !emailNotification) {
@@ -247,9 +253,9 @@ export function startJobAlertCron() {
         }
 
         // 2️⃣ Check DAILY / WEEKLY timing
-        if (!shouldSendJobAlert(repeat, lastSentAt, now)) {
-          continue;
-        }
+        // if (!shouldSendJobAlert(repeat, lastSentAt, now)) {
+        //   continue;
+        // }
 
         // 3️⃣ Find new matching jobs
         const jobs = await findMatchingJobs(user);
@@ -272,18 +278,26 @@ export function startJobAlertCron() {
         }
 
         // 4️⃣ Send email notification
-        if (emailNotification && user.email) {
+        if (emailNotification && email) {
           const template = emailTemplate.jobAlert(user, jobs);
+          const translatedSubject = await translateHelper.translateHTML(
+            template.subject,
+            'de',
+          );
+          const translatedHtml = await translateHelper.translateHTML(
+            template.html,
+            'de',
+          );
           await emailHelper.sendEmail({
-            to: user.email,
-            subject: template.subject,
-            html: template.html,
+            to: email,
+            subject: translatedSubject,
+            html: translatedHtml,
           });
         }
 
         // 5️⃣ Update lastSentAt after success
-        await User.updateOne(
-          { _id: user._id },
+        await JobSeeker.updateOne(
+          { user: user._id },
           { 'notificationSettings.lastSentAt': now },
         );
 
@@ -338,11 +352,13 @@ async function findMatchingJobs(user: any) {
           type: 'Point',
           coordinates: user.location.coordinates,
         },
-        $maxDistance: 2000 * 1000, // 10km in meters
+        $maxDistance: 200 * 1000, // 200km in meters
       },
     },
   })
-    .select('_id category subCategory jobType location')
+    .select(
+      '_id category subCategory jobType experience salaryType salaryAmount deadline location',
+    )
     .limit(20);
 }
 
