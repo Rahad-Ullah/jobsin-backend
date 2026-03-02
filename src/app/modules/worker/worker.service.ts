@@ -8,9 +8,12 @@ const createWorkerToDB = async (
   payload: Partial<IWorker>
 ): Promise<IWorker> => {
   // check if worker already exists
-  const existingWorker = await Worker.exists({ email: payload.email });
+  const existingWorker = await Worker.exists({
+    email: payload.email,
+    author: payload.author,
+  });
   if (existingWorker) {
-    throw new ApiError(StatusCodes.CONFLICT, 'Email already exists');
+    throw new ApiError(StatusCodes.CONFLICT, 'Worker already exists');
   }
 
   const result = await Worker.create(payload);

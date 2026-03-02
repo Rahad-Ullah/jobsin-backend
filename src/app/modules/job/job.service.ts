@@ -92,7 +92,11 @@ const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
     );
     const translatedHtml = await translateHelper.translateHTML(
       template.html,
-      language || 'en',
+      language || 'de',
+    );
+    const translatedSubject = await translateHelper.translateHTML(
+      template.subject,
+      language || 'de',
     );
     const fileName = `hiring-request-${existingJob._id}-${Date.now()}`;
     await generatePdfFromHtml(translatedHtml, fileName);
@@ -102,7 +106,7 @@ const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
 
     await emailHelper.sendEmail({
       to: platformEmail,
-      subject: template.subject,
+      subject: translatedSubject,
       html: `
               <p>Ihr Einstellungsantragsvertrag ist fertig.</p>
               <a href="${pdfUrl}" target="_blank">Download PDF</a>
