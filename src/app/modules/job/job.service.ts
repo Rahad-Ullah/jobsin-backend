@@ -104,7 +104,7 @@ const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
       to: platformEmail,
       subject: template.subject,
       html: `
-              <p>Your hiring request contract is ready.</p>
+              <p>Ihr Einstellungsantragsvertrag ist fertig.</p>
               <a href="${pdfUrl}" target="_blank">Download PDF</a>
             `,
     });

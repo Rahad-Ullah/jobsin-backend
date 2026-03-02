@@ -409,7 +409,7 @@ const jobSeekerAlert = (
 ) => {
   const data = {
     to: employerUser.email,
-    subject: `🚀 ${jobSeekerUsers.length} passende Kandidaten gefunden - Jobsin App`, // "Qualified Candidates Found"
+    subject: `🚀 ${jobSeekerUsers.length} passende Kandidaten gefunden - JobsinApp`, // "Qualified Candidates Found"
     html: `
       <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
@@ -467,14 +467,14 @@ const jobSeekerAlert = (
           <div style="background: #202124; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
             <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">Möchten Sie die Profile einsehen?</p>
             <p style="margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.5;">
-              Öffnen Sie die <strong>Jobsin App</strong>, um vollständige Lebensläufe und Kontaktdaten einzusehen und den Einstellungsprozess zu starten.
+              Öffnen Sie die <strong>JobsinApp</strong>, um vollständige Lebensläufe und Kontaktdaten einzusehen und den Einstellungsprozess zu starten.
             </p>
           </div>
 
         </div>
 
         <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. Alle Rechte vorbehalten.</p>
+          <p style="margin: 0;">© ${new Date().getFullYear()} JobsinApp. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     `,
@@ -487,7 +487,7 @@ const jobSeekerAlert = (
 const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
   const data = {
     to: user.email,
-    subject: `🚀 ${jobs.length} neue Job-Angebote - Jobsin App`, // "New Job Alerts"
+    subject: `🚀 ${jobs.length} neue Job-Angebote - JobsinApp`, // "New Job Alerts"
     html: `
       <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
@@ -530,14 +530,14 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
           <div style="background: #074E5E; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
             <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Bereit sich zu bewerben?</p>
             <p style="margin: 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
-              Diese Jobs warten auf Sie! Öffnen Sie die <strong>Jobsin App</strong>, um die Aufgabenbereiche zu sehen und sich sofort zu bewerben.
+              Diese Jobs warten auf Sie! Öffnen Sie die <strong>JobsinApp</strong>, um die Aufgabenbereiche zu sehen und sich sofort zu bewerben.
             </p>
           </div>
 
         </div>
 
         <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} Jobsin App. Alle Rechte vorbehalten.</p>
+          <p style="margin: 0;">© ${new Date().getFullYear()} JobsinApp. Alle Rechte vorbehalten.</p>
         </div>
       </div>
     `,

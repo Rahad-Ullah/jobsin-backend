@@ -78,7 +78,7 @@ const sendShiftPlanToWorker = async (
     const template = emailTemplate.shiftPlanToWorker(worker, existingPlan);
     const translatedHtml = await translateHelper.translateHTML(
       template.html,
-      language || 'en',
+      language || 'de',
     );
     const fileName = `shift-plan-${existingPlan._id}-${Date.now()}`;
     await generatePdfFromHtml(translatedHtml, fileName);
@@ -90,7 +90,7 @@ const sendShiftPlanToWorker = async (
       to: worker.email,
       subject: template.subject,
       html: `
-              <p>You have a new shift plan.</p>
+              <p>Sie haben einen neuen Schichtplan.</p>
               <a href="${pdfUrl}" target="_blank">Download PDF</a>
             `,
     });
