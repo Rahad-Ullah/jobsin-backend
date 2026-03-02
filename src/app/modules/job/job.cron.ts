@@ -67,8 +67,13 @@ export function startJobSeekerAlertCron() {
 
         if (!employer || !employer.notificationSettings) continue;
 
-        const { repeat, lastSentAt, pushNotification, emailNotification } =
-          employer.notificationSettings;
+        const {
+          repeat,
+          lastSentAt,
+          pushNotification,
+          emailNotification,
+          email,
+        } = employer.notificationSettings;
 
         // 2️⃣ MONTHLY LIMIT CHECK (BASIC users only)
         const isLimited = await LimitationServices.onJobSeekerMatchNotification(
@@ -97,6 +102,7 @@ export function startJobSeekerAlertCron() {
           categories as string[],
           pushNotification,
           emailNotification,
+          email,
         );
 
         // 6️⃣ Update lastSentAt after success
@@ -145,6 +151,7 @@ async function sendEmployerNotification(
   categories: string[],
   pushNotification: boolean,
   emailNotification: boolean,
+  email: string,
 ) {
   // fetch jobSeeker ids by filtering experiences category
   const jobSeekers = await JobSeeker.find({
@@ -195,13 +202,13 @@ async function sendEmployerNotification(
   }
 
   // send email notification
-  if (emailNotification && employerUser.email) {
+  if (emailNotification && email) {
     const template = emailTemplate.jobSeekerAlert(
       employerUser,
       jobSeekerUsers as any[],
     );
     await emailHelper.sendEmail({
-      to: employerUser.email,
+      to: email,
       subject: template.subject,
       html: template.html,
     });
@@ -221,7 +228,7 @@ const PER_USER_DELAY_MS = 300; // throttle between users
 
 // ----------- CRON STARTER -------------
 export function startJobAlertCron() {
-  nodeCron.schedule('*/1 * * * *', async () => {
+  nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Job alert started');
 
     try {
@@ -253,9 +260,9 @@ export function startJobAlertCron() {
         }
 
         // 2️⃣ Check DAILY / WEEKLY timing
-        // if (!shouldSendJobAlert(repeat, lastSentAt, now)) {
-        //   continue;
-        // }
+        if (!shouldSendJobAlert(repeat, lastSentAt, now)) {
+          continue;
+        }
 
         // 3️⃣ Find new matching jobs
         const jobs = await findMatchingJobs(user);

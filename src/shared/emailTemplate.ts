@@ -456,7 +456,7 @@ const jobSeekerAlert = (
                   </div>
 
                   <p style="margin: 12px 0 0 0; font-size: 13px; color: #777; line-height: 1.4;">
-                    "${candidate.jobSeeker.overview?.substring(0, 120) || 'Keine Beschreibung verfügbar'}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
+                    "${candidate.jobSeeker.overview?.substring(0, 120) || ''}${candidate.jobSeeker.overview?.length > 120 ? '...' : ''}"
                   </p>
                 </div>
               `;
@@ -469,6 +469,27 @@ const jobSeekerAlert = (
             <p style="margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.5;">
               Öffnen Sie die <strong>JobsinApp</strong>, um vollständige Lebensläufe und Kontaktdaten einzusehen und den Einstellungsprozess zu starten.
             </p>
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
+              <tr>
+                <td align="center">
+                  <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td style="padding: 0 20px;">
+                        <a href="https://jobsinapp.de" style="text-decoration: none;">
+                          <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Download on the App Store" style="width: 30px; display: block;" />
+                        </a>
+                      </td>
+                      <td style="padding: 0 20px;">
+                        <a href="https://jobsinapp.de" style="text-decoration: none;">
+                          <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Get it on Google Play" style="width: 30px; display: block;" />
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </div>
 
         </div>
