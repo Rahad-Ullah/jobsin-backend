@@ -6,6 +6,7 @@ import { Employer } from './employer.model';
 import { IUser } from '../user/user.interface';
 import unlinkFile from '../../../shared/unlinkFile';
 import { UpdateQuery } from 'mongoose';
+import { Category } from '../category/category.model';
 
 // -------------- update employer service by user id --------------
 export const updateEmployerByUserId = async (
@@ -16,6 +17,15 @@ export const updateEmployerByUserId = async (
   const existingEmployer = await Employer.findOne({ user: userId });
   if (!existingEmployer) {
     throw new Error('Employer not found');
+  }
+  // check if the category is valid
+  if (payload.businessCategory) {
+    const existingCategory = await Category.exists({
+      name: payload.businessCategory,
+    });
+    if (!existingCategory) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid business category');
+    }
   }
 
   // handle notificationSettings (PARTIAL UPDATE)
@@ -33,17 +43,26 @@ export const updateEmployerByUserId = async (
   );
 
   return result;
-};;
+};
 
-// -------------- update employer user profile --------------
+// -------------- update both employer & user profile --------------
 const updateEmployerUserProfile = async (
   userId: string,
-  payload: Partial<IEmployer> & Partial<IUser>
+  payload: Partial<IEmployer> & Partial<IUser>,
 ) => {
   // check if the user exists
   const existingUser = await User.findById(userId);
   if (!existingUser) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+  }
+  // check if the category is valid
+  if (payload.businessCategory) {
+    const existingCategory = await Category.exists({
+      name: payload.businessCategory,
+    });
+    if (!existingCategory) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid business category');
+    }
   }
 
   const { name, phone, address, location, image, ...employerData } = payload;
@@ -72,11 +91,11 @@ const updateEmployerUserProfile = async (
 
 // -------------- get employer by user id --------------
 const getEmployerByUserId = async (
-  userId: string
+  userId: string,
 ): Promise<IEmployer | null> => {
   const employer = await Employer.findOne({ user: userId }).populate(
     'user',
-    'name email role image phone address subscription status'
+    'name email role image phone address subscription status',
   );
   return employer;
 };
