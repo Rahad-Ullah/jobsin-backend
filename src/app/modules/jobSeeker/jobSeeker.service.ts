@@ -4,17 +4,47 @@ import { Application } from '../application/application.model';
 import { Job } from '../job/job.model';
 import { IJobSeeker } from './jobSeeker.interface';
 import { JobSeeker } from './jobSeeker.model';
+import { Category } from '../category/category.model';
+import ApiError from '../../../errors/ApiError';
+import { StatusCodes } from 'http-status-codes';
 
 // ------------- update job seeker by user id -------------
 const updateJobSeekerByUserId = async (
   userId: string,
   payload: UpdateQuery<IJobSeeker> & { removedImages?: string[] },
 ) => {
-  // console.log(payload);
   // check if job seeker exists
   const existingJobSeeker = await JobSeeker.findOne({ user: userId });
   if (!existingJobSeeker) {
     throw new Error('Job seeker not found');
+  }
+
+  // check if category and subcategory are valid
+  if (payload.experiences && payload.experiences.length > 0) {
+    const categories = await Category.find().select('name subCategories');
+    const categoryMap = new Map(
+      categories.map(category => [category.name, category]),
+    );
+    for (const experience of payload.experiences) {
+      if (experience.category) {
+        const category = categoryMap.get(experience.category);
+        if (!category) {
+          throw new ApiError(
+            StatusCodes.NOT_FOUND,
+            `Invalid category: ${experience.category}`,
+          );
+        }
+      }
+      if (experience.subCategory) {
+        const category = categoryMap.get(experience.category);
+        if (!category?.subCategories.includes(experience.subCategory)) {
+          throw new ApiError(
+            StatusCodes.NOT_FOUND,
+            `Invalid sub category: ${experience.subCategory}`,
+          );
+        }
+      }
+    }
   }
 
   // removed attachments handling
