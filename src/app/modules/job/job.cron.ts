@@ -76,10 +76,11 @@ export function startJobSeekerAlertCron() {
         } = employer.notificationSettings;
 
         // 2️⃣ MONTHLY LIMIT CHECK (BASIC users only)
-        const isLimited = await LimitationServices.onJobSeekerMatchNotification(
-          employerUser._id.toString(),
-          lastSentAt,
-        );
+        const { isLimited, plan } =
+          await LimitationServices.onJobSeekerMatchNotification(
+            employerUser._id.toString(),
+            lastSentAt,
+          );
 
         if (isLimited) {
           continue; // ⛔ already received notification in this month
@@ -103,6 +104,7 @@ export function startJobSeekerAlertCron() {
           pushNotification,
           emailNotification,
           email,
+          plan,
         );
 
         // 6️⃣ Update lastSentAt after success
@@ -152,6 +154,7 @@ async function sendEmployerNotification(
   pushNotification: boolean,
   emailNotification: boolean,
   email: string,
+  plan: string,
 ) {
   // fetch jobSeeker ids by filtering experiences category
   const jobSeekers = await JobSeeker.find({
@@ -195,6 +198,11 @@ async function sendEmployerNotification(
         message: `Job alert for ${category}`,
         referenceId: user._id.toString(),
       });
+
+      // monthly limit: 1 notification per month for BASIC users
+      if (plan === PackageName.BASIC) {
+        break; // stop after sending 1 notification
+      }
 
       // 💤 throttle per notification
       await sleep(PER_NOTIFICATION_DELAY_MS);

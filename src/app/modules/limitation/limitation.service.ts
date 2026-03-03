@@ -93,21 +93,22 @@ const onGetCandidateApplications = async (userId: string) => {
 export const onJobSeekerMatchNotification = async (
   userId: string,
   lastSentAt: Date | null,
-): Promise<boolean> => {
+): Promise<{ isLimited: boolean; plan: string }> => {
   const plan = await getUserPlan(userId);
 
   // Premium users → no limitation
   if (plan !== PackageName.BASIC) {
-    return false;
+    return { isLimited: false, plan };
   }
 
   // BASIC users → 1 per calendar month
   if (!lastSentAt) {
-    return false; // never sent before → allow
+    return { isLimited: false, plan }; // never sent before → allow
   }
 
   const now = new Date();
-  return isSameCalendarMonth(lastSentAt, now);
+  const isLimited = isSameCalendarMonth(lastSentAt, now);
+  return { isLimited, plan };
 };
 
 // on create appointment
