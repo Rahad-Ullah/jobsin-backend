@@ -76,6 +76,18 @@ const invoiceSchema = new Schema<IInvoice, InvoiceModel>(
       type: String,
       default: null,
     },
+    refundReceiptUrl: {
+      type: String,
+      default: null,
+    },
+    refundReason: {
+      type: String,
+      default: null,
+    },
+    refundAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

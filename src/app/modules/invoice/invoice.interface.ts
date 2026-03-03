@@ -20,6 +20,9 @@ export interface IInvoice {
   paidAt?: Date | null;
   invoicePdfUrl?: string | null;
   hostedInvoiceUrl?: string | null;
+  refundReceiptUrl?: string | null;
+  refundReason?: string | null;
+  refundAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

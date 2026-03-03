@@ -37,10 +37,20 @@ const refundInvoiceFromDB = async (invoiceId: string, reason: string) => {
     );
   }
 
+  // get refund receipt URL
+  const charge = await stripe.charges.retrieve(
+    invoice.stripeChargeId as string,
+  );
+  const receiptUrl = charge.receipt_url;
+
   // update invoice and it's subscription
   const result = await Invoice.findByIdAndUpdate(invoiceId, {
     status: InvoiceStatus.REFUNDED,
+    refundReceiptUrl: receiptUrl,
+    refundReason: reason,
+    refundAt: new Date(),
   });
+  
   await Subscription.findByIdAndUpdate(
     invoice.subscription,
     { status: SubscriptionStatus.CANCELED },
@@ -48,7 +58,7 @@ const refundInvoiceFromDB = async (invoiceId: string, reason: string) => {
   );
 
   return result;
-};
+};;
 
 // ------------- get invoices by user id -------------
 const getInvoicesByUserIdFromDB = async (
