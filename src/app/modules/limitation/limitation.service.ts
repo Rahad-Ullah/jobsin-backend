@@ -72,7 +72,7 @@ const onCreateJob = async (userId: string) => {
       isHiringRequest: false,
       createdAt: { $gte: startOfMonth },
     });
-
+    console.log(`plan: ${plan} --> jobCount: ${jobCount} --> user: ${userId}`);
     if (jobCount >= 5) {
       throw new ApiError(
         StatusCodes.PAYMENT_REQUIRED,
