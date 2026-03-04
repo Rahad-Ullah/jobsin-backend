@@ -387,10 +387,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
             <h3 style="font-size: 18px; margin-bottom: 10px;">Notes</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
               ${
-                shiftPlan.plans
-                  .map(p => p.remarks)
-                  .filter(r => r)
-                  .join('<br>') || ''
+                shiftPlan.plans.find(p => p.remarks)?.remarks || ''
               }
             </p>
           </div>
