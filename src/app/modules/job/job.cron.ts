@@ -380,7 +380,7 @@ async function findMatchingJobs(user: any) {
 // ############## CRON FOR PRIORITIZE JOB LIST ############
 export function startPrioritizedJobListCron() {
   // runs every day at 1:00 AM
-  nodeCron.schedule('0 1 * * *', async () => {
+  nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Prioritizing job list started');
     try {
       // get all employer users who have premium subscription
@@ -413,7 +413,7 @@ export function startPrioritizedJobListCron() {
         {
           author: { $in: premiumEmployerIds },
           deadline: { $gt: new Date() },
-          updatedAt: { $lte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          // updatedAt: { $lte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         },
         {},
       );
