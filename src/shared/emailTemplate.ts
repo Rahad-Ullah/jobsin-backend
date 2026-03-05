@@ -200,7 +200,6 @@ const hiringRequestToAdmin = (
                     <p style="margin: 10px 0 0 0;">
                         <strong>Auftraggeber</strong><br>
                         ${employer.name}<br>
-                        ${employer.email}<br>
                         ${employer.address}
                     </p>
                     <p style="margin: 10px 0 0 0;">
