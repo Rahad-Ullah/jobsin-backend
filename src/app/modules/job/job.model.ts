@@ -13,6 +13,7 @@ const jobSchema = new Schema<IJob, JobModel>(
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     category: { type: String, required: true },
     subCategory: { type: String, required: true },
+    address: { type: String, required: true },
     location: {
       type: {
         type: String,

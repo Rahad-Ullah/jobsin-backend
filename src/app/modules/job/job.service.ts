@@ -20,7 +20,9 @@ import { translateHelper } from '../../../helpers/translateHelper';
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
   // check if author exists
-  const existingUser = await User.findById(payload.author).select('location');
+  const existingUser = await User.findById(payload.author).select(
+    'location address',
+  );
   if (!existingUser) {
     throw new Error('User not found');
   }
@@ -36,6 +38,7 @@ const createJob = async (payload: IJob): Promise<IJob> => {
   }
 
   // inherit location from author
+  payload.address = existingUser.address;
   payload.location = existingUser.location;
 
   const result = await Job.create(payload);

@@ -13,6 +13,7 @@ export interface IJob {
   author: Types.ObjectId;
   category: string;
   subCategory: string;
+  address: string;
   location: {
     type: 'Point';
     coordinates: number[];
