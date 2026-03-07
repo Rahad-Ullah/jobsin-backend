@@ -460,29 +460,32 @@ const jobSeekerAlert = (
               .join('')}
           </div>
 
-          <div style="background: #202124; color: white; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">Möchten Sie die Profile einsehen?</p>
-            <p style="margin: 0; font-size: 14px; opacity: 0.9; line-height: 1.5;">
-              Öffnen Sie die <strong>JobsinApp</strong>, um vollständige Lebensläufe und Kontaktdaten einzusehen und den Einstellungsprozess zu starten.
+          <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+            <p style="margin: 0 0 5px 0; font-size: 14px;">
+              <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
+            </p>
+            <p style="margin: 0 0 20px 0; font-size: 14px;">
+              <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
             </p>
 
-            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
+            <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
+              <span style="margin-right: 5px;">⬇</span> Download our Mobile App
+            </p>
+            
+            <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
               <tr>
-                <td align="center">
-                  <table border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td style="padding: 0 20px;">
-                        <a href="https://jobsinapp.de" style="text-decoration: none;">
-                          <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Download on the App Store" style="width: 30px; display: block;" />
-                        </a>
-                      </td>
-                      <td style="padding: 0 20px;">
-                        <a href="https://jobsinapp.de" style="text-decoration: none;">
-                          <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Get it on Google Play" style="width: 30px; display: block;" />
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
+                <td style="font-size: 15px; font-weight: bold;">
+                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                    <span style="vertical-align: middle;">App Store</span>
+                  </a>
+                </td>
+                <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
+                <td style="font-size: 15px; font-weight: bold;">
+                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                    <span style="vertical-align: middle;">Google Play</span>
+                  </a>
                 </td>
               </tr>
             </table>
@@ -545,28 +548,31 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
           </div>
 
           <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 18px;">Ready to apply?</p>
-            <p style="margin: 0 0 20px 0; font-size: 15px; opacity: 0.95; line-height: 1.5;">
-              These jobs are waiting for you! Open <strong>JobsinApp</strong> to view details and apply instantly.
+            <p style="margin: 0 0 5px 0; font-size: 14px;">
+              <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
+            </p>
+            <p style="margin: 0 0 20px 0; font-size: 14px;">
+              <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
+            </p>
+
+            <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
+              <span style="margin-right: 5px;">⬇</span> Download our Mobile App
             </p>
             
-            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
               <tr>
-                <td align="center">
-                  <table border="0" cellspacing="0" cellpadding="0">
-                    <tr>
-                      <td style="padding: 0 20px;">
-                        <a href="https://jobsinapp.de" style="text-decoration: none;">
-                          <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Download on the App Store" style="width: 30px; display: block;" />
-                        </a>
-                      </td>
-                      <td style="padding: 0 20px;">
-                        <a href="https://jobsinapp.de" style="text-decoration: none;">
-                          <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Get it on Google Play" style="width: 30px; display: block;" />
-                        </a>
-                      </td>
-                    </tr>
-                  </table>
+                <td style="font-size: 15px; font-weight: bold;">
+                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                    <span style="vertical-align: middle;">App Store</span>
+                  </a>
+                </td>
+                <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
+                <td style="font-size: 15px; font-weight: bold;">
+                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+                    <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                    <span style="vertical-align: middle;">Google Play</span>
+                  </a>
                 </td>
               </tr>
             </table>
