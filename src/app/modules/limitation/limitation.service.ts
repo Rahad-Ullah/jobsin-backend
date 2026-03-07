@@ -82,6 +82,19 @@ const onCreateJob = async (userId: string) => {
   }
 };
 
+// on update job
+const onUpdateJob = async (userId: string) => {
+  const plan = await getUserPlan(userId);
+
+  // check job update limit for basic plan - 0 updates per month
+  if (plan === PackageName.BASIC) {
+    throw new ApiError(
+        StatusCodes.PAYMENT_REQUIRED,
+        'Please upgrade your plan.',
+      );
+  }
+};
+
 // on get candidate applications
 const onGetCandidateApplications = async (userId: string) => {
   const plan = await getUserPlan(userId);
@@ -172,6 +185,7 @@ export const onCreateAppointment = async (
 
 export const LimitationServices = {
   onCreateJob,
+  onUpdateJob,
   onGetCandidateApplications,
   onJobSeekerMatchNotification,
   onCreateAppointment,

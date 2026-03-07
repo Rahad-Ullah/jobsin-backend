@@ -30,6 +30,11 @@ const createJob = catchAsync(async (req: Request, res: Response) => {
 
 // update job
 const updateJob = catchAsync(async (req: Request, res: Response) => {
+  // check limitations for basic user
+  if (req.body.isHiringRequest !== true) {
+    await LimitationServices.onUpdateJob(req.user.id);
+  }
+
   const result = await JobServices.updateJob(req.params.id, req.body);
 
   sendResponse(res, {
