@@ -10,28 +10,22 @@ export const startSubscriptionExpirationCron = () => {
     try {
       const now = new Date();
 
-      const subscriptions = await Subscription.find({
+      const expiredSubscriptions = await Subscription.find({
         status: {
-          $in: [
-            SubscriptionStatus.ACTIVE,
-            SubscriptionStatus.TRIALING,
-            SubscriptionStatus.CANCELED,
-          ],
+          $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING],
         },
         cancelAtPeriodEnd: true,
         currentPeriodEnd: { $lte: now },
       }).select('_id user');
 
-      if (!subscriptions.length) return;
+      if (!expiredSubscriptions.length) return;
 
-      const expiredSubscriptionIds = subscriptions
-        .filter(s => s.status !== SubscriptionStatus.CANCELED)
-        .map(s => s._id);
-      const userIds = subscriptions.map(s => s.user);
+      const subscriptionIds = expiredSubscriptions.map(s => s._id);
+      const userIds = expiredSubscriptions.map(s => s.user);
 
       // 1️⃣ Expire subscriptions
       await Subscription.updateMany(
-        { _id: { $in: expiredSubscriptionIds } },
+        { _id: { $in: subscriptionIds } },
         { status: SubscriptionStatus.PAST_DUE },
       );
 
@@ -41,9 +35,7 @@ export const startSubscriptionExpirationCron = () => {
         { $set: { subscription: null } },
       );
 
-      console.log(
-        `[CRON] Expired ${expiredSubscriptionIds.length} subscriptions`,
-      );
+      console.log(`[CRON] Expired ${subscriptionIds.length} subscriptions`);
     } catch (error) {
       console.error('[CRON] Subscription expiration failed', error);
     }
