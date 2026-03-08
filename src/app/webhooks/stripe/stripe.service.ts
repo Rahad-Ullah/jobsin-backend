@@ -71,7 +71,7 @@ const onPaymentIntentSucceeded = async (event: Stripe.Event) => {
   );
 };
 
-// on checkout session completed
+// on customer subscription created
 const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
   try {
     const stripeSubscription = event.data.object as Stripe.Subscription;
@@ -162,6 +162,41 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
     }
     logger.info(
       `[Stripe Webhook] Invoice created successfully: ${invoiceResult._id}`,
+    );
+  } catch (error) {
+    console.error('Error onCheckoutSessionCompleted  ~~ ', error);
+  }
+};
+
+// on customer subscription deleted
+const onCustomerSubscriptionDeleted = async (event: Stripe.Event) => {
+  try {
+    const stripeSubscription = event.data.object as Stripe.Subscription;
+
+    const stripeSub: Stripe.Subscription = await stripe.subscriptions.retrieve(
+      stripeSubscription.id as string,
+    );
+
+    const result = await Subscription.findOneAndUpdate(
+      { stripeSubscriptionId: stripeSub.id },
+      { status: SubscriptionStatus.CANCELED },
+      { new: true },
+    );
+    if (!result) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Subscription deletion failed',
+      );
+    }
+
+    logger.info(
+      `[Stripe Webhook] Subscription deleted successfully: ${result._id}`,
+    );
+
+    // DB write: update user subscription
+    await User.findOneAndUpdate(
+      { subscription: result._id },
+      { subscription: null },
     );
   } catch (error) {
     console.error('Error onCheckoutSessionCompleted  ~~ ', error);
@@ -417,6 +452,7 @@ const onRefundCreated = async (event: Stripe.Event) => {
 
 export const StripeWebhookServices = {
   onCustomerSubscriptionCreated,
+  onCustomerSubscriptionDeleted,
   onPaymentIntentSucceeded,
   onInvoicePaid,
   onInvoicePaymentFailed,

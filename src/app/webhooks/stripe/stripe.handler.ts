@@ -24,7 +24,7 @@ export async function stripeEventHandler(event: Stripe.Event) {
       break;
 
     case 'customer.subscription.deleted':
-      //   await onSubscriptionDeleted(event.data.object);
+        await StripeWebhookServices.onCustomerSubscriptionDeleted(event);
       break;
 
     case 'invoice.paid':
