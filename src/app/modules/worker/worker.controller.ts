@@ -14,7 +14,7 @@ const createWorker = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Worker created successfully',
+    message: 'Employee created successfully',
     data: result,
   });
 });
@@ -26,7 +26,7 @@ const updateWorker = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Worker updated successfully',
+    message: 'Employee updated successfully',
     data: result,
   });
 });
@@ -38,7 +38,7 @@ const deleteWorker = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Worker deleted successfully',
+    message: 'Employee deleted successfully',
     data: result,
   });
 });
@@ -50,7 +50,7 @@ const getMyWorkers = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Workers retrieved successfully',
+    message: 'Employees retrieved successfully',
     data: result,
   });
 });
