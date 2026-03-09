@@ -5,7 +5,7 @@ import { Worker } from './worker.model';
 
 // --------------- create worker ---------------
 const createWorkerToDB = async (
-  payload: Partial<IWorker>
+  payload: Partial<IWorker>,
 ): Promise<IWorker> => {
   // check if worker already exists
   const existingWorker = await Worker.exists({
@@ -13,7 +13,7 @@ const createWorkerToDB = async (
     author: payload.author,
   });
   if (existingWorker) {
-    throw new ApiError(StatusCodes.CONFLICT, 'Worker already exists');
+    throw new ApiError(StatusCodes.CONFLICT, 'Employee already exists');
   }
 
   const result = await Worker.create(payload);
@@ -25,7 +25,7 @@ const updateWorker = async (id: string, payload: Partial<IWorker>) => {
   // check if the worker exists
   const existingWorker = await Worker.exists({ _id: id });
   if (!existingWorker) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Worker not found');
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Employee not found');
   }
 
   const result = await Worker.findByIdAndUpdate(id, payload, { new: true });
@@ -37,13 +37,13 @@ const deleteWorker = async (id: string): Promise<IWorker | null> => {
   // check if the worker exists
   const existingWorker = await Worker.exists({ _id: id });
   if (!existingWorker) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Worker not found');
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Employee not found');
   }
-  
+
   const result = await Worker.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
   return result;
 };
