@@ -469,7 +469,7 @@ const jobSeekerAlert = (
             </p>
 
             <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
-              <span style="margin-right: 5px;">⬇</span> Download our Mobile App
+              <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
             </p>
             
             <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
@@ -556,7 +556,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
             </p>
 
             <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
-              <span style="margin-right: 5px;">⬇</span> Download our Mobile App
+              <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
             </p>
             
             <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
