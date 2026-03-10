@@ -37,7 +37,7 @@ const experienceSchema = z
     endDate: z.string().datetime().nullable().optional(),
 
     workDetails: z.string().nonempty('Work details cannot be empty'),
-    portfolioUrls: z.array(z.string().url()).default([]).optional(),
+    portfolioUrls: z.array(z.string()).default([]).optional(),
   })
   .strict();
 
