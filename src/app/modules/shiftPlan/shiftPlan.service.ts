@@ -18,7 +18,7 @@ const createShiftPlanToDB = async (
   // check if the worker exists
   const existingWorker = await Worker.exists({ _id: payload.worker });
   if (!existingWorker) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Worker not found');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Employee not found');
   }
 
   const result = await ShiftPlan.create(payload);
@@ -40,7 +40,7 @@ const updateShiftPlan = async (
   // check if the worker exists
   const existingWorker = await Worker.exists({ _id: payload.worker });
   if (!existingWorker) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, 'Worker not found');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Employee not found');
   }
 
   const result = await ShiftPlan.findByIdAndUpdate(id, payload, { new: true });

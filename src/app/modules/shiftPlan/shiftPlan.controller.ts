@@ -57,7 +57,7 @@ const sendShiftPlanToWorker = catchAsync(async (req: Request, res: Response) => 
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Shift plan sent to worker successfully',
+    message: 'Shift plan sent to employee successfully',
     data: result,
   });
 });
