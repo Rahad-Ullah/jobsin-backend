@@ -83,13 +83,15 @@ const loginUserFromDB = async (payload: ILoginData) => {
     isExistUser?.authentication?.is2FAAppActive
   ) {
     const otp = generateOTP(6);
-    const values = {
-      name: isExistUser.name,
-      otp,
-      email: isExistUser.email!,
-    };
-    const createAccountTemplate = emailTemplate.createAccount(values);
-    emailHelper.sendEmail(createAccountTemplate);
+    if (isExistUser.authentication?.is2FAEmailActive && isExistUser.email) {
+      const values = {
+        name: isExistUser.name,
+        otp,
+        email: isExistUser.email!,
+      };
+      const createAccountTemplate = emailTemplate.createAccount(values);
+      emailHelper.sendEmail(createAccountTemplate);
+    }
 
     // Save authentication info
     const authentication = {
