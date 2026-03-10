@@ -29,6 +29,7 @@ export interface IJob {
   aboutCompany: string;
   status: JobStatus;
   isHiringRequest: boolean;
+  isPrioritized: boolean;
   isDeleted: boolean;
 }
 

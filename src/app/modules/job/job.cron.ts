@@ -415,7 +415,7 @@ export function startPrioritizedJobListCron() {
           deadline: { $gt: new Date() },
           // updatedAt: { $lte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
         },
-        {},
+        { isPrioritized: true },
       );
       console.log(
         `[CRON] Prioritized ${result.modifiedCount} jobs for premium employers`,

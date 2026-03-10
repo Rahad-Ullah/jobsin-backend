@@ -53,6 +53,7 @@ const jobSchema = new Schema<IJob, JobModel>(
       default: JobStatus.OPEN,
     },
     isHiringRequest: { type: Boolean, default: false },
+    isPrioritized: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true },
