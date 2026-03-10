@@ -37,7 +37,7 @@ const experienceSchema = z
     endDate: z.string().datetime().nullable().optional(),
 
     workDetails: z.string().nonempty('Work details cannot be empty'),
-    portfolioUrls: z.array(z.string().url()).default([]),
+    portfolioUrls: z.array(z.string().url()).default([]).optional(),
   })
   .strict();
 
@@ -69,9 +69,9 @@ export const resumeSchema = z.object({
       educations: z.array(educationSchema).optional(),
       experiences: z.array(experienceSchema).optional(),
       license: licenseSchema.optional(),
-      skills: z.array(z.string()).default([]),
-      extraActivities: z.array(z.string()).default([]),
-      hobbies: z.array(z.string()).default([]),
+      skills: z.array(z.string()).default([]).optional(),
+      extraActivities: z.array(z.string()).default([]).optional(),
+      hobbies: z.array(z.string()).default([]).optional(),
     })
     .strict(),
 });
