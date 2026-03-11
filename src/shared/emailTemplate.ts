@@ -11,7 +11,7 @@ import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 const createAccount = (values: ICreateAccount) => {
   const data = {
     to: values.email,
-    subject: 'Bestätigen Sie Ihr Konto', // "Verify your account"
+    subject: 'Bestätigen Sie Ihr Konto - JobsinApp', // "Verify your account"
     html: `
       <body
           style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
@@ -40,7 +40,7 @@ const createAccount = (values: ICreateAccount) => {
 const resetPassword = (values: IResetPassword) => {
   const data = {
     to: values.email,
-    subject: 'Passwort zurücksetzen', // "Reset your password"
+    subject: 'Passwort zurücksetzen - JobsinApp', // "Reset your password"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
           <div
@@ -67,7 +67,7 @@ const resetPassword = (values: IResetPassword) => {
 const confirmAppointment = (values: IAppointment) => {
   const data = {
     to: values.receiver,
-    subject: 'Neuer Termin verfügbar!', // "New Appointment Available!"
+    subject: 'Neuer Termin verfügbar! - JobsinApp', // "New Appointment Available!"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -104,7 +104,7 @@ const confirmAppointment = (values: IAppointment) => {
 const supportReply = (values: ISupport & { reply: string }) => {
   const data = {
     to: values.email,
-    subject: 'Support-Update', // "Support Update"
+    subject: 'Support-Update - JobsinApp', // "Support Update"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
           <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -144,7 +144,7 @@ const supportReply = (values: ISupport & { reply: string }) => {
 const paymentFailed = (values: any) => {
   const data = {
     to: values.email,
-    subject: values.subject || 'Zahlung fehlgeschlagen', // "Payment Failed"
+    subject: values.subject || 'Zahlung fehlgeschlagen - JobsinApp', // "Payment Failed"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
         <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -189,7 +189,7 @@ const hiringRequestToAdmin = (
 ) => {
   const data = {
     to: email,
-    subject: `Hiring Request: ${employer.name} - ${job.category}`, // "Hiring Request"
+    subject: `Hiring Request: ${employer.name} - ${job.category} | JobsinApp`, // "Hiring Request"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
         <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
@@ -310,7 +310,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
 
   const data = {
     to: worker.email,
-    subject: `Your shift plan for ${planMonthYear}`,
+    subject: `Your shift plan for ${planMonthYear} - JobsinApp`,
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
         <div style="max-width: 800px; margin: 0 auto;">
@@ -385,9 +385,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           <div style="margin-top: 40px;">
             <h3 style="font-size: 18px; margin-bottom: 10px;">Notes</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
-              ${
-                shiftPlan.plans.find(p => p.remarks)?.remarks || ''
-              }
+              ${shiftPlan.plans.find(p => p.remarks)?.remarks || ''}
             </p>
           </div>
 
