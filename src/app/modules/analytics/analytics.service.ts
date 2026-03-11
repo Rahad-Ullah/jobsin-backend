@@ -136,7 +136,7 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
   const result = await Subscription.aggregate([
     {
       $facet: {
-        totalSubscribers: [{ $count: 'count' }],
+        totalSubscriptions: [{ $count: 'count' }],
         monthlyData: [
           {
             $match: {
@@ -148,10 +148,17 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
           },
           {
             $group: {
+              // Group by month and user to ensure uniqueness per month
               _id: {
                 month: { $month: '$createdAt' },
                 user: '$user',
               },
+            },
+          },
+          {
+            // Now count how many unique users were in that month
+            $group: {
+              _id: '$_id.month',
               count: { $sum: 1 },
             },
           },
@@ -161,7 +168,7 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
     },
   ]);
 
-  const totalSubscribers = result[0].totalSubscribers[0]?.count || 0;
+  const totalSubscriptions = result[0].totalSubscriptions[0]?.count || 0;
   const rawMonthlyStats = result[0].monthlyData;
 
   // --- Fill empty months with zero ---
@@ -183,7 +190,7 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
   const monthlyStats = Array.from({ length: 12 }, (_, i) => {
     const monthNumber = i + 1; // Months are 1-12 in MongoDB
     const monthData = rawMonthlyStats.find(
-      (item: any) => item._id === monthNumber
+      (item: any) => item._id === monthNumber,
     );
 
     return {
@@ -195,18 +202,18 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
   // Calculate total new users for THIS specific year from the filled data
   const totalNewSubscribersThisYear = monthlyStats.reduce(
     (acc: number, curr: any) => acc + curr.count,
-    0
+    0,
   );
 
   const growthPercentage =
-    totalSubscribers > 0
-      ? (totalNewSubscribersThisYear / totalSubscribers) * 100
+    totalSubscriptions > 0
+      ? (totalNewSubscribersThisYear / totalSubscriptions) * 100
       : 0;
 
   return {
     year,
     totalNewSubscribersThisYear,
-    totalSubscribers,
+    totalSubscriptions,
     growthPercentage: Number(growthPercentage.toFixed(2)),
     monthlyStats,
   };
