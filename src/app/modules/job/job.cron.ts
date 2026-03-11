@@ -383,6 +383,9 @@ export function startPrioritizedJobListCron() {
   nodeCron.schedule('*/10 * * * *', async () => {
     console.log('[CRON] Prioritizing job list started');
     try {
+      // reset prioritized job list
+      await Job.updateMany({ isPrioritized: true }, { isPrioritized: false });
+
       // get all employer users who have premium subscription
       const usersWithSubscription = await User.find({
         isDeleted: false,

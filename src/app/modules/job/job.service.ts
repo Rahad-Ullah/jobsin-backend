@@ -222,7 +222,7 @@ const getAllJobs = async (query: Record<string, unknown>, user: JwtPayload) => {
   }
 
   const jobQuery = new QueryBuilder(
-    Job.find(filter).sort('-updatedAt').lean(),
+    Job.find(filter).sort({ isPrioritized: -1, createdAt: -1 }).lean(),
     query,
   )
     .search(['category', 'subCategory'])
@@ -333,7 +333,7 @@ const getAllJobsPublic = async (query: Record<string, unknown>) => {
   }
 
   const jobQuery = new QueryBuilder(
-    Job.find(filter).sort('-updatedAt').lean(),
+    Job.find(filter).sort({ isPrioritized: -1, createdAt: -1 }).lean(),
     query,
   )
     .search(['category', 'subCategory'])
