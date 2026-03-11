@@ -148,7 +148,10 @@ const getMonthlySubscribersGrowth = async (query: Record<string, any>) => {
           },
           {
             $group: {
-              _id: { $month: '$createdAt' },
+              _id: {
+                month: { $month: '$createdAt' },
+                user: '$user',
+              },
               count: { $sum: 1 },
             },
           },
