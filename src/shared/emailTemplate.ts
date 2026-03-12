@@ -271,6 +271,9 @@ const hiringRequestToAdmin = (
                 <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
                     ${job.qualifications.map(qual => `<li>${qual}</li>`).join('')}
                 </ul>
+
+                <h4 style="margin: 15px 0 5px 0;">Weitere Details</h4>
+                <p style="margin: 0; padding-left: 20px; font-size: 13px;">${job.aboutCompany}</p>
             </div>
 
             <div style="margin-top: 20px; border: 1px solid #ccc; padding: 10px; display: flex; justify-content: space-between;">

@@ -111,8 +111,41 @@ const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
       to: platformEmail,
       subject: translatedSubject,
       html: `
+            <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 20px; padding: 20px; color: #555;">
               <p>Ihr Einstellungsantragsvertrag ist fertig.</p>
               <a href="${pdfUrl}" target="_blank">Download PDF</a>
+
+              <div style="padding: 10px 0; margin-top: 50px; text-align: left;">
+                <p style="font-size: 14px;">
+                  <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
+                </p>
+                <p style="margin: 0 0 20px 0; font-size: 14px;">
+                  <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
+                </p>
+
+                <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
+                  <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
+                </p>
+                
+                <table border="0" cellspacing="0" cellpadding="0" style="text-align: left;">
+                  <tr>
+                    <td style="font-size: 15px; font-weight: bold;">
+                      <a href="https://jobsinapp.de" style="color: inherit; text-decoration: none;">
+                        <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                        <span style="vertical-align: middle;">App Store</span>
+                      </a>
+                    </td>
+                    <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
+                    <td style="font-size: 15px; font-weight: bold;">
+                      <a href="https://jobsinapp.de" style="color: inherit; text-decoration: none;">
+                        <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+                        <span style="vertical-align: middle;">Google Play</span>
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </body>
             `,
     });
   }
