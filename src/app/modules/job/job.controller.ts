@@ -68,7 +68,7 @@ const sendHiringPostToAdmin = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: 'Hiring post sent successfully',
+      message: 'Hiring Request sent successfully',
       data: result,
     });
   },
