@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { Employer } from '../employer/employer.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { Job } from '../job/job.model';
 
 // ------------- create user -------------
 export const createUserIntoDB = async (
@@ -186,6 +187,9 @@ const deleteUserByIdFromDB = async (id: string) => {
     { isDeleted: true },
     { new: true },
   );
+
+  // delete all jobs of this user
+  await Job.updateMany({ author: id, isDeleted: false }, { isDeleted: true });
 
   return result;
 };
