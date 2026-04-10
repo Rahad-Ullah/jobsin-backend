@@ -16,6 +16,18 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// refresh access token
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.refreshTokenToDB(req.body);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Token refreshed successfully',
+    data: result,
+  });
+});
+
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { ...loginData } = req.body;
   const result = await AuthService.loginUserFromDB(loginData);
@@ -90,6 +102,7 @@ const changeAdminPassword = catchAsync(async (req: Request, res: Response) => {
 
 export const AuthController = {
   verifyEmail,
+  refreshToken,
   loginUser,
   forgetPassword,
   resetPassword,

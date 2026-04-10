@@ -33,6 +33,14 @@ const createVerifyEmailZodSchema = z.object({
   }),
 });
 
+const refreshAccessTokenZodSchema = z.object({
+  body: z.object({
+    refreshToken: z
+      .string({ required_error: 'Refresh token is required' })
+      .nonempty("Refresh token can't be empty!"),
+  }),
+});
+
 const createResetPasswordZodSchema = z.object({
   body: z.object({
     newPassword: z
@@ -90,6 +98,7 @@ const createChangeAdminPasswordZodSchema = z.object({
 
 export const AuthValidation = {
   createVerifyEmailZodSchema,
+  refreshAccessTokenZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,

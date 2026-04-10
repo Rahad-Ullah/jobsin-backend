@@ -276,6 +276,28 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
   return { data, message };
 };
 
+// refresh access token
+const refreshTokenToDB = async (payload: { refreshToken: string }) => {
+  const { refreshToken } = payload;
+  // decode token
+  const decodedToken = jwtHelper.verifyToken(
+    refreshToken,
+    config.jwt.refresh_secret as Secret,
+  );
+  
+  const isExistUser = await User.findOne({ _id: decodedToken.id })
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  const accessToken = jwtHelper.createToken(
+    { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.jwt_expire_in as string,
+  );
+  return { accessToken };
+};
+
 //forget password
 const resetPasswordToDB = async (
   token: string,
@@ -475,6 +497,7 @@ const changeAdminPasswordToDB = async (
 
 export const AuthService = {
   verifyEmailToDB,
+  refreshTokenToDB,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
