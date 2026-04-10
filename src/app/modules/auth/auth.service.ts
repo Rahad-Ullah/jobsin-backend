@@ -116,9 +116,16 @@ const loginUserFromDB = async (payload: ILoginData) => {
       config.jwt.jwt_secret as Secret,
       config.jwt.jwt_expire_in as string,
     );
+    // refresh token
+    const refreshToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.refresh_secret as Secret,
+      config.jwt.refresh_expire_in as string,
+    );
 
     data = {
       accessToken,
+      refreshToken,
       role: isExistUser.role,
       isProfileFulfilled: await User.isProfileFulfilled(isExistUser._id),
     };
@@ -232,7 +239,17 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       config.jwt.jwt_secret as Secret,
       config.jwt.jwt_expire_in as string,
     );
-    data = accessToken;
+    const refreshToken = jwtHelper.createRefreshToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.refresh_secret as Secret,
+      config.jwt.refresh_expire_in as string,
+    );
+    data = {
+      accessToken,
+      refreshToken,
+      role: isExistUser.role,
+      isProfileFulfilled: await User.isProfileFulfilled(isExistUser._id),
+    };
     message = 'Login Successful';
   } else {
     await User.findOneAndUpdate(
@@ -254,7 +271,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
     });
     message =
       'Verification Successful: Please securely store and utilize this code for reset password';
-    data = createToken;
+    data = { resetToken: createToken };
   }
   return { data, message };
 };

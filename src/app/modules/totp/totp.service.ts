@@ -51,6 +51,12 @@ async function verifyToken(userId: string, userOtp: string) {
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as string,
   );
+  // generate refresh token
+  const refreshToken = jwtHelper.createRefreshToken(
+    { id: user._id, role: user.role, email: user.email },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expire_in as string,
+  );
 
   // update user to set 2FA app active
   if (!user.authentication?.is2FAAppActive) {
@@ -61,6 +67,7 @@ async function verifyToken(userId: string, userOtp: string) {
 
   return {
     accessToken,
+    refreshToken,
     role: user.role,
     isProfileFulfilled: await User.isProfileFulfilled(user._id),
   };
