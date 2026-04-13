@@ -21,11 +21,20 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   }
 
+  // format address
+  const splittedAddress = existingUser.address.split(',');
+  const fullAddress = splittedAddress.slice(0, -1).join(', ').trim();
+  const onlyCountry = splittedAddress[splittedAddress.length - 1].trim();
+
   // create new Stripe customer if not exist
   if (!existingUser.stripeCustomerId) {
     const customer = await stripe.customers.create({
-      email: existingUser.email || '',
       name: existingUser.name,
+      email: existingUser.email || '',
+      address: {
+        line1: fullAddress,
+        country: onlyCountry,
+      },
       metadata: { userId: existingUser._id.toString() },
     });
 
@@ -40,6 +49,14 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
         'Failed to create Stripe customer',
       );
     }
+  } else {
+    // update user address
+    await stripe.customers.update(existingUser.stripeCustomerId, {
+      address: {
+        line1: fullAddress,
+        country: onlyCountry,
+      },
+    });
   }
 
   // check if the package exists
@@ -81,7 +98,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   });
 
   return checkoutSession.url;
-};;
+};;;
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
