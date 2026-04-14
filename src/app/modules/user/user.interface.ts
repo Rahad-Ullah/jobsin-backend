@@ -3,6 +3,7 @@ import { USER_ROLES, USER_STATUS } from './user.constant';
 
 export type IUser = {
   _id: Types.ObjectId;
+  serial: number;
   name: string;
   role: USER_ROLES;
   email: string;

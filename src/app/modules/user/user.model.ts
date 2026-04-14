@@ -5,6 +5,7 @@ import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import { IUser, UserModal } from './user.interface';
 import { USER_ROLES, USER_STATUS } from './user.constant';
+import mongooseSequence from 'mongoose-sequence';
 
 const userSchema = new Schema<IUser, UserModal>(
   {
@@ -152,6 +153,9 @@ const userSchema = new Schema<IUser, UserModal>(
 );
 // location index
 userSchema.index({ location: '2dsphere' });
+
+// Apply the auto-increment plugin to the schema
+userSchema.plugin(mongooseSequence, { inc_field: 'serial' });
 
 //exist user check
 userSchema.statics.isExistUserById = async (id: string) => {
