@@ -8,6 +8,39 @@ import { IWorker } from '../app/modules/worker/worker.interface';
 import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
+const footerContent = `
+  <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+    <p style="margin: 0 0 5px 0; font-size: 14px;">
+      <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
+    </p>
+    <p style="margin: 0 0 20px 0; font-size: 14px;">
+      <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
+    </p>
+
+    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
+      <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
+    </p>
+    
+    <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
+      <tr>
+        <td style="font-size: 15px; font-weight: bold;">
+          <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+            <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+            <span style="vertical-align: middle;">App Store</span>
+          </a>
+        </td>
+        <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
+        <td style="font-size: 15px; font-weight: bold;">
+          <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
+            <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
+            <span style="vertical-align: middle;">Google Play</span>
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
+`;
+
 const createAccount = (values: ICreateAccount) => {
   const data = {
     to: values.email,
@@ -30,6 +63,8 @@ const createAccount = (values: ICreateAccount) => {
                   </span>
                   <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Dieser Code ist für 3 Minuten gültig.</p>
               </div>
+
+              ${footerContent}
           </div>
       </body>
     `,
@@ -57,6 +92,8 @@ const resetPassword = (values: IResetPassword) => {
                     Falls Sie diesen Code nicht angefordert haben, können Sie diese E-Mail einfach ignorieren. Eventuell hat jemand anderes versehentlich Ihre E-Mail-Adresse eingegeben.
                   </p>
               </div>
+
+              ${footerContent}
           </div>
       </body>
     `,
@@ -94,6 +131,8 @@ const confirmAppointment = (values: IAppointment) => {
                     Falls Sie diesen Termin verschieben oder absagen müssen, melden Sie sich bitte in Ihrem Konto an oder kontaktieren Sie den Support.
                   </p>
               </div>
+
+              ${footerContent}
           </div>
       </body>
     `,
@@ -133,6 +172,8 @@ const supportReply = (values: ISupport & { reply: string }) => {
                       <strong>Ihr JobsinApp Support-Team</strong>
                   </p>
               </div>
+
+              ${footerContent}
           </div>
       </body>
     `,
@@ -174,6 +215,8 @@ const paymentFailed = (values: any) => {
                     <strong>Ihr JobsinApp Billing-Team</strong>
                 </p>
             </div>
+            
+            ${footerContent}
         </div>
       </body>
     `,
@@ -288,6 +331,7 @@ const hiringRequestToAdmin = (
             </div>
             <p style="font-size: 11px; font-style: italic; margin-top: 5px;">Der Auftraggeber hat den Vertrag durch Auswahl des Kontrollkästchens bestätigt, daher war keine Unterschrift erforderlich und die Vereinbarung ist nun in Kraft.</p>
 
+          ${footerContent}
         </div>
       </body>
     `,
@@ -392,6 +436,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
             </p>
           </div>
 
+          ${footerContent}
         </div>
       </body>
     `,
@@ -408,7 +453,7 @@ const jobSeekerAlert = (
     to: employerUser.email,
     subject: `🚀 ${jobSeekerUsers.length} passende Kandidaten gefunden - JobsinApp`, // "Qualified Candidates Found"
     html: `
-      <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
+      <body style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
@@ -461,43 +506,10 @@ const jobSeekerAlert = (
               .join('')}
           </div>
 
-          <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 5px 0; font-size: 14px;">
-              <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
-            </p>
-            <p style="margin: 0 0 20px 0; font-size: 14px;">
-              <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
-            </p>
-
-            <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
-              <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
-            </p>
-            
-            <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
-              <tr>
-                <td style="font-size: 15px; font-weight: bold;">
-                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
-                    <span style="vertical-align: middle;">App Store</span>
-                  </a>
-                </td>
-                <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
-                <td style="font-size: 15px; font-weight: bold;">
-                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
-                    <span style="vertical-align: middle;">Google Play</span>
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </div>
+          ${footerContent}
 
         </div>
-
-        <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} JobsinApp. Alle Rechte vorbehalten.</p>
-        </div>
-      </div>
+      </body>
     `,
   };
 
@@ -510,7 +522,7 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
     to: user.email,
     subject: `🚀 ${jobs.length} neue Job-Angebote - JobsinApp`, // "New Job Alerts"
     html: `
-      <div style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
+      <body style="font-family: 'Trebuchet MS', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; background-color: #f4f7f6;">
         <div style="max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border: 1px solid #e1e4e8;">
           
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
@@ -548,43 +560,10 @@ const jobAlert = (user: Partial<IUser>, jobs: IJob[]) => {
               .join('')}
           </div>
 
-          <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-            <p style="margin: 0 0 5px 0; font-size: 14px;">
-              <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
-            </p>
-            <p style="margin: 0 0 20px 0; font-size: 14px;">
-              <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
-            </p>
-
-            <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
-              <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
-            </p>
-            
-            <table border="0" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
-              <tr>
-                <td style="font-size: 15px; font-weight: bold;">
-                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/128/5977/5977575.png" alt="Apple" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
-                    <span style="vertical-align: middle;">App Store</span>
-                  </a>
-                </td>
-                <td style="padding: 0 15px; font-size: 18px; opacity: 0.5;">|</td>
-                <td style="font-size: 15px; font-weight: bold;">
-                  <a href="https://jobsinapp.de" style="color: #ffffff; text-decoration: none;">
-                    <img src="https://cdn-icons-png.flaticon.com/128/16076/16076057.png" alt="Google" style="width: 18px; margin-right: 5px; vertical-align: middle;" />
-                    <span style="vertical-align: middle;">Google Play</span>
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </div>
+          ${footerContent}
 
         </div>
-
-        <div style="text-align: center; font-size: 12px; color: #999; margin-top: 25px;">
-          <p style="margin: 0;">© ${new Date().getFullYear()} JobsinApp. Alle Rechte vorbehalten.</p>
-        </div>
-      </div>
+      </body>
     `,
   };
   return data;
