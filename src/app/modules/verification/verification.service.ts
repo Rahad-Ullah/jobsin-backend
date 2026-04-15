@@ -1,4 +1,6 @@
+import { sendNotifications } from '../../../helpers/notificationHelper';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { USER_ROLES } from '../user/user.constant';
 import { User } from '../user/user.model';
 import { VerificationStatus } from './verification.constants';
 import { IVerification } from './verification.interface';
@@ -18,6 +20,24 @@ const createVerificationToDB = async (
   }
 
   const result = await Verification.create(payload);
+
+  // send notification to admins
+  const admins = await User.find({
+    role: { $in: [USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN] },
+  });
+
+  const notificationPromises = admins.map(admin => {
+    return sendNotifications({
+      type: 'VERIFICATION_REQUEST',
+      title: 'New Verification Request',
+      message: `A new verification request is submitted.`,
+      receiver: admin._id,
+      referenceId: result._id.toString(),
+    });
+  });
+
+  await Promise.all(notificationPromises);
+
   return result;
 };
 

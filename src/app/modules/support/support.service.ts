@@ -7,23 +7,43 @@ import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import { User } from '../user/user.model';
 import { SupportStatus } from './support.constants';
+import { USER_ROLES } from '../user/user.constant';
+import { sendNotifications } from '../../../helpers/notificationHelper';
 
 // -------------- create support --------------
 const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
-  // check if the user submitted a support within 6 hours
+  // max 6 request per 6 hours
   const existingSupports = await Support.countDocuments({
     email: payload.email,
     status: SupportStatus.PENDING,
     createdAt: { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) },
   });
-  if (existingSupports >= 3) {
+  if (existingSupports >= 6) {
     throw new ApiError(
       StatusCodes.CONFLICT,
-      'We are processing your another requests. Please try again later.'
+      'We are processing your another requests. Please try again later.',
     );
   }
 
   const result = await Support.create(payload);
+
+  // send notification to admins
+  const admins = await User.find({
+    role: { $in: [USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN] },
+  });
+
+  const notificationPromises = admins.map(admin => {
+    return sendNotifications({
+      type: 'SUPPORT_REQUEST',
+      title: 'New Support Request',
+      message: `A new support request is submitted.`,
+      receiver: admin._id,
+      referenceId: result._id.toString(),
+    });
+  });
+
+  await Promise.all(notificationPromises);
+
   return result;
 };
 
