@@ -12,6 +12,7 @@ import { USER_ROLES } from '../user/user.constant';
 import { calculateExpireDate } from '../../../util/calculateExpireDate';
 import mongoose from 'mongoose';
 import { logger } from '../../../shared/logger';
+import { PackageName } from '../package/package.constants';
 
 // create subscription
 const createSubscription = async (payload: Partial<ISubscription>) => {
@@ -88,6 +89,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
       packageId: pkg._id.toString(),
     },
     subscription_data: {
+      trial_period_days: pkg.name === PackageName.BASIC ? undefined : 15,
       metadata: {
         userId: existingUser._id.toString(),
         packageId: pkg._id.toString(),

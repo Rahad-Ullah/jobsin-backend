@@ -9,15 +9,15 @@ import config from '../config';
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
 const footerContent = `
-  <div style="background: #074E5E; color: #fff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
-    <p style="margin: 0 0 5px 0; font-size: 14px;">
+  <div style="background: #074E5E; color: #ffffff; padding: 25px; border-radius: 10px; text-align: center; margin-top: 25px;">
+    <p style="margin: 0 0 5px 0; font-size: 14px; color: #ffffff;">
       <span style="margin-right: 8px;">✉</span> <strong>Email:</strong> info@jobsinapp.de
     </p>
-    <p style="margin: 0 0 20px 0; font-size: 14px;">
+    <p style="margin: 0 0 20px 0; font-size: 14px; color: #ffffff;">
       <span style="margin-right: 8px;">🔗</span> <strong>Website:</strong> jobsinapp.de
     </p>
 
-    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px;">
+    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 18px; color: #ffffff;">
       <span style="margin-right: 5px;">⬇</span> Laden Sie unsere mobile App herunter
     </p>
     

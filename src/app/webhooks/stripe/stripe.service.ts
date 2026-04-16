@@ -144,7 +144,7 @@ const onCustomerSubscriptionCreated = async (event: Stripe.Event) => {
       invoiceNumber: stripeInvoice.number!,
       periodStart: new Date(period.start * 1000),
       periodEnd: new Date(period.end * 1000),
-      amount: unitAmount,
+      amount: stripeInvoice.amount_paid / 100, // actual paid amount by this invoice
       currency: stripeSub.currency,
       status: InvoiceStatus.PAID,
       paidAt: new Date(stripeInvoice.status_transitions.paid_at! * 1000),
@@ -331,7 +331,7 @@ const onInvoicePaymentFailed = async (event: Stripe.Event) => {
       invoiceNumber: stripeInvoice.number!,
       periodStart: new Date(period.start * 1000),
       periodEnd: new Date(period.end * 1000),
-      amount: stripeInvoice.total / 100,
+      amount: stripeInvoice.amount_paid / 100,
       currency: stripeInvoice.currency,
       status: InvoiceStatus.RETRYING,
       paidAt: null,
