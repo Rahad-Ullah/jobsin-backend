@@ -50,7 +50,7 @@ const createSupportToDB = async (payload: ISupport): Promise<ISupport> => {
 // -------------- create support for logged in user --------------
 const createSupportForLoggedInUser = async (
   userId: string,
-  payload: ISupport
+  payload: ISupport,
 ): Promise<ISupport> => {
   // check if the user exists
   const existingUser = await User.findById(userId);
@@ -69,14 +69,32 @@ const createSupportForLoggedInUser = async (
     status: SupportStatus.PENDING,
     createdAt: { $gte: new Date(Date.now() - 6 * 60 * 60 * 1000) },
   });
-  if (existingSupports >= 3) {
+  if (existingSupports >= 6) {
     throw new ApiError(
       StatusCodes.CONFLICT,
-      'We are processing your another requests. Please try again later.'
+      'We are processing your another requests. Please try again later.',
     );
   }
 
   const result = await Support.create(payload);
+
+  // send notification to admins
+  const admins = await User.find({
+    role: { $in: [USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN] },
+  });
+
+  const notificationPromises = admins.map(admin => {
+    return sendNotifications({
+      type: 'SUPPORT_REQUEST',
+      title: 'New Support Request',
+      message: `A new support request is submitted.`,
+      receiver: admin._id,
+      referenceId: result._id.toString(),
+    });
+  });
+
+  await Promise.all(notificationPromises);
+
   return result;
 };
 
