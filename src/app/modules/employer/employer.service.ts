@@ -95,7 +95,7 @@ const getEmployerByUserId = async (
 ): Promise<IEmployer | null> => {
   const employer = await Employer.findOne({ user: userId }).populate(
     'user',
-    'name email role image phone address subscription status',
+    'name email role image serial phone address subscription status',
   );
   return employer;
 };
