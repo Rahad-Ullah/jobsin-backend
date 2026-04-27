@@ -69,6 +69,20 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
   }
 
+  // check if the package is already in use
+  const hasActiveSubscription = await Subscription.exists({
+    user: payload.user,
+    package: payload.package,
+    status: { $in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+  });
+
+  if (hasActiveSubscription) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'You are already using this package',
+    );
+  }
+
   // check if the user has used the package before
   const hasUsedThePackageBefore = await Subscription.exists({
     user: payload.user,
@@ -106,7 +120,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   });
 
   return checkoutSession.url;
-};
+};;;;;;;;
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
