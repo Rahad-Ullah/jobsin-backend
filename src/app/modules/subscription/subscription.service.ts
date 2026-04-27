@@ -69,6 +69,12 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Package not found');
   }
 
+  // check if the user has used the package before
+  const hasUsedThePackageBefore = await Subscription.exists({
+    user: payload.user,
+    package: payload.package,
+  });
+
   // create basic plan for free
   if (pkg.price === 0) {
     const subscription = await SubscriptionServices.giftSubscription(payload);
@@ -89,7 +95,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
       packageId: pkg._id.toString(),
     },
     subscription_data: {
-      trial_period_days: pkg.name === PackageName.BASIC ? undefined : 15,
+      trial_period_days: hasUsedThePackageBefore ? undefined : 15,
       metadata: {
         userId: existingUser._id.toString(),
         packageId: pkg._id.toString(),
@@ -100,7 +106,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   });
 
   return checkoutSession.url;
-};;;
+};
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
