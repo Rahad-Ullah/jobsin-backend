@@ -15,7 +15,6 @@ import { JwtPayload } from 'jsonwebtoken';
 import { Contact } from '../contact/contact.model';
 import { generatePdfFromHtml } from '../../../util/htmlToPdf';
 import { getDistance } from '../../../util/getDistance';
-import { translateHelper } from '../../../helpers/translateHelper';
 
 // --------------- create job post --------------
 const createJob = async (payload: IJob): Promise<IJob> => {
@@ -93,23 +92,16 @@ const sendHiringPostToAdmin = async (jobId: string, language?: string) => {
       platformEmail,
       contactInfo?.address as string,
     );
-    const translatedHtml = await translateHelper.translateHTML(
-      template.html,
-      language || 'de',
-    );
-    const translatedSubject = await translateHelper.translateHTML(
-      template.subject,
-      language || 'de',
-    );
+
     const fileName = `hiring-request-${existingJob._id}-${Date.now()}`;
-    await generatePdfFromHtml(translatedHtml, fileName);
+    await generatePdfFromHtml(template.html, fileName);
 
     // Public URL (served via express static)
     const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;
 
     await emailHelper.sendEmail({
       to: platformEmail,
-      subject: translatedSubject,
+      subject: template.subject,
       html: `
             <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 20px; padding: 20px; color: #555;">
               <p>Ihr Einstellungsantragsvertrag ist fertig.</p>

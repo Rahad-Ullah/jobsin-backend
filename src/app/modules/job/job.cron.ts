@@ -16,7 +16,6 @@ import { IEmployer } from '../employer/employer.interface';
 import { JobSeeker } from '../jobSeeker/jobSeeker.model';
 import { PackageName } from '../package/package.constants';
 import { JobStatus } from './job.constants';
-import { translateHelper } from '../../../helpers/translateHelper';
 
 // ############# CRON JOB FOR JOB SEEKER ALERT #############
 // ----------- CONFIG -----------
@@ -295,18 +294,11 @@ export function startJobAlertCron() {
         // 4️⃣ Send email notification
         if (emailNotification && email) {
           const template = emailTemplate.jobAlert(user, jobs);
-          const translatedSubject = await translateHelper.translateHTML(
-            template.subject,
-            'de',
-          );
-          const translatedHtml = await translateHelper.translateHTML(
-            template.html,
-            'de',
-          );
+
           await emailHelper.sendEmail({
             to: email,
-            subject: translatedSubject,
-            html: translatedHtml,
+            subject: template.subject,
+            html: template.html,
           });
         }
 

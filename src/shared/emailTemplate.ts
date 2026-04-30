@@ -185,7 +185,7 @@ const supportReply = (values: ISupport & { reply: string }) => {
 const paymentFailed = (values: any) => {
   const data = {
     to: values.email,
-    subject: values.subject || 'Zahlung fehlgeschlagen - JobsinApp', // "Payment Failed"
+    subject: 'Zahlung fehlgeschlagen - JobsinApp', // "Payment Failed"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 0; padding: 50px; color: #555;">
         <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
@@ -232,7 +232,7 @@ const hiringRequestToAdmin = (
 ) => {
   const data = {
     to: email,
-    subject: `Hiring Request: ${employer.name} - ${job.category} | JobsinApp`, // "Hiring Request"
+    subject: `Einstellungsanfrage: ${employer.name} - ${job.category} | JobsinApp`, // "Hiring Request"
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f0f0f0; padding: 20px; color: #333;">
         <div style="max-width: 700px; margin: 0 auto; background-color: #ffffff; padding: 40px; border: 1px solid #ddd;">
@@ -357,14 +357,14 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
 
   const data = {
     to: worker.email,
-    subject: `Your shift plan for ${planMonthYear} - JobsinApp`,
+    subject: `Ihr Schichtplan für ${planMonthYear} - JobsinApp`,  // 
     html: `
       <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #ffffff; margin: 0; padding: 40px; color: #333;">
         <div style="max-width: 800px; margin: 0 auto;">
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <div style="display: flex; align-items: center;">
-               <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Shift Plan View</h1>
+               <h1 style="font-size: 24px; margin: 0; font-weight: bold;">Schichtplanübersicht</h1>
             </div>
             <img src="https://jobsinapp.de/logo.png" alt="JobsinApp Logo" style="width: 80px;" />
           </div>
@@ -372,25 +372,25 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; font-size: 15px;">
             <div>
               <p style="margin: 5px 0;"><strong>Name</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${worker.name}</p>
-              <p style="margin: 5px 0; display: flex; gap: 7px"><strong>Address</strong> &nbsp;: <span>${worker.address}</span></p>
+              <p style="margin: 5px 0; display: flex; gap: 7px"><strong>Adresse</strong> &nbsp;: <span>${worker.address}</span></p>
             </div>
             <div>
               <p style="margin: 5px 0;"><strong>E-Mail</strong> &nbsp;&nbsp;&nbsp;&nbsp;: ${worker.email}</p>
-              <p style="margin: 5px 0;"><strong>Contact</strong> &nbsp;: ${worker.phone}</p>
+              <p style="margin: 5px 0;"><strong>Kontakt</strong> &nbsp;: ${worker.phone}</p>
             </div>
           </div>
 
           <div style="margin-bottom: 25px;">
-            <h2 style="font-size: 18px; margin: 0;">Plan for ${planMonthYear}</h2>
+            <h2 style="font-size: 18px; margin: 0;">Plan für ${planMonthYear}</h2>
           </div>
 
           <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
             <thead>
               <tr style="color: #333;">
-                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Date</th>
-                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Day</th>
-                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">Start — End</th>
-                <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Shift</th>
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Datum</th>
+                <th style="padding: 10px 0; font-weight: normal; width: 20%;">Wochentag</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: center; width: 30%;">Beginn — Ende</th>
+                <th style="padding: 10px 0; font-weight: normal; text-align: right; width: 20%;">Schicht</th>
               </tr>
             </thead>
             <tbody>
@@ -419,7 +419,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
           </table>
 
           <div style="margin-top: 40px;">
-            <h3 style="font-size: 18px; margin-bottom: 10px;">Tasks</h3>
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Aufgaben</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
               ${
                 shiftPlan.plans
@@ -430,7 +430,7 @@ const shiftPlanToWorker = (worker: IWorker, shiftPlan: IShiftPlan) => {
             </p>
           </div>
           <div style="margin-top: 40px;">
-            <h3 style="font-size: 18px; margin-bottom: 10px;">Notes</h3>
+            <h3 style="font-size: 18px; margin-bottom: 10px;">Anmerkungen</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.6;">
               ${shiftPlan.plans.find(p => p.remarks)?.remarks || ''}
             </p>

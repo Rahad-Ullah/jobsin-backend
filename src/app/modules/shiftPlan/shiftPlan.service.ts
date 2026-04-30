@@ -9,7 +9,6 @@ import { emailHelper } from '../../../helpers/emailHelper';
 import { emailTemplate } from '../../../shared/emailTemplate';
 import { generatePdfFromHtml } from '../../../util/htmlToPdf';
 import config from '../../../config';
-import { translateHelper } from '../../../helpers/translateHelper';
 
 // ------------ create shift plan --------------
 const createShiftPlanToDB = async (
@@ -76,23 +75,16 @@ const sendShiftPlanToWorker = async (
   // send mail
   if (worker.email) {
     const template = emailTemplate.shiftPlanToWorker(worker, existingPlan);
-    const translatedHtml = await translateHelper.translateHTML(
-      template.html,
-      language || 'de',
-    );
-    const translatedSubject = await translateHelper.translateHTML(
-      template.subject,
-      language || 'de',
-    );
+
     const fileName = `shift-plan-${existingPlan._id}-${Date.now()}`;
-    await generatePdfFromHtml(translatedHtml, fileName);
+    await generatePdfFromHtml(template.html, fileName);
 
     // Public URL (served via express static)
     const pdfUrl = `${config.backend_url}/documents/${fileName}.pdf`;
 
     await emailHelper.sendEmail({
       to: worker.email,
-      subject: translatedSubject,
+      subject: template.subject,
       html: `
               <body style="font-family: 'Trebuchet MS', sans-serif; background-color: #f9f9f9; margin: 20px; padding: 20px; color: #555;">
                 <p>Sie haben einen neuen Schichtplan.</p>
