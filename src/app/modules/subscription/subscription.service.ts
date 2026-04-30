@@ -103,6 +103,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
     success_url: `${config.frontend_url}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${config.frontend_url}/payment/cancel`,
     payment_method_collection: 'always', // Ensures Stripe collects the necessary info for PayPal/Klarna mandates
+    locale: 'de',
     client_reference_id: existingUser._id.toString(),
     metadata: {
       userId: existingUser._id.toString(),
@@ -120,7 +121,7 @@ const createSubscription = async (payload: Partial<ISubscription>) => {
   });
 
   return checkoutSession.url;
-};;;;;;;;
+};
 
 // gift subscription
 const giftSubscription = async (payload: Partial<ISubscription>) => {
