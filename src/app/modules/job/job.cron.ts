@@ -193,8 +193,8 @@ async function sendEmployerNotification(
       await sendNotifications({
         type: 'JOB_SEEKER_ALERT',
         receiver: employerUser._id,
-        title: `Job alert for ${category}`,
-        message: `Job alert for ${category}`,
+        title: `Candidate alert for ${category}`,
+        message: `Candidate alert for ${category}`,
         referenceId: user._id.toString(),
       });
 
