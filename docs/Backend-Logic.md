@@ -1,42 +1,59 @@
-# Backend Logic & Architecture Documentation
+# Backend Platform Features & Logic
 
-## Overview
-The JobsinApp backend is designed with a scalable, modular architecture using **Node.js, Express.js, and TypeScript**. The architecture follows the **Controller-Service-Route** (often akin to MVC) pattern which strictly separates concerns and ensures clean code maintainability.
+This document comprehensively outlines all the features running on the JobsinApp backend platform and explains the underlying business logic, storage paradigms, and functionality architectures.
 
-## Architectural Flow
-Every incoming request goes through the following lifecycle:
-1. **Router (`Routes`)**: Defines the API endpoints (`/api/v1/...`) and routes the incoming request to the specific Controller. Handles middleware execution (e.g., Auth, Zod Validation).
-2. **Controller**: Extracts data (body, params, query) from the HTTP request, invokes the corresponding Service function, and sends back the formatted HTTP response (using a standard overarching `sendResponse` utility). 
-3. **Service (`Business Logic Layer`)**: This is where the core logic lives. It processes data, communicates with external APIs (like DeepSeek, Stripe, Google APIs), and performs database interactions.
-4. **Model/DB (`Mongoose Layer`)**: The data layer that defines MongoDB schemas and interacts with the database.
+## 1. Platform Features Overview
+The core backend infrastructure comprises the following primary features:
+- **Authentication & Multi-Role User Management:** Handled natively via JWT, managing multiple user modalities (`JobSeeker`, `Employer`, `Admin`).
+- **Job Matching & Filtering Engine:** Uses Geospatial indexing algorithms and strict data types to query exact matches.
+- **DeepSeek AI Integration:** Powering automated salary estimates, category analysis, and recruitment chat capabilities.
+- **Automated Alerts Delivery:** Push and email notifications to keep job seekers and employers synced on job matches.
+- **Subscription & Stripe Payment Gateways:** Automated tracking of platform tiers (free and paid packages).
+- **Communication Module:** Supporting appointments, live chat, and direct messaging between employers and seekers.
 
-## Core Modules (`src/app/modules`)
-The application is feature-sliced into independent modules. Below are the prominent ones:
+## 2. In-Depth Logic & Workflows
 
-### 1. `auth` & `user` & `totp`
-- Manages user registrations, logins, profile updates.
-- Responsible for JWT generation, token verification, and password resets.
-- Integrates Google Two-Factor Authentication (TOTP) through `speakeasy`.
+### A. Job Matching Engine
+**How it works:**
+The job matching logic skips rudimentary string-matching in favor of complex MongoDB Aggregation & Filtering.
+1. **Location Proximity Logic**: The database uses `$geoWithin` spherical coordinates. When a job seeker searches for jobs within a specific radius, the backend utilizes the Haversine formula internally, projecting matches occurring strictly inside the bounding radius in Kilometers.
+2. **Criteria Overlaps**: Filtering occurs strictly across specific data vertices: `category`, `subCategory`, and a numerical threshold for `salaryAmount` (`$gte`).
 
-### 2. `job` & `category` & `application`
-- **Job**: Handling job postings, fetching job details, AI-based matching, and categorization.
-- **Application**: Managing user job applications and tracking application statuses.
+### B. Alerts & Notifications
+**How they work:**
+- **Job Alerts / JobSeeker Matches**: Notification systems use event-driven loops attached to Redis cache states. Whenever a new job matches the seeker's `experience` and `category` profile, a notification payload is structured.
+- **Trigger Frequency**: Profiles contain a `NotificationSettings` sub-schema identifying `repeat` mechanisms (e.g., Daily). Cron jobs or trigger functions iterate over user preferences evaluating `lastSentAt` timestamps to batch-dispatch notifications efficiently via NodeMailer (Emails) or specific push mechanisms.
 
-### 3. `subscription` & `stripeEvent` & `package` & `invoice`
-- Integrates **Stripe** for handling sub-payments and auto-renewals.
-- Validates webhooks strictly securely to manage user premium tiers, usage limitations, and invoicing.
+### C. Subscription Facilities & Free-Tier Limitations
+**How it works:**
+The platform relies on a continuous integration with Stripe Webhooks (`stripeEvent` and `invoice` modules) to auto-transition user `status` based on successful payments. Non-subscribed (meaning `BASIC` tier) users face hardcoded logic limitations (`limitation.service.ts`):
+- **Employers (Basic Plan)**:
+  - Can post a maximum of **5 new jobs per calendar month**.
+  - **Zero updates** allowed to existing jobs during the same month without upgrading.
+- **JobSeekers & Employers Interaction Limitations**:
+  - `BASIC` users are restricted to receiving **1 match notification per calendar month**.
+  - Employers mapping out interviews can create extremely restricted appointments (Maximum 5 global appointments/month; 1 per specific job; 1 per specific candidate limit).
+- Any violation triggers an immediate `402 Payment Required` HTTP response, forcing users toward premium conversion pipelines.
 
-### 4. `appointment` & `chat` & `message`
-- Real-time communication structures. Includes socket-based authentication and messaging architectures for seamless user-to-user communication.
+### D. Data Modeling & Storage
+The platform heavily segregates logic to keep base entities agile:
+- **Core User Data Store**: Secures base identity mapping. Stores Hashed Passwords, Registration Emails, standard Phone and Addresses, Point-based Coordinates (Lon/Lat) for strict map scaling, Apple/Google OAuth linking metadata, and 2FA secrets.
+- **JobSeeker Data Store**: Stores precise candidate details: `overview`, rich-text `about`, structured arrays of `experiences` mapping categories/salaries, and specific file references (PDF `attachments` / `resumeUrl`). Contains a global toggle (`isProfileVisible`) for privacy enforcement.
+- **Employer Data Store**: Retains rigid business details: `businessCategory`, `legalForm`, Corporate identifications (`Tax No`, `DE No`), WhatsApp contact funnels, and enterprise overviews.
 
-### 5. Utilities & Shared Services
-- **Mailing**: Using `nodemailer` for transactional emails.
-- **Uploads**: Handling file uploads (like Resume/PDFs) through `multer`, safely stored and occasionally cleaned up using `fs.unlink`.
-- **AI & APIs**: Modularized integration of DeepSeek AI for recruitment intelligence, Google Translate, and Google Places.
+**Data Visibility to Employers:**
+When an employer queries a candidate list securely, the payload undergoes filtration. Critical system data (like `password`, `stripeCustomerId`, Stripe data, 2FA credentials, Apple IDs) are hidden heavily via `select: 0` inside Mongoose queries. Employers receive public profile variables such as `name`, `experiences`, `overview`, `resumeUrl`, and calculated radial geographical distance from the job posting, assuring candidates privacy unless specific contact requests are initiated.
 
-## Middlewares used in Logic
-- `validateRequest`: Intercepts the request and parses the body against a **Zod** schema. If validation fails, it throws a standard error before reaching the controller.
-- `auth`: A guard middleware checking roles. E.g., `auth('ADMIN')` completely blocks standard users.
+### E. Additional Enterprise Features
 
-## Error Handling Logic
-Instead of sprinkling `try-catch` blocks randomly, the application utilizes a `globalErrorHandler`. Any synchronous or asynchronous errors are passed to the `next(error)` function. The global error handler strictly interprets the error (Zod Error, Mongoose Validation Error, JWT Error) and maps it into a consistent JSON format with actionable messages.
+1. **Shift Plan System & PDF Generation:**
+Employers can create internal Work Shift Schedules (`ShiftPlan`) assigned to explicitly invited registered employees (`Worker`). The backend automatically parses these MongoDB plans into a localized HTML template and utilizes `htmlToPdf` to synthesize exportable `.pdf` schedules. These files are asynchronously emailed to the remote employee's registered mailing address by leveraging integrated Nodemailer pipelines.
+
+2. **Real-time Private Chat Engine:**
+The implementation features a native inter-user messaging architecture. It uses advanced MongoDB sub-queries to instantly calculate the last sent message and total unread counts per chat list. A separate socket layer generally facilitates live event distribution across candidates and employers when matching occurs.
+
+3. **Invoicing & Automatic Refund Lifecycles:**
+All subscriptions map strictly to auto-generated native `Invoice` objects containing Stripe's `ChargeId` and `PaymentIntentId`. The backend contains strict automated refund structures: if a user or admin processes a refund, the server communicates with Stripe's Refund API to selectively remit the funds. Concurrently, the local Subscription status reverts to `CANCELED`, cutting off premium accesses and enforcing system synchronicity.
+
+4. **Personal File Drive Space:**
+Users hold access to a `Drive` management system traversing internal volumes. When assets (like generic profile files) are deposited via `multer`, the `Drive` schema tracks their virtual ownership. Deleting items directly queries OS-native `fs.unlink()` protocols, destroying orphaned blocks to systematically prevent storage bleeding.
