@@ -80,7 +80,7 @@ const getApplicationsByJobId = async (
     Application.find({ job: id, isDeleted: false }).populate([
       {
         path: 'user',
-        select: 'name email phone address image jobSeeker',
+        select: 'name email phone address image jobSeeker isDeleted',
         populate: {
           path: 'jobSeeker',
         },
